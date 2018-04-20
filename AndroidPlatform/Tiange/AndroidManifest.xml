@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.helpking.exporttounity">
+
+    <!-- SDK版本指定 -->
+    <uses-sdk
+        android:minSdkVersion="19"
+        android:maxSdkVersion="26"
+        android:targetSdkVersion="25"/>
+
+    <!-- 配置权限 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+
+    <!-- 屏幕设定 -->
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:anyDensity="true"/>
+
+    <application
+        android:allowBackup="true"
+        android:name="com.snowfish.cn.ganga.helper.SFOnlineApplication"
+        android:label="@string/app_name"
+        android:supportsRtl="true">
+
+        <!-- 易接设定 -->
+        <activity android:name="com.machong.UToASDK.OneSDK.GameMainActivity"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:label="@string/app_name">
+
+            <!-- <meta-data android:name="unityplayer.UnityActivity" android:value="true"/>
+            <meta-data android:name="unityplayer.ForwardNativeEventsToDalvik" android:value="true"/> -->
+
+            <!--  Unity3d相关  -->
+            <meta-data android:name="unityplayer.UnityActivity" android:value="true"/>
+            <meta-data android:name="android.app.lib_name" android:value="unity"/>
+            <meta-data android:name="unityplayer.ForwardNativeEventsToDalvik" android:value="false"/>
+        </activity>
+        <activity
+            android:name="com.machong.UToASDK.OneSDK.OneSDKSplashActivity"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <service android:name="com.snowfish.a.a.s.ABGSvc"
+            android:enabled="true"
+            android:process="com.snowfish.a.a.bg">
+            <intent-filter>
+                <action android:name="com.snowfish.a.a.s.ABGSvc"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </service>
+        <meta-data
+            android:name="com.snowfish.customer"
+            android:value="SNOWFISH">
+        </meta-data>
+        <meta-data
+            android:name="com.snowfish.channel"
+            android:value="SNOWFISH">
+        </meta-data>
+        <meta-data
+            android:name="com.snowfish.sdk.version"
+            android:value="2">
+        </meta-data>
+        <meta-data
+            android:name="com.snowfish.appid"
+            android:value="@string/app_id">
+        </meta-data>
+        <meta-data
+            android:name="com.snowfish.channelid"
+            android:value="{4ff036a1-3254eafe}"> <!-- 此参数不做修改，保持默认就行，打包会自动替换 -->
+        </meta-data>
+    </application>
+
+</manifest>
