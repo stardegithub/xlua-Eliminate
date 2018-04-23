@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="app_name">AdapterTest</string>
-    <string name="zy_class_name">com.yijie.cn.sdk.demo.MainActivity</string>
-
-</resources>

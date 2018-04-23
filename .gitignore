@@ -91,6 +91,4 @@ Assets/StreamingAssets.meta
 Assets/StreamingAssets/*
 BackUp/*
 
-Assets/Plugins/Android/res/*
-Assets/Plugins/Android/*.xml
-Assets/Plugins/Android/*.aar
+Assets/Plugins/Android/*.*

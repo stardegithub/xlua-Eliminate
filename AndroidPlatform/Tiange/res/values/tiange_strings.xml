@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!-- 易接设定 -->
+  <string name="zy_class_name">com.machong.UToASDK.OneSDK.GameMainActivity</string>
+  <string name="Tiange_GameName">UnityPlugins</string>
+  <string name="Tiange_OneSDK_AppID">{85659E99-04556EC0}</string>
+</resources>
