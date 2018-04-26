@@ -11,19 +11,18 @@ namespace GameSystem
     {
         [SerializeField]
         protected string luaFilePath;
-        protected string luaScript;
         protected LuaTable luaTable;
         protected Dictionary<string, Action<object>> messageMethodMap = new Dictionary<string, Action<object>>();
         protected Action awakeMethod, startMethod, onenableMethod, ondisableMethod, ondestroyMethod, updateMethod;
 
         void Awake()
         {
-            LoadLuaScript();
+            string luaScript = GetLuaScript();
             if (string.IsNullOrEmpty(luaScript))
             {
                 return;
             }
-            BindMethod();
+            BindMethod(luaScript);
             Facade.Instance.RemoveObserver(this, ObserverMessages);
             Facade.Instance.RegisterObserver(this, ObserverMessages);
 
@@ -87,16 +86,18 @@ namespace GameSystem
             }
         }
 
-        protected void LoadLuaScript()
+        protected string GetLuaScript()
         {
             if (string.IsNullOrEmpty(luaFilePath))
             {
-                return;
+                return null;
             }
-            luaScript = LoadAssetManager.LoadAssetStatic<TextAsset>(luaFilePath).text;
+            var ta = AssetBundles.DataLoader.Load<TextAsset>(luaFilePath);
+            if (ta == null) return null;
+            return ta.text;
         }
 
-        protected void BindMethod()
+        protected void BindMethod(string luaScript)
         {
             luaTable = LuaManager.Instance.LuaEnv.NewTable();
             LuaTable metaTable = LuaManager.Instance.LuaEnv.NewTable();

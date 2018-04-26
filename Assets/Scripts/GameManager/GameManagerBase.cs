@@ -1,4 +1,5 @@
 using System;
+using Common;
 using GameSystem;
 
 namespace GameManager
@@ -12,7 +13,7 @@ namespace GameManager
         void OnMemoryWarning(float currMem, float devMem, float perc);
     }
 
-    public abstract class GameManagerBase<T> : Singleton<T>, IGameManager where T : GameManagerBase<T>
+    public abstract class GameManagerBase<T> : SingletonMonoBehaviourBase<T>, IGameManager where T : GameManagerBase<T>
     {
         protected bool initialized;
 

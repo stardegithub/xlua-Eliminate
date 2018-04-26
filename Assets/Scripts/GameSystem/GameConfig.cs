@@ -15,7 +15,7 @@ namespace GameSystem
             {
                 if (instance == null)
                 {
-                    instance = LoadAssetManager.LoadAssetStatic<GameConfig>(GAME_CONFIG_PATH);
+                    instance = AssetBundles.DataLoader.Load<GameConfig>(GAME_CONFIG_PATH);
                 }
                 return instance;
             }

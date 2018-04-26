@@ -200,8 +200,11 @@ namespace GameManager
                 }
                 else if (gameStateInfos[i].type == GameConfig.GameStateType.Lua)
                 {
-                    string luaScript = LoadAssetManager.LoadAssetStatic<TextAsset>(gameStateInfos[i].context).text;
-                    gameStates[gameStateInfos[i].name] = new LuaGameState(gameStateInfos[i].name, luaScript);
+                    var ta = AssetBundles.DataLoader.Load<TextAsset>(gameStateInfos[i].context);
+                    if (ta != null)
+                    {
+                        gameStates[gameStateInfos[i].name] = new LuaGameState(gameStateInfos[i].name, ta.text);
+                    }
                 }
             }
 

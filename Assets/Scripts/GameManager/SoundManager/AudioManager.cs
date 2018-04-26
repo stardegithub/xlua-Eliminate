@@ -90,66 +90,36 @@ namespace GameManager
             }
         }
 
-        public LoadAssetsRequest PushAudioCache(string audioPath, Action<AudioClip> callBack)
+        public void PushAudioCache(string audioPath, Action<bool, string, AudioClip> callBack)
         {
-            return LoadAssetManager.Instance.LoadAssetAsync(audioPath, delegate (LoadAssetInfo loadAssetInfo)
+            StartCoroutine(AssetBundles.DataLoader.LoadAsync<AudioClip>(audioPath, (success, path, assetBundleType, audioClip) =>
             {
-                if (loadAssetInfo != null)
+                if (success)
                 {
-                    audioClipCachePool.Add(audioPath, loadAssetInfo.assetObject as AudioClip);
-                    if (callBack != null && loadAssetInfo.assetObject != null)
-                    {
-                        callBack(loadAssetInfo.assetObject as AudioClip);
-                    }
-                    else
-                    {
-                        callBack(null);
-                    }
+                    audioClipCachePool.Add(path, audioClip);
                 }
-                else if (callBack != null)
-                {
-                    callBack(null);
-                }
-            });
+                callBack(success, path, audioClip);
+            }));
         }
 
-        public LoadAssetsRequest PushAudioCaches(string[] audioPaths, Action<AudioClip[]> callBack)
+        public void PushAudioCaches(string[] audioPaths, Action<bool, string, AudioClip> callBack)
         {
-            return LoadAssetManager.Instance.LoadAssetsAsync(audioPaths, delegate (LoadAssetInfo[] loadAssetInfos)
+            foreach (var audioPath in audioPaths)
             {
-                if (loadAssetInfos != null)
-                {
-                    AudioClip[] audioClips = new AudioClip[loadAssetInfos.Length];
-                    for (int i = 0; i < loadAssetInfos.Length; i++)
-                    {
-                        if (loadAssetInfos[i] != null && loadAssetInfos[i].assetObject != null)
-                        {
-                            audioClips[i] = loadAssetInfos[i].assetObject as AudioClip;
-                            audioClipCachePool.Add(loadAssetInfos[i].assetPath, loadAssetInfos[i].assetObject as AudioClip);
-                        }
-                    }
-                    if (callBack != null)
-                    {
-                        callBack(audioClips);
-                    }
-                }
-                else if (callBack != null)
-                {
-                    callBack(null);
-                }
-            });
+                PushAudioCache(audioPath, callBack);
+            }
         }
 
         public void PlayAudio(string audioPath)
         {
-            if(string.IsNullOrEmpty(audioPath))
+            if (string.IsNullOrEmpty(audioPath))
             {
                 return;
             }
             AudioClip audioClip;
             if (!audioClipCachePool.TryGetValue(audioPath, out audioClip))
             {
-                audioClip = LoadAssetManager.Instance.LoadAsset<AudioClip>(audioPath);
+                audioClip = AssetBundles.DataLoader.Load<AudioClip>(audioPath);
                 if (audioClip != null)
                 {
                     audioClipCachePool.Add(audioPath, audioClip);

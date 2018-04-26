@@ -1,12 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Common;
 using GameManager;
 using UnityEngine;
 
 namespace GameSystem
 {
-    public class GameMain : Singleton<GameMain>
+    public class GameMain : SingletonMonoBehaviourBase<GameMain>
     {
         private bool initialized;
         public bool Initialized
@@ -47,7 +48,7 @@ namespace GameSystem
 
             if (GameConfig.Instance == null)
             {
-                Debug.LogError("game config asset not found");
+                Error("game config asset not found");
                 return;
             }
 
@@ -80,7 +81,7 @@ namespace GameSystem
         private void ShowExceptionPopup(Exception e, Action evtContinue, Action evtBreak, string prefix = null)
         {
             string msg = string.Format("{0} {1}\n{2}", prefix, e.Message, e.StackTrace);
-            Debug.LogError(msg);
+            Error(msg);
             // object[] param = new object[] { "Continue", evtContinue, "Break", evtBreak };
             //UIManager.MessageBox("ERROR", msg, UIMessageBox.ButtonType.TwoButton, param);
         }
@@ -90,7 +91,7 @@ namespace GameSystem
             loadLevelExceptionCount++;
             //print("exception count " + _loadLevelExceptionCount);
             string msg = string.Format("{0} {1}\n{2}", prefix, e.Message, e.StackTrace);
-            Debug.LogError(msg);
+            Error(msg);
             // object[] param = new object[] { "OK", evtConfirm };
             //UIManager.MessageBox("ERROR", msg, UIMessageBox.ButtonType.OneButton, param);
         }
@@ -206,12 +207,12 @@ namespace GameSystem
                     }
                     else
                     {
-                        Debug.LogErrorFormat("type is not singleton: {0}", name);
+                        Error("type is not singleton: {0}", name);
                     }
                 }
                 else
                 {
-                    // Debug.LogErrorFormat("type not found: {0}", name);
+                    Error("type not found: {0}", name);
                 }
             }
         }

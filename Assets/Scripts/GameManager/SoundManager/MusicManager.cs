@@ -86,7 +86,7 @@ namespace GameManager
 
         public void PlayMusic(string audioPath)
         {
-            AudioClip audioClip = LoadAssetManager.Instance.LoadAsset<AudioClip>(audioPath);
+            AudioClip audioClip = AssetBundles.DataLoader.Load<AudioClip>(audioPath);
             if (audioClip != null)
             {
                 PlayMusic(audioClip);
@@ -117,7 +117,7 @@ namespace GameManager
 
         public void FadeInMusic(string audioPath)
         {
-            AudioClip audioClip = LoadAssetManager.Instance.LoadAsset<AudioClip>(audioPath);
+            AudioClip audioClip = AssetBundles.DataLoader.Load<AudioClip>(audioPath);
             if (audioClip != null)
             {
                 FadeInMusic(audioClip);
@@ -144,7 +144,7 @@ namespace GameManager
 
         public void PlayBackgroundMusic(string audioPath)
         {
-            AudioClip audioClip = LoadAssetManager.Instance.LoadAsset<AudioClip>(audioPath);
+            AudioClip audioClip = AssetBundles.DataLoader.Load<AudioClip>(audioPath);
             if (audioClip != null)
             {
                 PlayBackgroundMusic(audioClip);
@@ -171,7 +171,7 @@ namespace GameManager
 
         public void FadeInBackgroundMusic(string audioPath)
         {
-            AudioClip audioClip = LoadAssetManager.Instance.LoadAsset<AudioClip>(audioPath);
+            AudioClip audioClip = AssetBundles.DataLoader.Load<AudioClip>(audioPath);
             if (audioClip != null)
             {
                 FadeInBackgroundMusic(audioClip);

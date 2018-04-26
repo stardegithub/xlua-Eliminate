@@ -60,12 +60,17 @@ namespace GameSystem
 
         protected void InitBinder()
         {
-            if (_binder != null)
+            if (luaFilePath == null || _binder != null)
             {
                 return;
             }
 
             string luaScript = GetLuaScript();
+            if (string.IsNullOrEmpty(luaScript))
+            {
+                return;
+            }
+
             LuaTable luaTable = LuaManager.Instance.LuaEnv.NewTable();
             LuaTable metaTable = LuaManager.Instance.LuaEnv.NewTable();
             metaTable.Set("__index", LuaManager.Instance.LuaEnv.Global);
@@ -91,7 +96,11 @@ namespace GameSystem
 
         public string GetLuaScript()
         {
-            var ta = LoadAssetManager.LoadAssetStatic<TextAsset>(luaFilePath);
+            if (string.IsNullOrEmpty(luaFilePath))
+            {
+                return null;
+            }
+            var ta = AssetBundles.DataLoader.Load<TextAsset>(luaFilePath);
             if (ta == null) return null;
             return ta.text;
         }
