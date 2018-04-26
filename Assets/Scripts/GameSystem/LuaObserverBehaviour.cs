@@ -7,7 +7,7 @@ using GameManager;
 
 namespace GameSystem
 {
-    public class LuaObserverView : ObserverView
+    public class LuaObserverBehaviour : ObserverBehaviour
     {
         [SerializeField]
         protected string luaFilePath;

@@ -12,9 +12,9 @@ public class Message : IMessage
     }
 
     /// <summary>
-    /// Get the string representation of the <c>Notification instance</c>
+    /// 消息转字符串
     /// </summary>
-    /// <returns>The string representation of the <c>Notification</c> instance</returns>
+    /// <returns></returns>
     public override string ToString()
     {
         string msg = "Notification Name: " + Name;
@@ -23,9 +23,9 @@ public class Message : IMessage
     }
 
     /// <summary>
-    /// The name of the <c>Notification</c> instance
+    /// 消息名字
     /// </summary>
-    /// <remarks>This accessor is thread safe</remarks>
+    /// <returns></returns>
     public virtual string Name
     {
         get
@@ -35,9 +35,9 @@ public class Message : IMessage
     }
 
     /// <summary>
-    /// The body of the <c>Notification</c> instance
+    /// 消息体
     /// </summary>
-    /// <remarks>This accessor is thread safe</remarks>
+    /// <returns></returns>
     public virtual object Body
     {
         get
