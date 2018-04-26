@@ -1,21 +1,44 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using Common;
 
 namespace UnitySocket
 {
-    public class TcpSocketClient
+    /// <summary>
+    /// tcp socket客服端类, 基于C#的Socket实现
+    /// </summary>
+    public class TcpSocketClient : ClassExtension
     {
+        /// <summary>
+        /// tcp socket
+        /// </summary>
         protected Socket tcpSocket;
+        /// <summary>
+        /// 异步连接操作事件
+        /// </summary>
         protected SocketAsyncEventArgs connectEventArgs;
 
-        public bool IsConnected { get; protected set; }
-        public long SendLatency { get; protected set; }
-        public long ReceiveInterval { get { return UserToken.ReceiveStopwatch.ElapsedMilliseconds; } }
+        /// <summary>
+        /// 请求连接的地址
+        /// </summary>
+        /// <returns></returns>
         public EndPoint RemoteEndPoint { get; protected set; }
+        /// <summary>
+        /// 异步请求操作对象
+        /// </summary>
+        /// <returns></returns>
         public TcpSocketUserToken UserToken { get; protected set; }
+        /// <summary>
+        /// tcp接收回调元素
+        /// </summary>
+        /// <returns></returns>
         public TcpSocketInvokeElement ReceiveInvokeElement { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="receiveBufferSize">最大接收缓存大小</param>
         public TcpSocketClient(int receiveBufferSize)
         {
             UserToken = new TcpSocketUserToken(receiveBufferSize);
@@ -26,6 +49,12 @@ namespace UnitySocket
             connectEventArgs.Completed += ConnectEventArg_Completed;
         }
 
+        /// <summary>
+        /// 异步连接服务器
+        /// </summary>
+        /// <param name="hostNameOrAddress">地址(支持ipv6)</param>
+        /// <param name="port">端口</param>
+        /// <param name="invokeElement">连接完成回调元素</param>
         public void ConnectServer(string hostNameOrAddress, int port, TcpSocketInvokeElement invokeElement)
         {
             EndPoint remoteEndPoint = null;
@@ -53,6 +82,11 @@ namespace UnitySocket
             ConnectServer(remoteEndPoint, invokeElement);
         }
 
+        /// <summary>
+        /// 异步连接服务器
+        /// </summary>
+        /// <param name="remoteEndPoint">请求连接的地址</param>
+        /// <param name="invokeElement">连接完成回调元素</param>
         public void ConnectServer(EndPoint remoteEndPoint, TcpSocketInvokeElement invokeElement)
         {
             if (remoteEndPoint == null)
@@ -67,7 +101,8 @@ namespace UnitySocket
             connectEventArgs.UserToken = invokeElement;
             connectEventArgs.RemoteEndPoint = remoteEndPoint;
 
-            ResetTimer();
+            Info("start connect server : {0}", remoteEndPoint);
+
             bool willRaiseEvent = tcpSocket.ConnectAsync(connectEventArgs);
             if (!willRaiseEvent)
             {
@@ -75,11 +110,21 @@ namespace UnitySocket
             }
         }
 
+        /// <summary>
+        /// 异步连接完成回调
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="connectEventArgs"></param>
         protected void ConnectEventArg_Completed(object sender, SocketAsyncEventArgs connectEventArgs)
         {
+            Info("connect server completed: {0}", connectEventArgs.SocketError);
             ProcessConnect(connectEventArgs);
         }
 
+        /// <summary>
+        /// 连接完成处理
+        /// </summary>
+        /// <param name="connectEventArgs"></param>
         protected void ProcessConnect(SocketAsyncEventArgs connectEventArgs)
         {
             if (connectEventArgs.SocketError == SocketError.Success || connectEventArgs.SocketError == SocketError.IsConnected)
@@ -111,6 +156,11 @@ namespace UnitySocket
             }
         }
 
+        /// <summary>
+        /// 异步请求（接收，发送）完成回调
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="asyncEventArgs"></param>
         protected void IO_Completed(object sender, SocketAsyncEventArgs asyncEventArgs)
         {
             var userToken = asyncEventArgs.UserToken as TcpSocketUserToken;
@@ -127,26 +177,27 @@ namespace UnitySocket
             }
         }
 
+        /// <summary>
+        /// 接收完成处理
+        /// </summary>
+        /// <param name="receiveEventArgs"></param>
         protected void ProcessReceive(SocketAsyncEventArgs receiveEventArgs)
         {
             var userToken = receiveEventArgs.UserToken as TcpSocketUserToken;
 
             if (userToken.ReceiveEventArgs.SocketError == SocketError.Success)
             {
-                // UnityEngine.Debug.Log("receive packet:" + userToken.ReceiveEventArgs.BytesTransferred);
+                // Info("receive packet:" + userToken.ReceiveEventArgs.BytesTransferred);
 
                 if (ReceiveInvokeElement != null && userToken.ReceiveEventArgs.BytesTransferred > 0)
                 {
-                    userToken.ReceiveStopwatch.Reset();
-                    userToken.ReceiveStopwatch.Start();
-
                     try
                     {
                         ReceiveInvokeElement.SocketCompletedInvoke(userToken);
                     }
                     catch (Exception e)
                     {
-                        UnityEngine.Debug.LogError("Process Receive Exception:" + e.ToString());
+                        Error("Process Receive Exception: {0}", e.ToString());
                     }
                 }
                 bool willRaiseEvent = userToken.TcpSocket.ReceiveAsync(userToken.ReceiveEventArgs); //投递接收请求
@@ -164,6 +215,10 @@ namespace UnitySocket
             }
         }
 
+        /// <summary>
+        /// 发送完成处理
+        /// </summary>
+        /// <param name="sendEventArgs"></param>
         protected void ProcessSend(SocketAsyncEventArgs sendEventArgs)
         {
             var userToken = sendEventArgs.UserToken as TcpSocketUserToken;
@@ -174,11 +229,10 @@ namespace UnitySocket
                 {
                     userToken.SendInvokeElement.SocketCompletedInvoke(userToken);
                 }
-                userToken.SendStopwatch.Stop();
-                SendLatency = userToken.SendStopwatch.ElapsedMilliseconds;
             }
             else
             {
+                Error("Process Send Error: ", sendEventArgs.SocketError);
                 if (userToken.SendInvokeElement != null)
                 {
                     userToken.SendInvokeElement.SocketErrorInvoke(userToken, userToken.ReceiveEventArgs.SocketError);
@@ -186,6 +240,12 @@ namespace UnitySocket
             }
         }
 
+        /// <summary>
+        /// 完成端口的异步发送，前一步次发送没完成前，后一次不能发送，建议发送用这种方法
+        /// </summary>
+        /// <param name="buffer">发送数据</param>
+        /// <param name="invokeElement">发送完成回调元素</param>
+        /// <returns></returns>
         public bool SendAsync(byte[] buffer, TcpSocketInvokeElement invokeElement)
         {
             if (UserToken.TcpSocket == null || !UserToken.LockSendState()) return false;
@@ -195,8 +255,6 @@ namespace UnitySocket
                 return false;
             }
             UserToken.SendInvokeElement = invokeElement;
-            UserToken.SendStopwatch.Reset();
-            UserToken.SendStopwatch.Start();
 
             UserToken.SendEventArgs.SetBuffer(buffer, 0, buffer.Length);
             bool willRaiseEvent = UserToken.TcpSocket.SendAsync(UserToken.SendEventArgs);
@@ -207,6 +265,11 @@ namespace UnitySocket
             return true;
         }
 
+        /// <summary>
+        /// 异步发送，前一步次发送没完成，不影响后一次发送，强连接使用，比如帧同步战斗数据发送
+        /// </summary>
+        /// <param name="buffer">发送数据</param>
+        /// <param name="invokeElement">发送完成回调元素</param>
         public void BeginSend(byte[] buffer, TcpSocketInvokeElement invokeElement)
         {
             if (UserToken.TcpSocket == null) return;
@@ -217,11 +280,14 @@ namespace UnitySocket
             }
             TcpSocketSendState sendState = new TcpSocketSendState(UserToken.TcpSocket);
             sendState.SendInvokeElement = invokeElement;
-            sendState.SendStopwatch.Start();
             sendState.Buffer = buffer;
             UserToken.TcpSocket.BeginSend(sendState.Buffer, sendState.CurrentLength, sendState.TargetLength, SocketFlags.None, out sendState.errorCode, new AsyncCallback(EndSend), sendState);
         }
 
+        /// <summary>
+        /// 异步发送接收结束回调
+        /// </summary>
+        /// <param name="ar"></param>
         private void EndSend(IAsyncResult ar)
         {
             TcpSocketSendState sendState = ar.AsyncState as TcpSocketSendState;
@@ -239,13 +305,12 @@ namespace UnitySocket
                     if (sendState.SendInvokeElement != null)
                     {
                         sendState.SendInvokeElement.SocketCompletedInvoke(UserToken);
-                        sendState.SendStopwatch.Stop();
-                        SendLatency = sendState.SendStopwatch.ElapsedMilliseconds;
                     }
                 }
             }
             else
             {
+                Error("End Send Error: ", sendState.errorCode);
                 if (sendState.SendInvokeElement != null)
                 {
                     sendState.SendInvokeElement.SocketErrorInvoke(UserToken, sendState.errorCode);
@@ -253,6 +318,11 @@ namespace UnitySocket
             }
         }
 
+        /// <summary>
+        /// 同步发送
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="errorCode"></param>
         public void Send(byte[] buffer, out SocketError errorCode)
         {
             if (UserToken.TcpSocket == null)
@@ -263,19 +333,19 @@ namespace UnitySocket
             UserToken.TcpSocket.Send(buffer, 0, buffer.Length, SocketFlags.None, out errorCode);
         }
 
+        /// <summary>
+        /// 重连
+        /// </summary>
+        /// <param name="invokeElement">重连完成回调元素</param>
         public void ReconnectSocket(TcpSocketInvokeElement invokeElement)
         {
             UserToken.TcpSocket.Close();
             ConnectServer(RemoteEndPoint, invokeElement);
         }
 
-        public void ResetTimer()
-        {
-            UserToken.SendStopwatch.Reset();
-            UserToken.ReceiveStopwatch.Reset();
-            UserToken.ReceiveStopwatch.Start();
-        }
-
+        /// <summary>
+        /// 关闭
+        /// </summary>
         public void CloseSocket()
         {
             if (UserToken.TcpSocket == null) return;
@@ -286,8 +356,6 @@ namespace UnitySocket
             UserToken.ReceiveEventArgs = null;
             UserToken.SendEventArgs.Dispose();
             UserToken.SendEventArgs = null;
-            UserToken.SendStopwatch.Reset();
-            UserToken.ReceiveStopwatch.Reset();
         }
     }
 }
