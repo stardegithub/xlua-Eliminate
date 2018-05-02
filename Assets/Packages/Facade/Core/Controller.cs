@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// 控制器，核心类
+/// </summary>
 public class Controller : IController
 {
     protected IDictionary<string, Type> _commandMap;
     protected IDictionary<IObserver, List<string>> _observerMap;
 
-    protected static volatile IController m_instance;
-    protected readonly object m_syncRoot = new object();
-    protected static readonly object m_staticSyncRoot = new object();
+    protected static volatile IController _instance;
+    protected readonly object _syncRoot = new object();
+    protected static readonly object _staticSyncRoot = new object();
 
     protected Controller()
     {
@@ -19,32 +22,43 @@ public class Controller : IController
     {
     }
 
+    /// <summary>
+    /// 单例
+    /// </summary>
+    /// <returns></returns>
     public static IController Instance
     {
         get
         {
-            if (m_instance == null)
+            if (_instance == null)
             {
-                lock (m_staticSyncRoot)
+                lock (_staticSyncRoot)
                 {
-                    if (m_instance == null) m_instance = new Controller();
+                    if (_instance == null) _instance = new Controller();
                 }
             }
-            return m_instance;
+            return _instance;
         }
     }
 
+    /// <summary>
+    /// 初始化
+    /// </summary>
     protected virtual void InitializeController()
     {
         _commandMap = new Dictionary<string, Type>();
         _observerMap = new Dictionary<IObserver, List<string>>();
     }
 
+    /// <summary>
+    /// 通知消息，注册了对应消息的事件命令执行，监听对应消息的观察者作出反应
+    /// </summary>
+    /// <param name="message">消息</param>
     public virtual void NotifyMessage(IMessage message)
     {
         Type commandType = null;
         List<IObserver> views = null;
-        lock (m_syncRoot)
+        lock (_syncRoot)
         {
             if (_commandMap.ContainsKey(message.Name))
             {
@@ -79,18 +93,28 @@ public class Controller : IController
             views = null;
         }
     }
-
+    
+    /// <summary>
+    /// 注册事件命令，收到消息执行对应命令
+    /// </summary>
+    /// <param name="messageName">消息名字</param>
+    /// <param name="commandType">命令类</param>
     public virtual void RegisterCommand(string messageName, Type commandType)
     {
-        lock (m_syncRoot)
+        lock (_syncRoot)
         {
             _commandMap[messageName] = commandType;
         }
     }
 
+    /// <summary>
+    /// 注册观察者，观察者监听到消息后作出反应
+    /// </summary>
+    /// <param name="observer">观察者</param>
+    /// <param name="messageNames">监听消息的名字</param>
     public virtual void RegisterObserver(IObserver observer, List<string> messageNames)
     {
-        lock (m_syncRoot)
+        lock (_syncRoot)
         {
             if (_observerMap.ContainsKey(observer))
             {
@@ -110,9 +134,13 @@ public class Controller : IController
         }
     }
 
+    /// <summary>
+    /// 移除事件命令
+    /// </summary>
+    /// <param name="messageName">消息名字</param>
     public virtual void RemoveCommand(string messageName)
     {
-        lock (m_syncRoot)
+        lock (_syncRoot)
         {
             if (_commandMap.ContainsKey(messageName))
             {
@@ -121,9 +149,13 @@ public class Controller : IController
         }
     }
 
+    /// <summary>
+    /// 移除观察者
+    /// </summary>
+    /// <param name="observer">观察者</param>
     public virtual void RemoveObserver(IObserver observer, List<string> messageNames)
     {
-        lock (m_syncRoot)
+        lock (_syncRoot)
         {
             if (_observerMap.ContainsKey(observer))
             {
@@ -143,17 +175,25 @@ public class Controller : IController
         }
     }
 
+    /// <summary>
+    /// 是否有对应消息的事件命令
+    /// </summary>
+    /// <param name="messageName"></param>
+    /// <returns></returns>
     public virtual bool HasCommand(string messageName)
     {
-        lock (m_syncRoot)
+        lock (_syncRoot)
         {
             return _commandMap.ContainsKey(messageName);
         }
     }
 
+    /// <summary>
+    /// 清理事件命令池，观察者池
+    /// </summary>
     public virtual void ClearAll()
     {
-        lock (m_syncRoot)
+        lock (_syncRoot)
         {
             _commandMap.Clear();
             _observerMap.Clear();

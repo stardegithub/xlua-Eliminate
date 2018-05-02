@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
+/// <summary>
+/// 通用的观察者
+/// </summary>
 public class ControllerObserver : IObserver
 {
     protected Dictionary<string, Action<object>> messageMethodMap;
@@ -44,7 +47,10 @@ public class ControllerObserver : IObserver
     }
 }
 
-public class ObserverView : MonoBehaviour, IObserver
+/// <summary>
+/// MonoBehaviour类型观察者基类
+/// </summary>
+public class ObserverBehaviour : MonoBehaviour, IObserver
 {
     public virtual List<string> ObserverMessages { get; protected set; }
 

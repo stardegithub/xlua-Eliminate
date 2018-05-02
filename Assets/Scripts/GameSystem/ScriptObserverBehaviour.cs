@@ -5,7 +5,7 @@ using System;
 
 namespace GameSystem
 {
-    public class ScriptObserverView : ObserverView
+    public class ScriptObserverBehaviour : ObserverBehaviour
     {
         [SerializeField]
         protected string scriptName;
