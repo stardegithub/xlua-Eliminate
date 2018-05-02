@@ -28,8 +28,6 @@ namespace GameManager
         private int heartbeatInterval;
         private int maxReceiveInterval;
 
-        public long NetworkLatency { get { return tcpClient.SendLatency; } }
-
         public bool IsConnected { get { return tcpSocketState > 0; } }
 
         #region Singleton
@@ -265,7 +263,6 @@ namespace GameManager
                     {
                         UnityEngine.Debug.LogWarning("Reconnect --> TcpSocket is Connected");
 
-                        tcpClient.ResetTimer();
                         ReconnectCompleted();
                         // invokeElement.SocketCompletedInvoke(userToken);
                         SendMsgPacket();

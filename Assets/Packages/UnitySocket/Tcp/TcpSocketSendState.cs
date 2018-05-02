@@ -4,6 +4,9 @@ using System.Net.Sockets;
 
 namespace UnitySocket
 {
+    /// <summary>
+    /// 异步发送
+    /// </summary>
     public class TcpSocketSendState
     {
         protected Socket tcpSocket;
@@ -27,7 +30,6 @@ namespace UnitySocket
 
         public int TargetLength { get; protected set; }
         public int CurrentLength { get; set; }
-        public Stopwatch SendStopwatch { get; set; }
         public TcpSocketInvokeElement SendInvokeElement { get; set; }
 
 
@@ -35,7 +37,6 @@ namespace UnitySocket
         {
             tcpSocket = socket;
             CurrentLength = 0;
-            SendStopwatch = new Stopwatch();
         }
     }
 }

@@ -5,6 +5,9 @@ using System.Threading;
 
 namespace UnitySocket
 {
+    /// <summary>
+    /// 异步请求操作对象(完成端口)
+    /// </summary>
     public class TcpSocketUserToken
     {
         protected Socket tcpSocket;
@@ -40,12 +43,6 @@ namespace UnitySocket
         protected DateTime connectDateTime;
         public DateTime ConnectDateTime { get { return connectDateTime; } set { connectDateTime = value; } }
 
-        protected Stopwatch sendStopwatch;
-        public Stopwatch SendStopwatch { get { return sendStopwatch; } set { sendStopwatch = value; } }
-
-        protected Stopwatch receiveStopwatch;
-        public Stopwatch ReceiveStopwatch { get { return receiveStopwatch; } set { receiveStopwatch = value; } }
-
         public TcpSocketUserToken(int receiveBufferSize)
         {
             receiveEventArgs = new SocketAsyncEventArgs();
@@ -55,16 +52,21 @@ namespace UnitySocket
 
             sendEventArgs = new SocketAsyncEventArgs();
             sendEventArgs.UserToken = this;
-
-            sendStopwatch = new Stopwatch();
-            ReceiveStopwatch = new Stopwatch();
         }
 
+        /// <summary>
+        /// 用原子锁修改发送状态
+        /// </summary>
+        /// <returns></returns>
         public bool LockSendState()
         {
             return Interlocked.CompareExchange(ref sendState, 1, 0) == 0;
         }
 
+        /// <summary>
+        /// 用原子锁解锁发送状态
+        /// </summary>
+        /// <returns></returns>
         public bool UnLockSendState()
         {
             return Interlocked.Exchange(ref sendState, 0) == 1;
