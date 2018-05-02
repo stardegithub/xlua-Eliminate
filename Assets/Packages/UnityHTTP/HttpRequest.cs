@@ -3,22 +3,37 @@ using System.Net;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using Common;
 
 namespace UnityHttp
 {
     public delegate void HttpResponseHandler(bool isSuccess, HttpStatusCode httpStatusCode, string response);
 
-    public class HttpRequest
+    /// <summary>
+    /// http请求类，基于C#的HttpWebRequest实现
+    /// </summary>
+    public class HttpRequest : ClassExtension
     {
         private int retryCount = 1;
         private byte[] paramBytes;
 
+        /// <summary>
+        /// http同步请求结束回调
+        /// </summary>
         public event HttpResponseHandler httpRequestCallback;
+
+        /// <summary>
+        /// http异步请求结束回调
+        /// </summary>
         public event HttpResponseHandler asyncHttpRequestCallback;
 
+        /// <summary>
+        /// 创建http同步请求
+        /// </summary>
+        /// <param name="requestInfo">请求信息</param>
         public void CreateHttpRequest(HttpRequestInfo requestInfo)
         {
-            Print("HttpRequest[{0}]: {1}", retryCount, requestInfo);
+            Info("HttpRequest[{0}]: {1}", retryCount, requestInfo);
             // ignore SSL certificate errors
             ServicePointManager.ServerCertificateValidationCallback += (s, ce, ca, p) => true;
 
@@ -46,7 +61,7 @@ namespace UnityHttp
             }
             catch (Exception e)
             {
-                Print("retryCount={0}, error={1}", retryCount, e.Message);
+                Error("retryCount={0}, error={1}", retryCount, e.Message);
                 request.Abort();
                 RetryRequest(requestInfo, HttpStatusCode.BadRequest, e.Message);
                 return;
@@ -61,13 +76,13 @@ namespace UnityHttp
 
                 if (response.StatusCode == HttpStatusCode.Created || response.StatusCode == HttpStatusCode.OK)
                 {
-                    Print("HttpResponse[{0}]: {1},{2},{3}", retryCount, "true", response.StatusCode, responseJson);
+                    Info("HttpResponse[{0}]: {1},{2},{3}", retryCount, "true", response.StatusCode, responseJson);
                     retryCount = 1;
                     httpRequestCallback.Invoke(true, response.StatusCode, responseJson);
                 }
                 else
                 {
-                    Print("retryCount={0}, status={1}, response={2}", retryCount, response.StatusCode, responseJson);
+                    Info("retryCount={0}, status={1}, response={2}", retryCount, response.StatusCode, responseJson);
                     request.Abort();
                     RetryRequest(requestInfo, response.StatusCode, responseJson);
                 }
@@ -76,16 +91,20 @@ namespace UnityHttp
             }
             catch (Exception e)
             {
-                Print("HttpResponse[{0}]: {1},{2},{3}", "false", retryCount, HttpStatusCode.ExpectationFailed, e.Message);
+                Error("HttpResponse[{0}]: {1},{2},{3}", "false", retryCount, HttpStatusCode.ExpectationFailed, e.Message);
                 retryCount = 1;
                 request.Abort();
                 httpRequestCallback.Invoke(false, HttpStatusCode.ExpectationFailed, e.Message);
             }
         }
 
+        /// <summary>
+        /// 创建http异步请求
+        /// </summary>
+        /// <param name="requestInfo">请求信息</param>
         public void CreateAsyncHttpRequest(HttpRequestInfo requestInfo)
         {
-            Print("HttpRequest[{0}]: {1}", retryCount, requestInfo);
+            Info("HttpRequest[{0}]: {1}", retryCount, requestInfo);
             // ignore SSL certificate errors
             ServicePointManager.ServerCertificateValidationCallback += (s, ce, ca, p) => true;
 
@@ -143,7 +162,7 @@ namespace UnityHttp
             retryCount = retryCount + 1;
             if (retryCount > 3)
             {
-                Print("HttpResponse[{0}]: {1},{2},{3}", retryCount - 1, "false", httpStatusCode, error);
+                Info("HttpResponse[{0}]: {1},{2},{3}", retryCount - 1, "false", httpStatusCode, error);
                 retryCount = 1;
                 httpRequestCallback.Invoke(false, httpStatusCode, error);
             }
@@ -152,21 +171,29 @@ namespace UnityHttp
                 CreateHttpRequest(requestInfo);
             }
         }
-
-        private static void Print(String format, params object[] args)
-        {
-            // UnityEngine.Debug.LogFormat("<color=yellow>[Web]" + format + "</color>", args);
-            UnityEngine.Debug.LogFormat("[Web]" + format, args);
-        }
     }
 
+    /// <summary>
+    /// http请求消息类
+    /// </summary>
     public class HttpRequestInfo
     {
+        /// <summary>
+        /// 地址
+        /// </summary>
+        /// <returns></returns>
         public string URL { get; set; }
 
+        /// <summary>
+        /// 请求方法（post，get）
+        /// </summary>
+        /// <returns></returns>
         public string Method { get; set; }
 
         private Dictionary<string, string> param;
+        /// <summary>
+        /// 参数
+        /// </summary>
         public string Param
         {
             get
@@ -188,6 +215,10 @@ namespace UnityHttp
         }
 
         private Dictionary<string, string> headers;
+        /// <summary>
+        /// 消息头
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<string, string> Headers { get { return headers; } }
 
         public HttpRequestInfo()
@@ -198,16 +229,30 @@ namespace UnityHttp
             param = new Dictionary<string, string>();
         }
 
+        /// <summary>
+        /// 添加请求参数
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="value">value</param>
         public void AddParam(string key, string value)
         {
             param.Add(key, value);
         }
 
+        /// <summary>
+        /// 添加消息头
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="value">value</param>
         public void AddHeader(string key, string value)
         {
             headers.Add(key, value);
         }
 
+        /// <summary>
+        /// 转字符串
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return string.Format("url:{0},method:{1},content:{2}", URL, Method, Param);
