@@ -14,6 +14,8 @@ namespace GameSystem
     {
         public string luaFilePath;
 
+        
+
         private Action<ObservableMessage> _onBindingEvent = delegate { };
         public event Action<ObservableMessage> OnBindingUpdate
         {
@@ -80,10 +82,13 @@ namespace GameSystem
             Action<string, object> action = NotifyProperty;
             luaTable.Set("notifyproperty", action);
             luaTable.Set("self", this.gameObject);
+            LuaManager.Instance.LuaEnv.DoString(@"
+            function set(key, value)
+                _ENV[key] = value
+                notifyproperty(key, value)
+            end", GetType().Name, luaTable);
             LuaManager.Instance.LuaEnv.DoString(luaScript, GetType().Name, luaTable);
             _binder = new LuaModelBinder(this, luaTable);
-
-            LuaManager.Instance.LuaEnv.DoString(@"set('Text', 'ddddd')", GetType().Name, luaTable);
         }
 
         protected virtual void OnDestroy()
