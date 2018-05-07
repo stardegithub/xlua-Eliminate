@@ -15,7 +15,7 @@ namespace GameSystem
         [HideInInspector]
         public TextAsset _luaText;
         [HideInInspector]
-        public string _luaFilePath;
+        public string _luaTextPath;
 
         private Action awakeMethod, startMethod, onenableMethod, ondisableMethod, ondestroyMethod, updateMethod;
 
@@ -164,11 +164,11 @@ namespace GameSystem
         {
             if (_luaText == null)
             {
-                if (string.IsNullOrEmpty(_luaFilePath))
+                if (string.IsNullOrEmpty(_luaTextPath))
                 {
                     return null;
                 }
-                _luaText = AssetBundles.DataLoader.Load<TextAsset>(_luaFilePath);
+                _luaText = AssetBundles.DataLoader.Load<TextAsset>(_luaTextPath);
             }
 
             if (_luaText == null) return null;

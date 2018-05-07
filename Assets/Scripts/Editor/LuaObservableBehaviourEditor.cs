@@ -11,11 +11,18 @@ namespace GameEditor
         {
             base.OnInspectorGUI();
             var lob = target as LuaObservableBehaviour;
-            var newTxtAsset = EditorGUILayout.ObjectField("LuaText", lob._luaText, typeof(TextAsset), true) as TextAsset;
-            if (newTxtAsset != lob._luaText)
+            var newLuaText = EditorGUILayout.ObjectField("LuaText", lob._luaText, typeof(TextAsset), true) as TextAsset;
+            if (newLuaText != lob._luaText)
             {
-                lob._luaText = newTxtAsset;
-                lob._luaFilePath = AssetDatabase.GetAssetPath(newTxtAsset);
+                lob._luaText = newLuaText;
+                lob._luaTextPath = AssetDatabase.GetAssetPath(newLuaText);
+            }
+
+            var newLuaTextPath = EditorGUILayout.TextField("LuaTextPath", lob._luaTextPath);
+            if (newLuaTextPath != lob._luaTextPath)
+            {
+                lob._luaText = AssetDatabase.LoadAssetAtPath<TextAsset>(newLuaTextPath);
+                lob._luaTextPath = newLuaTextPath;
             }
         }
     }
