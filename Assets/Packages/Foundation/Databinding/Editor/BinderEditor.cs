@@ -12,15 +12,44 @@ using System.Reflection;
 using Foundation.Databinding;
 using UnityEditor;
 using UnityEngine;
+using XLua;
 
 namespace Foundation.Editor
 {
     /// <summary>
     ///     Handles the finding of the Context
     /// </summary>
-    [CustomEditor(typeof (BindingBase), true)]
+    [CustomEditor(typeof(BindingBase), true)]
     public class BinderEditor : UnityEditor.Editor
     {
+        LuaEnv luaEnv;
+        LuaTable luaTable;
+
+        void OnEnable()
+        {
+            if (luaTable == null)
+            {
+                luaEnv = new LuaEnv();
+                luaTable = luaEnv.NewTable();
+                LuaTable metaTable = luaEnv.NewTable();
+                metaTable.Set("__index", luaEnv.Global);
+                luaTable.SetMetaTable(metaTable);
+                metaTable.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// This function is called when the behaviour becomes disabled or inactive.
+        /// </summary>
+        void OnDisable()
+        {
+            if (luaTable != null)
+            {
+                luaTable.Dispose();
+                luaEnv.Dispose();
+            }
+        }
+
         protected BindingBase Target;
 
         public override void OnInspectorGUI()
@@ -44,8 +73,8 @@ namespace Foundation.Editor
             }
             else
             {
-                Target.Init();
 
+                Target.Init();
 
                 foreach (var binding in Target.GetBindingInfos())
                 {
@@ -61,43 +90,89 @@ namespace Foundation.Editor
         {
             var type = Target.Context.DataType;
 
-            var members = new MemberInfo[0];
+            var labels = new System.Collections.Generic.List<string>();
+            var names = new System.Collections.Generic.List<string>();
 
-            // filter
-            switch (info.Filters)
+            if (!Target.Context.DataType.IsAssignableFrom(typeof(GameSystem.LuaObervableBehaviour)))
             {
-                case BindingBase.BindingFilter.Commands:
-                    members = EditorMembersHelper.GetMethods(type);
-                    break;
-                case BindingBase.BindingFilter.Properties:
-                    members = EditorMembersHelper.GetProperties(type);
-                    break;
+
+                var members = new MemberInfo[0];
+
+                // filter
+                switch (info.Filters)
+                {
+                    case BindingBase.BindingFilter.Commands:
+                        members = EditorMembersHelper.GetMethods(type);
+                        break;
+                    case BindingBase.BindingFilter.Properties:
+                        members = EditorMembersHelper.GetProperties(type);
+                        break;
+                }
+
+                // filter
+                if (info.FilterTypes != null)
+                {
+                    members = members.Where(o => info.FilterTypes.Any(t => ValidType(t, o.GetParamaterType()))).ToArray();
+                }
+
+                labels = members.Select(o => string.Format("{0} : {1}", o.Name, o.GetParamaterType())).ToList();
+                names = members.Select(o => o.Name).ToList();
+            }
+            else
+            {
+                var luaObervableBehaviour = Target.Context.DataInstance as GameSystem.LuaObervableBehaviour;
+                string luaScript = luaObervableBehaviour.GetLuaScript();
+                if (!string.IsNullOrEmpty(luaScript))
+                {
+                    luaEnv.DoString(luaScript, GetType().Name, luaTable);
+                    var keys = luaTable.GetKeys<string>().OrderBy(c => c);
+                    foreach (var k in keys)
+                    {
+                        if (k == "set" || k == "get") continue;
+
+                        object value;
+                        if (info.FilterTypes != null)
+                        {
+                            foreach (var t in info.FilterTypes)
+                            {
+                                if (luaTable.TryGet(k, t, out value))
+                                {
+                                    labels.Add(string.Format("{0} : {1}", k, value.GetType()));
+                                    names.Add(k);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (luaTable.TryGet(k, out value))
+                            {
+                                Type t = value.GetType();
+                                if (info.Filters == BindingBase.BindingFilter.Commands && t == typeof(LuaFunction)
+                                || info.Filters == BindingBase.BindingFilter.Properties && t != typeof(LuaFunction))
+                                {
+                                    labels.Add(string.Format("{0} : {1}", k, value.GetType()));
+                                    names.Add(k);
+                                }
+                            }
+                        }
+                    }
+                    luaEnv.Tick();
+                }
             }
 
-            //filter
-            if (info.FilterTypes != null)
-            {
-                members = members.Where(o => info.FilterTypes.Any(t => ValidType(t, o.GetParamaterType()))).ToArray();
-            }
-
-            if (members.Length == 0)
+            if (labels.Count == 0)
             {
                 EditorGUILayout.LabelField(string.Format("{0}->{1} has no valid members.", info.BindingName, type.Name));
                 return;
             }
 
-            var labels = members.Select(o => string.Format("{0} : {1}", o.Name, o.GetParamaterType())).ToList();
-
-            var names = members.Select(o => o.Name).ToList();
-
             labels.Insert(0, "Null");
             names.Insert(0, "");
 
-            var index = Array.IndexOf(names.ToArray(), info.MemberName);
-
+            var index = names.FindIndex(c => c == info.MemberName);
             var i = EditorGUILayout.Popup(info.BindingName, index, labels.ToArray());
 
-            if (i != index)
+            if (i != index || info.MemberName != names[i])
             {
                 info.MemberName = names[i];
                 EditorUtility.SetDirty(target);
