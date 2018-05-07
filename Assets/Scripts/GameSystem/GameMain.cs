@@ -9,86 +9,100 @@ namespace GameSystem
 {
     public class GameMain : SingletonMonoBehaviourBase<GameMain>
     {
-        private bool initialized;
+        private bool _initialized;
         public bool Initialized
         {
             get
             {
-                return initialized;
+                return _initialized;
             }
         }
 
-        private GameObject constManagerLayer;
-        private GameObject dynamicManagerLayer;
-        private List<IGameManager> constManagers = new List<IGameManager>();
-        private List<IGameManager> dynamicManagers = new List<IGameManager>();
-
-        private Action evtOnExceptionPopupContinue;
-        private Action evtOnExceptionPopupConfirm;
-        private Exception initException = null;
-        private int loadLevelExceptionCount = 0;
-        public int LoadLevelExceptionCount { get { return loadLevelExceptionCount; } }
+        private GameObject _constManagerLayer;
+        private GameObject _dynamicManagerLayer;
+        private List<IGameManager> _constManagers;
+        private List<IGameManager> _dynamicManagers;
+        private Action _evtOnExceptionPopupContinue;
+        private Action _evtOnExceptionPopupConfirm;
+        private Exception _initException = null;
+        private int _loadLevelExceptionCount = 0;
+        public int LoadLevelExceptionCount { get { return _loadLevelExceptionCount; } }
 
         protected override void SingletonAwake()
         {
-            base.SingletonAwake();
-            gameObject.AddComponent<DontDestroy>();
-
-            Screen.sleepTimeout = GameConfig.Instance.sleepTimeout;
-            Application.targetFrameRate = GameConfig.Instance.gameFrameRate;
-
-            evtOnExceptionPopupContinue = delegate ()
+            _constManagers = new List<IGameManager>();
+            _dynamicManagers = new List<IGameManager>();
+            _evtOnExceptionPopupContinue = delegate ()
             {
                 GameStateManager.Instance.SetNextState("GameStateException");
             };
-            evtOnExceptionPopupConfirm = delegate ()
+            _evtOnExceptionPopupConfirm = delegate ()
             {
-                loadLevelExceptionCount--;
+                _loadLevelExceptionCount--;
             };
 
+            base.SingletonAwake();
+            gameObject.AddComponent<DontDestroy>();
+
+            DownLoad(DownLoadSuccess, DownLoadFail);
+        }
+
+        void DownLoad(Action onDownLoadSuccess, Action onDownLoadFail)
+        {
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+            //todo
+            onDownLoadSuccess();
+        }
+
+        void DownLoadSuccess()
+        {
+            InitGame();
+        }
+
+        void DownLoadFail()
+        {
+            //todo
+        }
+
+        void InitGame()
+        {
             if (GameConfig.Instance == null)
             {
                 Error("game config asset not found");
                 return;
             }
 
-            constManagerLayer = new GameObject("Constant");
-            constManagerLayer.transform.parent = transform;
+            Screen.sleepTimeout = GameConfig.Instance.sleepTimeout;
+            Application.targetFrameRate = GameConfig.Instance.gameFrameRate;
+
+            _constManagerLayer = new GameObject("Constant");
+            _constManagerLayer.transform.parent = transform;
+
             try
             {
                 AddConstantManager(GameConfig.Instance.constManagers);
             }
             catch (Exception e)
             {
-                initException = e;
+                _initException = e;
             }
-        }
-
-        void Start()
-        {
-            if (initException == null)
+            finally
             {
-                GameStateManager.Instance.SetNextState("GameStateLogin");
+                _initialized = true;
+                if (_initException == null)
+                {
+                    GameStateManager.Instance.SetNextState("GameStateLogin");
+                }
+                else
+                {
+                    ShowExceptionPopup(_initException, _evtOnExceptionPopupContinue, "ConstantManager");
+                }
             }
-            else
-            {
-                ShowExceptionPopup(initException, evtOnExceptionPopupContinue, null, "ConstantManager");
-            }
-
-            initialized = true;
-        }
-
-        private void ShowExceptionPopup(Exception e, Action evtContinue, Action evtBreak, string prefix = null)
-        {
-            string msg = string.Format("{0} {1}\n{2}", prefix, e.Message, e.StackTrace);
-            Error(msg);
-            // object[] param = new object[] { "Continue", evtContinue, "Break", evtBreak };
-            //UIManager.MessageBox("ERROR", msg, UIMessageBox.ButtonType.TwoButton, param);
         }
 
         private void ShowExceptionPopup(Exception e, Action evtConfirm, string prefix = null)
         {
-            loadLevelExceptionCount++;
+            _loadLevelExceptionCount++;
             //print("exception count " + _loadLevelExceptionCount);
             string msg = string.Format("{0} {1}\n{2}", prefix, e.Message, e.StackTrace);
             Error(msg);
@@ -96,47 +110,6 @@ namespace GameSystem
             //UIManager.MessageBox("ERROR", msg, UIMessageBox.ButtonType.OneButton, param);
         }
 
-        //public void SimulateMemoryWarningNow()
-        //{
-        //    OnMemoryWarning();
-        //}
-
-        //private void OnMemoryWarning()
-        //{
-        //    if (_memWwarningHandleTimer > 0) { return; }
-        //    _memWwarningHandleTimer = _memWarningHandleInterval;
-
-        //    float mega = 1024f * 1024f;
-        //    float curMem = NativeUtils.GetCurrentMemoryBytes() / mega;
-        //    float devMem = (float)SystemInfo.systemMemorySize;
-        //    float perc = curMem / devMem * 100f;
-        //    Debug.LogWarningFormat("Received system low memory warning at: {0:N1}/{1:N1}, {2:N1}%", curMem, devMem, perc);
-
-        //    for (int i = 0; i < _constantMgrs.Count; i++)
-        //    {
-        //        ICustomManager mgr = _constantMgrs[i];
-        //        try
-        //        {
-        //            mgr.SingletonOnMemoryWarning(curMem, devMem, perc);
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            ShowExceptionPopup(e, _evtOnExceptionPopupConfirm, mgr.GetType().Name);
-        //        }
-        //    }
-        //    for (int i = 0; i < _dynamicMgrs.Count; i++)
-        //    {
-        //        ICustomManager mgr = _dynamicMgrs[i];
-        //        try
-        //        {
-        //            mgr.SingletonOnMemoryWarning(curMem, devMem, perc);
-        //        }
-        //        catch (Exception e)
-        //        {
-        //            ShowExceptionPopup(e, _evtOnExceptionPopupConfirm, mgr.GetType().Name);
-        //        }
-        //    }
-        //}
 
         private void AddConstantManager(string[] typeNames)
         {
@@ -150,36 +123,36 @@ namespace GameSystem
 
         private void DestroyDynamicManager(bool immediate = false)
         {
-            if (dynamicManagerLayer != null)
+            if (_dynamicManagerLayer != null)
             {
                 if (immediate)
                 {
-                    DestroyImmediate(dynamicManagerLayer);
+                    DestroyImmediate(_dynamicManagerLayer);
                 }
                 else
                 {
-                    Destroy(dynamicManagerLayer);
+                    Destroy(_dynamicManagerLayer);
                 }
-                dynamicManagerLayer = null;
-                dynamicManagers.Clear();
+                _dynamicManagerLayer = null;
+                _dynamicManagers.Clear();
             }
         }
 
         private void CreateDynamicManager()
         {
-            if (dynamicManagerLayer == null)
+            if (_dynamicManagerLayer == null)
             {
-                dynamicManagerLayer = new GameObject("Dynamic");
-                DontDestroyOnLoad(dynamicManagerLayer);
-                dynamicManagerLayer.transform.parent = transform;
+                _dynamicManagerLayer = new GameObject("Dynamic");
+                DontDestroyOnLoad(_dynamicManagerLayer);
+                _dynamicManagerLayer.transform.parent = transform;
                 //dynamicManagers.Clear();
             }
         }
 
         private void AddManager(string[] typeNames, bool constant)
         {
-            GameObject go = constant ? constManagerLayer : dynamicManagerLayer;
-            List<IGameManager> managerPool = constant ? constManagers : dynamicManagers;
+            GameObject go = constant ? _constManagerLayer : _dynamicManagerLayer;
+            List<IGameManager> managerPool = constant ? _constManagers : _dynamicManagers;
             Type managerBaseType = typeof(IGameManager);
             for (int i = 0; i < typeNames.Length; i++)
             {
@@ -207,22 +180,24 @@ namespace GameSystem
                     }
                     else
                     {
-                        Error("type is not singleton: {0}", name);
+                        string msg = string.Format("type is not inherit form IGameManager: {0}", name);
+                        Error(msg);
+                        throw new Exception(msg);
                     }
                 }
                 else
                 {
-                    Error("type not found: {0}", name);
+                    string msg = string.Format("type can not found: {0}", name);
+                    Error(msg);
+                    throw new Exception(msg);
                 }
             }
         }
 
         public void OnBeginStateEnter(string currStateName, string nextStateName)
         {
-            loadLevelExceptionCount = 0;
-
+            _loadLevelExceptionCount = 0;
             CreateDynamicManager();
-
             var nextStateInfo = Array.Find(GameConfig.Instance.gameStateInfos, c => c.name == nextStateName);
             if (nextStateInfo != null)
             {
@@ -235,56 +210,54 @@ namespace GameSystem
                     }
                     catch (Exception e)
                     {
-                        ShowExceptionPopup(e, evtOnExceptionPopupConfirm, "AddDynamicManager");
+                        ShowExceptionPopup(e, _evtOnExceptionPopupConfirm, "AddDynamicManager");
                     }
                 }
             }
 
-            for (int i = 0; i < constManagers.Count; i++)
+            for (int i = 0; i < _constManagers.Count; i++)
             {
-                IGameManager manager = constManagers[i];
+                IGameManager manager = _constManagers[i];
                 try
                 {
                     manager.OnBeginStateEnter(currStateName, nextStateName);
                 }
                 catch (Exception e)
                 {
-                    ShowExceptionPopup(e, evtOnExceptionPopupConfirm, manager.GetType().Name);
+                    ShowExceptionPopup(e, _evtOnExceptionPopupConfirm, manager.GetType().Name);
                 }
             }
 
-            for (int i = 0; i < dynamicManagers.Count; i++)
+            for (int i = 0; i < _dynamicManagers.Count; i++)
             {
-                IGameManager mgr = dynamicManagers[i];
+                IGameManager mgr = _dynamicManagers[i];
                 try
                 {
                     mgr.OnBeginStateEnter(currStateName, nextStateName);
                 }
                 catch (Exception e)
                 {
-                    ShowExceptionPopup(e, evtOnExceptionPopupConfirm, mgr.GetType().Name);
+                    ShowExceptionPopup(e, _evtOnExceptionPopupConfirm, mgr.GetType().Name);
                 }
             }
-            //PQEventManager.SendCommonMsg(PQEventType.EndLoadLevel, curLevelName, nextLevelName, curState);
         }
 
         public void OnEndStateExit(string currStateName, string nextStateName)
         {
-            loadLevelExceptionCount = 0;
-            for (int i = 0; i < constManagers.Count; i++)
+            _loadLevelExceptionCount = 0;
+            for (int i = 0; i < _constManagers.Count; i++)
             {
-                IGameManager mamager = constManagers[i];
+                IGameManager mamager = _constManagers[i];
                 try
                 {
                     mamager.OnEndStateExit(currStateName, nextStateName);
                 }
                 catch (Exception e)
                 {
-                    ShowExceptionPopup(e, evtOnExceptionPopupConfirm, mamager.GetType().Name);
+                    ShowExceptionPopup(e, _evtOnExceptionPopupConfirm, mamager.GetType().Name);
                 }
             }
             DestroyDynamicManager();
-            //PQEventManager.SendCommonMsg(PQEventType.BeginLoadLevel, curLevelName, nextLevelName, curState);
             Facade.Instance.ClearAll();
         }
     }
