@@ -10,9 +10,14 @@ using XLua;
 
 namespace GameSystem
 {
-    public class LuaObervableBehaviour : MonoBehaviour, IObservableModel
+    public class LuaObservableBehaviour : MonoBehaviour, IObservableModel
     {
-        public string luaFilePath;
+        [HideInInspector]
+        public TextAsset _luaText;
+        [HideInInspector]
+        public string _luaFilePath;
+
+        private Action awakeMethod, startMethod, onenableMethod, ondisableMethod, ondestroyMethod, updateMethod;
 
         
 
@@ -58,11 +63,68 @@ namespace GameSystem
             if (_bindingMessage == null)
                 _bindingMessage = new ObservableMessage { Sender = this };
             InitBinder();
+
+            if (awakeMethod != null)
+            {
+                awakeMethod();
+            }
+        }
+
+        void Start()
+        {
+            if (startMethod != null)
+            {
+                startMethod();
+            }
+        }
+
+        void OnEnable()
+        {
+            if (onenableMethod != null)
+            {
+                onenableMethod();
+            }
+        }
+
+        void OnDisable()
+        {
+            if (ondisableMethod != null)
+            {
+                ondisableMethod();
+            }
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (IsApplicationQuit)
+                return;
+
+            if (ondestroyMethod != null)
+            {
+                ondestroyMethod();
+            }
+
+            awakeMethod = null;
+            startMethod = null;
+            onenableMethod = null;
+            ondisableMethod = null;
+            ondestroyMethod = null;
+            updateMethod = null;
+
+            Dispose();
+        }
+
+        void Update()
+        {
+            if (updateMethod != null)
+            {
+                updateMethod();
+            }
         }
 
         protected void InitBinder()
         {
-            if (luaFilePath == null || _binder != null)
+            if (_binder != null)
             {
                 return;
             }
@@ -88,26 +150,29 @@ namespace GameSystem
                 notifyproperty(key, value)
             end", GetType().Name, luaTable);
             LuaManager.Instance.LuaEnv.DoString(luaScript, GetType().Name, luaTable);
+
+            luaTable.Get("awake", out awakeMethod);
+            luaTable.Get("start", out startMethod);
+            luaTable.Get("onenable", out onenableMethod);
+            luaTable.Get("ondisable", out ondisableMethod);
+            luaTable.Get("ondestroy", out ondestroyMethod);
+            luaTable.Get("update", out updateMethod);
             _binder = new LuaModelBinder(this, luaTable);
-        }
-
-        protected virtual void OnDestroy()
-        {
-            if (IsApplicationQuit)
-                return;
-
-            Dispose();
         }
 
         public string GetLuaScript()
         {
-            if (string.IsNullOrEmpty(luaFilePath))
+            if (_luaText == null)
             {
-                return null;
+                if (string.IsNullOrEmpty(_luaFilePath))
+                {
+                    return null;
+                }
+                _luaText = AssetBundles.DataLoader.Load<TextAsset>(_luaFilePath);
             }
-            var ta = AssetBundles.DataLoader.Load<TextAsset>(luaFilePath);
-            if (ta == null) return null;
-            return ta.text;
+
+            if (_luaText == null) return null;
+            return _luaText.text;
         }
 
         [HideInInspector]

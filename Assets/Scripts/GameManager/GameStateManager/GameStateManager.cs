@@ -25,11 +25,11 @@ namespace GameManager
             {
                 Debug.LogErrorFormat("GameConfig is not found {0}", GameConfig.GAME_CONFIG_PATH);
             }
-           
+
             gameStates = GameStateHelper.GetGameStates(GameConfig.Instance.gameStateInfos);
             if (gameStates == null || gameStates.Count == 0)
             {
-                //Logger.Error("gameStates is empty");
+                Error("gameStates is empty");
             }
             initialized = true;
         }
@@ -78,7 +78,13 @@ namespace GameManager
         public IGameState GetState(string stateName)
         {
             if (gameStates == null || !Initialized) return null;
-            return gameStates[stateName];
+            IGameState gameState;
+            if (!gameStates.TryGetValue(stateName, out gameState))
+            {
+                string msg = string.Format("GameState is not found: {0}", stateName);
+                Error(msg);
+            }
+            return gameState;
         }
 
         public void RefreshState()

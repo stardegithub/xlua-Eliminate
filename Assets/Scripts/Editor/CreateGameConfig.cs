@@ -2,14 +2,17 @@ using UnityEngine;
 using UnityEditor;
 using GameSystem;
 
-public class CreateGameConfig
+namespace GameEditor
 {
-    [MenuItem("Assets/Config/CreateGameConfig", false, 700)]
-    public static void Create()
+    public class CreateGameConfig
     {
-        //实例化GameConfig  
-        GameConfig config = ScriptableObject.CreateInstance<GameConfig>();
+        [MenuItem("Assets/Create/CreateGameConfig", false, 700)]
+        public static void Create()
+        {
+            //实例化GameConfig  
+            GameConfig config = ScriptableObject.CreateInstance<GameConfig>();
 
-        AssetDatabase.CreateAsset(config, GameConfig.GAME_CONFIG_PATH);
+            AssetDatabase.CreateAsset(config, GameConfig.GAME_CONFIG_PATH);
+        }
     }
 }

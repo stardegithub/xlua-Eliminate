@@ -10,13 +10,7 @@ namespace GameSystem
     public class GameMain : SingletonMonoBehaviourBase<GameMain>
     {
         private bool _initialized;
-        public bool Initialized
-        {
-            get
-            {
-                return _initialized;
-            }
-        }
+        public bool Initialized { get { return _initialized; } }
 
         private GameObject _constManagerLayer;
         private GameObject _dynamicManagerLayer;
@@ -110,7 +104,6 @@ namespace GameSystem
             //UIManager.MessageBox("ERROR", msg, UIMessageBox.ButtonType.OneButton, param);
         }
 
-
         private void AddConstantManager(string[] typeNames)
         {
             AddManager(typeNames, true);
@@ -187,7 +180,7 @@ namespace GameSystem
                 }
                 else
                 {
-                    string msg = string.Format("type can not found: {0}", name);
+                    string msg = string.Format("type is not found: {0}", name);
                     Error(msg);
                     throw new Exception(msg);
                 }

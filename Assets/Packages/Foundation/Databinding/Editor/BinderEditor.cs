@@ -93,7 +93,7 @@ namespace Foundation.Editor
             var labels = new System.Collections.Generic.List<string>();
             var names = new System.Collections.Generic.List<string>();
 
-            if (!Target.Context.DataType.IsAssignableFrom(typeof(GameSystem.LuaObervableBehaviour)))
+            if (!Target.Context.DataType.IsAssignableFrom(typeof(GameSystem.LuaObservableBehaviour)))
             {
 
                 var members = new MemberInfo[0];
@@ -120,7 +120,7 @@ namespace Foundation.Editor
             }
             else
             {
-                var luaObervableBehaviour = Target.Context.DataInstance as GameSystem.LuaObervableBehaviour;
+                var luaObervableBehaviour = Target.Context.DataInstance as GameSystem.LuaObservableBehaviour;
                 string luaScript = luaObervableBehaviour.GetLuaScript();
                 if (!string.IsNullOrEmpty(luaScript))
                 {
@@ -172,6 +172,10 @@ namespace Foundation.Editor
             var index = names.FindIndex(c => c == info.MemberName);
             var i = EditorGUILayout.Popup(info.BindingName, index, labels.ToArray());
 
+            if (i < 0)
+            {
+                return;
+            }
             if (i != index || info.MemberName != names[i])
             {
                 info.MemberName = names[i];
