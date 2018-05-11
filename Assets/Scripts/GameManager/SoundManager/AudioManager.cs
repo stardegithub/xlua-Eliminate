@@ -46,7 +46,7 @@ namespace GameManager
             CreateAudioListener();
             CreateAudioChannels(10);
             audioClipCachePool = new Dictionary<string, AudioClip>();
-            initialized = true;
+            _initialized = true;
         }
 
         protected override void SingletonDestroy()

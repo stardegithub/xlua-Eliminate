@@ -6,15 +6,13 @@ namespace GameManager
 {
     public class PoolManager : GameManagerBase<PoolManager>
     {
-        private Dictionary<string, ICashePool> cashePoolMap;
-        private Dictionary<string, IObjectPool> objectPoolMap;
+        private Dictionary<string, IObjectPool> _objectPoolDict;
 
         #region Singleton
         protected override void SingletonAwake()
         {
-            cashePoolMap = new Dictionary<string, ICashePool>();
-            objectPoolMap = new Dictionary<string, IObjectPool>();
-            initialized = true;
+            _objectPoolDict = new Dictionary<string, IObjectPool>();
+            _initialized = true;
         }
 
         protected override void SingletonDestroy()
@@ -22,192 +20,345 @@ namespace GameManager
         }
         #endregion
 
-        #region CashePool
-        public CashePool<T> CreateCashePool<T>(string poolName) where T : Object
+        #region ObjectMap
+        /// <summary>
+        /// 创建对象表池
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>对象表池</returns>
+        public ObjectMap<T> CreateObjectMap<T>(string poolName)
         {
-            ClearCashePool<T>(poolName);
-            var cashePool = new CashePool<T>();
-            cashePoolMap[poolName] = cashePool;
+            ClearObjectMap<T>(poolName);
+            var cashePool = new ObjectMap<T>();
+            _objectPoolDict[poolName] = cashePool;
             return cashePool;
         }
 
-        public bool ExistsCashePool<T>(string poolName) where T : Object
+        /// <summary>
+        /// 是否存在对象表池
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public bool ExistsObjectMap<T>(string poolName)
         {
-            ICashePool cashePool;
-            if (cashePoolMap.TryGetValue(poolName, out cashePool))
+            IObjectPool objectPool;
+            if (_objectPoolDict.TryGetValue(poolName, out objectPool))
             {
-                return cashePool.GetType() == typeof(CashePool<T>);
+                return objectPool.GetType() == typeof(ObjectMap<T>);
             }
             return false;
         }
 
-        public CashePool<T> GetCashePool<T>(string poolName) where T : Object
+        /// <summary>
+        /// 获得对象表池
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public ObjectMap<T> GetObjectMap<T>(string poolName)
         {
-            ICashePool cashePool;
-            if (cashePoolMap.TryGetValue(poolName, out cashePool))
+            IObjectPool objectPool;
+            if (_objectPoolDict.TryGetValue(poolName, out objectPool))
             {
-                if (cashePool.GetType() == typeof(CashePool<T>))
+                if (objectPool.GetType() == typeof(ObjectMap<T>))
                 {
-                    return cashePool as CashePool<T>;
+                    return objectPool as ObjectMap<T>;
                 }
             }
             return null;
         }
 
-        public T GetCasheElement<T>(string poolName, string elementName) where T : Object
+        /// <summary>
+        /// 获得对象表池元素
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <param name="elementKey">元素键</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetObjectMapElement<T>(string poolName, string elementKey)
         {
-            var cashePool = GetCashePool<T>(poolName);
-            if (cashePool != null)
+            var objectMap = GetObjectMap<T>(poolName);
+            if (objectMap != null)
             {
-                return cashePool.Get(elementName);
-            }
-            return null;
-        }
-
-        public bool PushCasheElement<T>(string poolName, T element) where T : Object
-        {
-            var cashePool = GetCashePool<T>(poolName);
-            if (cashePool != null)
-            {
-                return cashePool.Push(element);
-            }
-            return false;
-        }
-
-        public void ClearCashePool<T>(string poolName) where T : Object
-        {
-            var cashePool = GetCashePool<T>(poolName);
-            if (cashePool != null)
-            {
-                cashePool.ClearPool();
-                cashePoolMap.Remove(poolName);
-            }
-        }
-        #endregion
-
-        #region ObjectPool
-        public ObjectPool<T> CreateObjectPool<T>(string poolName)
-        {
-            ClearObjectPool<T>(poolName);
-            var objectPool = new ObjectPool<T>();
-            objectPoolMap[poolName] = objectPool;
-            return objectPool;
-        }
-
-        public bool ExistsObjecPool<T>(string poolName)
-        {
-            IObjectPool objectPool;
-            if (objectPoolMap.TryGetValue(poolName, out objectPool))
-            {
-                return objectPool.GetType() == typeof(ObjectPool<T>);
-            }
-            return false;
-        }
-
-        public ObjectPool<T> GetObjectPool<T>(string poolName)
-        {
-            IObjectPool objectPool;
-            if (objectPoolMap.TryGetValue(poolName, out objectPool))
-            {
-                if (objectPool.GetType() == typeof(ObjectPool<T>))
-                {
-                    return objectPool as ObjectPool<T>;
-                }
-            }
-            return null;
-        }
-
-        public T GetObjectElement<T>(string poolName)
-        {
-            var objectPool = GetObjectPool<T>(poolName);
-            if (objectPool != null)
-            {
-                return objectPool.Get();
+                return objectMap.Get(elementKey);
             }
             return default(T);
         }
 
-        public bool PushObjectElement<T>(string poolName, T element)
+        /// <summary>
+        /// 推入对象表池元素
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <param name="elementKey">元素键</param>
+        /// <param name="elementValue">元素值</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public bool PushObjectMapElement<T>(string poolName, string elementKey, T elementValue)
         {
-            var objectPool = GetObjectPool<T>(poolName);
-            if (objectPool != null)
+            var objectMap = GetObjectMap<T>(poolName);
+            if (objectMap != null)
             {
-                return objectPool.Push(element);
+                return objectMap.Push(elementKey, elementValue);
             }
             return false;
         }
 
-        public void ClearObjectPool<T>(string poolName)
+        /// <summary>
+        /// 创建对象表池并推入元素
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <param name="elementKey">元素键</param>
+        /// <param name="elementValue">元素值</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public bool CreateAndPushObjectMapElement<T>(string poolName, string elementKey, T elementValue)
         {
-            var objectPool = GetObjectPool<T>(poolName);
+            var objectMap = GetObjectMap<T>(poolName);
+            if (objectMap == null)
+            {
+                objectMap = CreateObjectMap<T>(poolName);
+            }
+            if (objectMap == null)
+            {
+                return false;
+            }
+            return objectMap.Push(elementKey, elementValue);
+        }
+
+        /// <summary>
+        /// 清理对象表池
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <typeparam name="T"></typeparam>
+        public void ClearObjectMap<T>(string poolName)
+        {
+            var objectPool = GetObjectMap<T>(poolName);
             if (objectPool != null)
             {
                 objectPool.ClearPool();
-                objectPoolMap.Remove(poolName);
+                _objectPoolDict.Remove(poolName);
             }
         }
         #endregion
 
-        #region GameObjectPool
-        public GameObjectPool CreateGameObjectPool(string poolName, GameObject objectPrefab, int initCount, int maxSize)
+        #region ObjectStack
+        /// <summary>
+        /// 创建对象堆池
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>对象堆池</returns>
+        public ObjectStack<T> CreateObjectStack<T>(string poolName)
         {
-            ClearGameObjectPool(poolName);
-            Transform poolRoot = new GameObject(poolName).transform;
-            poolRoot.SetParent(transform, false);
-            var gameObjectPool = new GameObjectPool(poolName, objectPrefab, initCount, maxSize, poolRoot);
-            objectPoolMap[poolName] = gameObjectPool;
-            return gameObjectPool;
+            ClearObjectStack<T>(poolName);
+            var objectStack = new ObjectStack<T>();
+            _objectPoolDict[poolName] = objectStack;
+            return objectStack;
         }
 
-        public bool ExistsGameObjecPool(string poolName)
+        /// <summary>
+        /// 是否存在对象堆池
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public bool ExistsObjecStack<T>(string poolName)
         {
             IObjectPool objectPool;
-            if (objectPoolMap.TryGetValue(poolName, out objectPool))
+            if (_objectPoolDict.TryGetValue(poolName, out objectPool))
             {
-                return objectPool.GetType() == typeof(GameObjectPool);
+                return objectPool.GetType() == typeof(ObjectStack<T>);
             }
             return false;
         }
 
-        public GameObjectPool GetGameObjectPool(string poolName)
+        /// <summary>
+        /// 获得对象堆池
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public ObjectStack<T> GetObjectStack<T>(string poolName)
         {
             IObjectPool objectPool;
-            if (objectPoolMap.TryGetValue(poolName, out objectPool))
+            if (_objectPoolDict.TryGetValue(poolName, out objectPool))
             {
-                if (objectPool.GetType() == typeof(GameObjectPool))
+                if (objectPool.GetType() == typeof(ObjectStack<T>))
                 {
-                    return objectPool as GameObjectPool;
+                    return objectPool as ObjectStack<T>;
                 }
             }
             return null;
         }
 
-        public GameObject GetGameObjectElement(string poolName)
+        /// <summary>
+        /// 获得对象堆池元素
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetObjectStackElement<T>(string poolName)
         {
-            var gameObjectPool = GetGameObjectPool(poolName);
-            if (gameObjectPool != null)
+            var objectStack = GetObjectStack<T>(poolName);
+            if (objectStack != null)
             {
-                return gameObjectPool.Get();
+                return objectStack.Get();
             }
-            return null;
+            return default(T);
         }
 
-        public bool PushGameObjectElement(string poolName, GameObject element)
+        /// <summary>
+        /// 推入对象堆池元素
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <param name="element">元素</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public bool PushObjectStackElement<T>(string poolName, T element)
         {
-            var gameObjectPool = GetGameObjectPool(poolName);
-            if (gameObjectPool != null)
+            var objectStack = GetObjectStack<T>(poolName);
+            if (objectStack != null)
             {
-                return gameObjectPool.Push(element);
+                return objectStack.Push(element);
             }
             return false;
         }
 
-        public void PushGameObjectElement(string poolName, GameObject element, float delay)
+        /// <summary>
+        /// 创建对象堆池并推入元素
+        /// </summary>
+        /// <param name="poolName"池名字></param>
+        /// <param name="element">元素</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public bool CreateAndPushObjectStackElement<T>(string poolName, T element)
         {
-            StartCoroutine(PushGameObjectElement_Routine(poolName, element, delay));
+            var objectStack = GetObjectStack<T>(poolName);
+            if (objectStack == null)
+            {
+                objectStack = CreateObjectStack<T>(poolName);
+            }
+            if (objectStack == null)
+            {
+                return false;
+            }
+            return objectStack.Push(element);
         }
 
-        private IEnumerator PushGameObjectElement_Routine(string poolName, GameObject element, float delay)
+
+        /// <summary>
+        /// 清理对象堆池
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <typeparam name="T"></typeparam>
+        public void ClearObjectStack<T>(string poolName)
+        {
+            var objectStack = GetObjectStack<T>(poolName);
+            if (objectStack != null)
+            {
+                objectStack.ClearPool();
+                _objectPoolDict.Remove(poolName);
+            }
+        }
+        #endregion
+
+        #region GameObjectStack
+        /// <summary>
+        /// 创建游戏对象
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <param name="objectPrefab">预制体</param>
+        /// <param name="initCount">初始数量</param>
+        /// <param name="maxSize">最大数量</param>
+        /// <returns></returns>
+        public GameObjectStack CreateGameObjectStack(string poolName, GameObject objectPrefab, int initCount, int maxSize)
+        {
+            ClearGameObjectStack(poolName);
+            Transform poolRoot = new GameObject(poolName).transform;
+            poolRoot.SetParent(transform, false);
+            var gameObjectStack = new GameObjectStack(poolName, objectPrefab, initCount, maxSize, poolRoot);
+            _objectPoolDict[poolName] = gameObjectStack;
+            return gameObjectStack;
+        }
+
+        /// <summary>
+        /// 是否存在游戏对象堆
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <returns></returns>
+        public bool ExistsGameObjectStack(string poolName)
+        {
+            IObjectPool objectPool;
+            if (_objectPoolDict.TryGetValue(poolName, out objectPool))
+            {
+                return objectPool.GetType() == typeof(GameObjectStack);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 获得游戏对象堆
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <returns></returns>
+        public GameObjectStack GetGameObjectStack(string poolName)
+        {
+            IObjectPool objectPool;
+            if (_objectPoolDict.TryGetValue(poolName, out objectPool))
+            {
+                if (objectPool.GetType() == typeof(GameObjectStack))
+                {
+                    return objectPool as GameObjectStack;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 获得游戏对象堆元素
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <returns></returns>
+        public GameObject GetGameObjectStackElement(string poolName)
+        {
+            var gameObjectStack = GetGameObjectStack(poolName);
+            if (gameObjectStack != null)
+            {
+                return gameObjectStack.Get();
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 推入游戏对象堆
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <param name="element">游戏对象</param>
+        /// <returns></returns>
+        public bool PushGameObjectsStackElement(string poolName, GameObject element)
+        {
+            var gameObjectStack = GetGameObjectStack(poolName);
+            if (gameObjectStack != null)
+            {
+                return gameObjectStack.Push(element);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 延迟推入游戏对象堆
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <param name="element">游戏对象</param>
+        /// <param name="delay">延迟时间</param>
+        public void PushGameObjectStackElement(string poolName, GameObject element, float delay)
+        {
+            StartCoroutine(PushGameObjectStackElement_Routine(poolName, element, delay));
+        }
+
+        private IEnumerator PushGameObjectStackElement_Routine(string poolName, GameObject element, float delay)
         {
             if (delay > 0)
             {
@@ -217,75 +368,108 @@ namespace GameManager
             {
                 yield return null;
             }
-            PushGameObjectElement(poolName, element);
+            PushGameObjectsStackElement(poolName, element);
         }
 
-        public void ClearGameObjectPool(string poolName)
+        /// <summary>
+        /// 清理游戏对象堆池
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        public void ClearGameObjectStack(string poolName)
         {
-            var gameObjectPool = GetGameObjectPool(poolName);
-            if (gameObjectPool != null)
+            var gameObjectStack = GetGameObjectStack(poolName);
+            if (gameObjectStack != null)
             {
-                gameObjectPool.ClearPool();
-                objectPoolMap.Remove(poolName);
+                gameObjectStack.ClearPool();
+                _objectPoolDict.Remove(poolName);
             }
         }
         #endregion
 
+        /// <summary>
+        /// 是否存在对象池
+        /// </summary>
+        /// <param name="poolName"></param>
+        /// <returns></returns>
+        public bool ExistsObjectPool(string poolName)
+        {
+            return _objectPoolDict.ContainsKey(poolName);
+        }
+
+        /// <summary>
+        /// 清理所以池
+        /// </summary>
         public void ClearAllPools()
         {
-            foreach (var element in cashePoolMap)
+            foreach (var element in _objectPoolDict)
             {
                 element.Value.ClearPool();
             }
-            cashePoolMap.Clear();
-
-            foreach (var element in objectPoolMap)
-            {
-                element.Value.ClearPool();
-            }
-            objectPoolMap.Clear();
+            _objectPoolDict.Clear();
         }
     }
 
-    public interface ICashePool
+    /// <summary>
+    /// 对象池接口
+    /// </summary>
+    public interface IObjectPool
     {
+        /// <summary>
+        /// 清理池
+        /// </summary>
         void ClearPool();
     }
 
-    public class CashePool<T> : ICashePool where T : Object
+    /// <summary>
+    /// 对象表
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class ObjectMap<T> : IObjectPool
     {
-        protected bool unLoadOnClear;
         protected Dictionary<string, T> casheMap;
 
-        public CashePool()
+        public ObjectMap()
         {
-            unLoadOnClear = true;
             casheMap = new Dictionary<string, T>();
         }
 
-        public virtual T Get(string name)
+        /// <summary>
+        /// 获得元素
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <returns></returns>
+        public virtual T Get(string key)
         {
-            if (casheMap.ContainsKey(name))
+            if (casheMap.ContainsKey(key))
             {
-                return casheMap[name];
+                return casheMap[key];
             }
-            return null;
+            return default(T);
         }
 
-        public virtual bool Push(T element)
+        /// <summary>
+        /// 推入元素
+        /// </summary>
+        /// <param name="key">键</param>
+        /// <param name="value">值</param>
+        /// <returns></returns>
+        public virtual bool Push(string key, T value)
         {
-            if (element == null) return false;
-            casheMap[element.name] = element;
+            if (value == null) return false;
+            casheMap[key] = value;
             return true;
         }
 
+        /// <summary>
+        /// 清理池
+        /// </summary>
         public virtual void ClearPool()
         {
-            if (unLoadOnClear)
+            foreach (var element in casheMap)
             {
-                foreach (var element in casheMap)
+                if (element.GetType().IsAssignableFrom(typeof(Object)))
                 {
-                    Resources.UnloadAsset(element.Value);
+                    Resources.UnloadAsset(element.Value as Object);
                 }
             }
 
@@ -293,20 +477,23 @@ namespace GameManager
         }
     }
 
-    public interface IObjectPool
-    {
-        void ClearPool();
-    }
-
-    public class ObjectPool<T> : IObjectPool
+    /// <summary>
+    /// 对象堆
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class ObjectStack<T> : IObjectPool
     {
         protected Stack<T> objectStack;
 
-        public ObjectPool()
+        public ObjectStack()
         {
             objectStack = new Stack<T>();
         }
 
+        /// <summary>
+        /// 获得元素
+        /// </summary>
+        /// <returns></returns>
         public virtual T Get()
         {
             if (objectStack.Count > 0)
@@ -316,27 +503,52 @@ namespace GameManager
             return default(T);
         }
 
+        /// <summary>
+        /// 推入元素
+        /// </summary>
+        /// <param name="element">元素</param>
+        /// <returns></returns>
         public virtual bool Push(T element)
         {
             objectStack.Push(element);
             return true;
         }
 
+        /// <summary>
+        /// 清理池
+        /// </summary>
         public virtual void ClearPool()
         {
+            objectStack.Clear();
         }
     }
 
-    public class GameObjectPool : ObjectPool<GameObject>
+    /// <summary>
+    /// 游戏对象堆
+    /// </summary>
+    /// <typeparam name="GameObject"></typeparam>
+    public class GameObjectStack : ObjectStack<GameObject>
     {
         private int maxSize;
         // private int poolSize;
         private Transform poolRoot;
         private GameObject objectPrefab;
 
+        /// <summary>
+        /// 缓存父物体
+        /// </summary>
+        /// <returns></returns>
         public Transform PoolRoot { get { return poolRoot; } }
 
-        public GameObjectPool(string poolName, GameObject objectPrefab, int initCount, int maxSize, Transform poolRoot)
+        /// <summary>
+        /// 构造游戏堆池
+        /// </summary>
+        /// <param name="poolName">池名字</param>
+        /// <param name="objectPrefab">预制体</param>
+        /// <param name="initCount">初始数量</param>
+        /// <param name="maxSize">最大数量</param>
+        /// <param name="poolRoot">缓存父物体</param>
+        public GameObjectStack(string poolName, GameObject objectPrefab, int initCount, int maxSize, Transform poolRoot)
         {
             this.maxSize = maxSize;
             // this.poolSize = initCount;
@@ -363,6 +575,10 @@ namespace GameManager
             return GameObject.Instantiate(objectPrefab) as GameObject;
         }
 
+        /// <summary>
+        /// 获得元素
+        /// </summary>
+        /// <returns></returns>
         public override GameObject Get()
         {
             if (objectStack.Count == 0)
@@ -374,6 +590,11 @@ namespace GameManager
             return go;
         }
 
+        /// <summary>
+        /// 推入元素
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
         public override bool Push(GameObject element)
         {
             if (!element)
@@ -394,6 +615,9 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 清理元素
+        /// </summary>
         public override void ClearPool()
         {
             // while (objectStack.Count > 0)

@@ -51,11 +51,13 @@ namespace GameSystem
                     case SetActiveType.Open:
                         {
                             graphic.enabled = true;
+                            this.enabled = false;
                             return;
                         }
                     case SetActiveType.Close:
                         {
                             graphic.enabled = false;
+                            this.enabled = false;
                             return;
                         }
                     case SetActiveType.PingPong:
@@ -68,6 +70,12 @@ namespace GameSystem
             }
 
             cumulative += Time.deltaTime;
+        }
+
+        public void Reset()
+        {
+            cumulative = 0;
+            this.enabled = true;
         }
     }
 }

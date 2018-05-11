@@ -7,38 +7,49 @@ namespace GameManager
 {
     public class LuaManager : GameManagerBase<LuaManager>
     {
-        private const float GCInterval = 1;//1 second 
-        private float lastGCTime = 0;
+        /// <summary>
+        /// lua gc 间隔
+        /// </summary>
+        private const float GC_INTERVAL = 1;//1 second 
+        private float _lastGCTime = 0;
 
-        private LuaEnv luaEnv;
+        private LuaEnv _luaEnv;
+        public LuaEnv LuaEnv { get { return _luaEnv; } }
 
-        public LuaEnv LuaEnv { get { return luaEnv; } }
+        private Dictionary<string, string> _luaScriptMap;
 
-        private Dictionary<string, string> luaScriptMap;
+        private bool _isApplicationQuit;
 
         #region Singleton
         protected override void SingletonAwake()
         {
-            luaEnv = new LuaEnv();
-            luaScriptMap = new Dictionary<string, string>();
-            initialized = true;
+            _luaEnv = new LuaEnv();
+            _luaScriptMap = new Dictionary<string, string>();
+            _initialized = true;
         }
 
         protected override void SingletonDestroy()
         {
-            // luaEnv.Dispose();
-            // luaEnv = null;
+            if (_isApplicationQuit) return;
+
+            _luaEnv.Dispose();
+            _luaEnv = null;
         }
         #endregion
 
         // Update is called once per frame
         void Update()
         {
-            if (Time.time - lastGCTime > GCInterval)
+            if (Time.time - _lastGCTime > GC_INTERVAL)
             {
-                luaEnv.Tick();
-                lastGCTime = Time.time;
+                _luaEnv.Tick();// lua gc
+                _lastGCTime = Time.time;
             }
+        }
+
+        void OnApplicationQuit()
+        {
+            _isApplicationQuit = true;
         }
     }
 }

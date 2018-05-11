@@ -35,7 +35,7 @@ namespace GameManager
         {
             sendMsgPool = new List<TcpSendMsg>();
             tcpClient = new TcpSocketClient(RECEIVE_BUFFER_MAX_SIZE);
-            initialized = true;
+            _initialized = true;
         }
 
         protected override void SingletonDestroy()

@@ -15,13 +15,13 @@ namespace GameManager
 
     public abstract class GameManagerBase<T> : SingletonMonoBehaviourBase<T>, IGameManager where T : GameManagerBase<T>
     {
-        protected bool initialized;
+        protected bool _initialized;
 
         public bool Initialized
         {
             get
             {
-                return initialized;
+                return _initialized;
             }
         }
 

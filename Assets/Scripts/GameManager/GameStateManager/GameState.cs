@@ -9,36 +9,72 @@ using GameSystem;
 
 namespace GameManager
 {
+    /// <summary>
+    /// 游戏状态接口
+    /// </summary>
     public interface IGameState
     {
+        /// <summary>
+        /// 名字
+        /// </summary>
         string StateName { get; }
+
+        /// <summary>
+        /// 开始
+        /// </summary>
         void Enter();
+
+        /// <summary>
+        /// 更新
+        /// </summary>
         void Update();
+
+        /// <summary>
+        /// 退出
+        /// </summary>
         void Exit();
     }
 
-    public class GameStateBase : IGameState
+    /// <summary>
+    /// 游戏状态基类
+    /// </summary>
+    public abstract class GameStateBase : IGameState
     {
         protected string stateName;
 
+        /// <summary>
+        /// 名字
+        /// </summary>
         public virtual string StateName
         {
             get { return stateName; }
         }
 
+        /// <summary>
+        /// 开始
+        /// </summary>
         public virtual void Enter()
         {
         }
 
+        /// <summary>
+        /// 更新
+        /// </summary>
         public virtual void Update()
         {
         }
 
+        /// <summary>
+        /// 退出
+        /// </summary>
         public virtual void Exit()
         {
         }
     }
 
+    /// <summary>
+    /// 游戏状态(反射类)
+    /// </summary>
     public class ScriptGameState : GameStateBase
     {
         protected string stateType;
@@ -53,6 +89,9 @@ namespace GameManager
             this.stateType = stateType;
         }
 
+        /// <summary>
+        /// 反射函数
+        /// </summary>
         protected void ReflectMethod()
         {
             Type type = Type.GetType(stateType);
@@ -82,6 +121,9 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 开始
+        /// </summary>
         public override void Enter()
         {
             ReflectMethod();
@@ -92,6 +134,9 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 更新
+        /// </summary>
         public override void Update()
         {
             if (updateMethod != null)
@@ -100,6 +145,9 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 退出
+        /// </summary>
         public override void Exit()
         {
             if (exitMethod != null)
@@ -114,6 +162,9 @@ namespace GameManager
         }
     }
 
+    /// <summary>
+    /// 游戏状态(lua)
+    /// </summary>
     public class LuaGameState : GameStateBase
     {
         protected string luaScript;
@@ -148,6 +199,9 @@ namespace GameManager
 
         }
 
+        /// <summary>
+        /// 开始
+        /// </summary>
         public override void Enter()
         {
             BindMethod();
@@ -158,6 +212,9 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 更新
+        /// </summary>
         public override void Update()
         {
             if (updateMethod != null)
@@ -166,6 +223,9 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 退出
+        /// </summary>
         public override void Exit()
         {
             if (exitMethod != null)

@@ -41,6 +41,11 @@ namespace GameSystem
             DownLoad(DownLoadSuccess, DownLoadFail);
         }
 
+        /// <summary>
+        /// 下载游戏资源
+        /// </summary>
+        /// <param name="onDownLoadSuccess">下载成功回调</param>
+        /// <param name="onDownLoadFail">下载失败回调</param>
         void DownLoad(Action onDownLoadSuccess, Action onDownLoadFail)
         {
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -48,16 +53,25 @@ namespace GameSystem
             onDownLoadSuccess();
         }
 
+        /// <summary>
+        /// 下载成功处理
+        /// </summary>
         void DownLoadSuccess()
         {
             InitGame();
         }
 
+        /// <summary>
+        /// 下载失败处理
+        /// </summary>
         void DownLoadFail()
         {
             //todo
         }
 
+        /// <summary>
+        /// 初始化游戏
+        /// </summary>
         void InitGame()
         {
             if (GameConfig.Instance == null)
@@ -94,6 +108,12 @@ namespace GameSystem
             }
         }
 
+        /// <summary>
+        /// 异常信息弹窗
+        /// </summary>
+        /// <param name="e">异常</param>
+        /// <param name="evtConfirm">回调函数</param>
+        /// <param name="prefix">弹窗标题</param>
         private void ShowExceptionPopup(Exception e, Action evtConfirm, string prefix = null)
         {
             _loadLevelExceptionCount++;
@@ -187,6 +207,11 @@ namespace GameSystem
             }
         }
 
+        /// <summary>
+        /// 状态开始
+        /// </summary>
+        /// <param name="currStateName"></param>
+        /// <param name="nextStateName"></param>
         public void OnBeginStateEnter(string currStateName, string nextStateName)
         {
             _loadLevelExceptionCount = 0;
@@ -235,6 +260,12 @@ namespace GameSystem
             }
         }
 
+
+        /// <summary>
+        /// 状态结束
+        /// </summary>
+        /// <param name="currStateName"></param>
+        /// <param name="nextStateName"></param>
         public void OnEndStateExit(string currStateName, string nextStateName)
         {
             _loadLevelExceptionCount = 0;

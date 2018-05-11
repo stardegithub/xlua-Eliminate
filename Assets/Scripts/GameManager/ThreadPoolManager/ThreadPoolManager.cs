@@ -18,7 +18,7 @@ namespace GameManager
         #region Singleton
         protected override void SingletonAwake()
         {
-            initialized = true;
+            _initialized = true;
         }
         #endregion
 

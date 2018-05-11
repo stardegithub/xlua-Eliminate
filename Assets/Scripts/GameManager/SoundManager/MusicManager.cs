@@ -37,7 +37,7 @@ namespace GameManager
             musicVolume = PlayerPrefs.GetFloat(VOLUMEKEY, 1);
 
             musicChannels = new List<MusicChannel>();
-            initialized = true;
+            _initialized = true;
         }
 
         protected override void SingletonDestroy()

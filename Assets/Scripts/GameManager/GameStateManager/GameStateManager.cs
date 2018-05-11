@@ -6,17 +6,20 @@ namespace GameManager
 {
     public class GameStateManager : GameManagerBase<GameStateManager>
     {
-        private IGameState nextState;
-        private IGameState currState;
+        private IGameState _nextState;
+        private IGameState _currState;
+        /// <summary>
+        /// 当前状态
+        /// </summary>
         public IGameState CurrState
         {
             get
             {
-                return currState;
+                return _currState;
             }
         }
 
-        private Dictionary<string, IGameState> gameStates;
+        private Dictionary<string, IGameState> _gameStates;
 
         #region Singleton
         protected override void SingletonAwake()
@@ -26,41 +29,46 @@ namespace GameManager
                 Debug.LogErrorFormat("GameConfig is not found {0}", GameConfig.GAME_CONFIG_PATH);
             }
 
-            gameStates = GameStateHelper.GetGameStates(GameConfig.Instance.gameStateInfos);
-            if (gameStates == null || gameStates.Count == 0)
+            _gameStates = GameStateHelper.GetGameStates(GameConfig.Instance.gameStateInfos);
+            if (_gameStates == null || _gameStates.Count == 0)
             {
                 Error("gameStates is empty");
             }
-            initialized = true;
+            _initialized = true;
         }
         #endregion
 
         void LateUpdate()
         {
-            if (currState != nextState)
+            if (_currState != _nextState)
             {
-                string currStateName = currState == null ? "" : currState.StateName;
-                string nextStateName = nextState == null ? "" : nextState.StateName;
+                string currStateName = _currState == null ? "" : _currState.StateName;
+                string nextStateName = _nextState == null ? "" : _nextState.StateName;
 
-                if (currState != null)
+                if (_currState != null)
                 {
-                    currState.Exit();
+                    _currState.Exit();
                     GameMain.Instance.OnEndStateExit(currStateName, nextStateName);
                 }
 
-                currState = nextState;
-                if (nextState != null)
+                _currState = _nextState;
+                if (_nextState != null)
                 {
 
                     GameMain.Instance.OnBeginStateEnter(currStateName, nextStateName);
-                    nextState.Enter();
+                    _nextState.Enter();
                 }
             }
-            else if (currState != null)
+            else if (_currState != null)
             {
-                currState.Update();
+                _currState.Update();
             }
         }
+        
+        /// <summary>
+        /// 设置状态
+        /// </summary>
+        /// <param name="stateName"></param>
         public void SetNextState(string stateName)
         {
             var gameState = GetState(stateName);
@@ -70,16 +78,25 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 设置状态
+        /// </summary>
+        /// <param name="gameState"></param>
         public void SetNextState(IGameState gameState)
         {
-            nextState = gameState;
+            _nextState = gameState;
         }
 
+        /// <summary>
+        /// 获得状态
+        /// </summary>
+        /// <param name="stateName">状态名字</param>
+        /// <returns></returns>
         public IGameState GetState(string stateName)
         {
-            if (gameStates == null || !Initialized) return null;
+            if (_gameStates == null || !Initialized) return null;
             IGameState gameState;
-            if (!gameStates.TryGetValue(stateName, out gameState))
+            if (!_gameStates.TryGetValue(stateName, out gameState))
             {
                 string msg = string.Format("GameState is not found: {0}", stateName);
                 Error(msg);
@@ -87,16 +104,19 @@ namespace GameManager
             return gameState;
         }
 
+        /// <summary>
+        /// 刷新状态
+        /// </summary>
         public void RefreshState()
         {
-            if (currState != null)
+            if (_currState != null)
             {
-                currState.Exit();
+                _currState.Exit();
             }
 
-            if (currState != null)
+            if (_currState != null)
             {
-                currState.Enter();
+                _currState.Enter();
             }
         }
     }
