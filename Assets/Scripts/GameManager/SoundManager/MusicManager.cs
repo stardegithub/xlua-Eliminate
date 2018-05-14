@@ -3,87 +3,107 @@ using UnityEngine;
 
 namespace GameManager
 {
+    /// <summary>
+    /// 音乐管理器
+    /// </summary>
+    /// <typeparam name="MusicManager"></typeparam>
     public class MusicManager : GameManagerBase<MusicManager>
     {
         private const string VOLUMEKEY = "GameMusicVolume";
-        private float musicVolume;
+        private float _musicVolume;
+        /// <summary>
+        /// 音乐频道
+        /// </summary>
+        /// <returns></returns>
         public float MusicVolume
         {
             get
             {
-                return musicVolume;
+                return _musicVolume;
             }
             set
             {
-                if (value != musicVolume && value >= 0 && value <= 1)
+                if (value != _musicVolume && value >= 0 && value <= 1)
                 {
-                    musicVolume = value;
+                    _musicVolume = value;
                     PlayerPrefs.SetFloat(VOLUMEKEY, value);
-                    for (int i = 0; i < musicChannels.Count; i++)
+                    for (int i = 0; i < _musicChannels.Count; i++)
                     {
-                        musicChannels[i].SetVolume(value);
+                        _musicChannels[i].SetVolume(value);
                     }
                 }
             }
         }
 
-        private MusicChannel backgroundMusic;
-        private List<MusicChannel> musicChannels;
-        public List<MusicChannel> MusicChannels { get { return musicChannels; } }
+        private MusicChannel _backgroundMusic;
+        private List<MusicChannel> _musicChannels;
+        /// <summary>
+        /// 音乐信道
+        /// </summary>
+        /// <returns></returns>
+        public List<MusicChannel> MusicChannels { get { return _musicChannels; } }
 
         #region Singleton
         protected override void SingletonAwake()
         {
-            musicVolume = PlayerPrefs.GetFloat(VOLUMEKEY, 1);
+            _musicVolume = PlayerPrefs.GetFloat(VOLUMEKEY, 1);
 
-            musicChannels = new List<MusicChannel>();
+            _musicChannels = new List<MusicChannel>();
             _initialized = true;
         }
 
         protected override void SingletonDestroy()
         {
-            for (int i = 0; i < musicChannels.Count; i++)
+            for (int i = 0; i < _musicChannels.Count; i++)
             {
-                musicChannels[i].Stop();
+                _musicChannels[i].Stop();
             }
         }
         #endregion
 
         private void Update()
         {
-            for (int i = 0; i < musicChannels.Count; i++)
+            for (int i = 0; i < _musicChannels.Count; i++)
             {
-                if (!musicChannels[i].AudioSource)
+                if (!_musicChannels[i].AudioSource)
                 {
-                    musicChannels.RemoveAt(i);
+                    _musicChannels.RemoveAt(i);
                     i--;
                     continue;
                 }
-                if (musicChannels[i].FadeInfo != null)
+                if (_musicChannels[i].FadeInfo != null)
                 {
-                    if (musicChannels[i].FadeInfo.OnFade(musicChannels[i].AudioSource))
+                    if (_musicChannels[i].FadeInfo.OnFade(_musicChannels[i].AudioSource))
                     {
-                        if (musicChannels[i].FadeInfo.FadeType == MusicFadeType.FadeOut)
+                        if (_musicChannels[i].FadeInfo.FadeType == MusicFadeType.FadeOut)
                         {
-                            musicChannels[i].Stop();
-                            musicChannels.RemoveAt(i);
+                            _musicChannels[i].Stop();
+                            _musicChannels.RemoveAt(i);
                         }
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// 创建音乐频道
+        /// </summary>
+        /// <returns></returns>
         public MusicChannel CreateAudioChannel()
         {
             var audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
-            audioSource.volume = musicVolume;
+            audioSource.volume = _musicVolume;
             audioSource.spatialBlend = 0;
             var musicChannel = new MusicChannel(audioSource);
-            musicChannels.Add(musicChannel);
+            _musicChannels.Add(musicChannel);
             return musicChannel;
         }
 
+        /// <summary>
+        /// 播放音乐
+        /// </summary>
+        /// <param name="audioPath">音频地址</param>
         public void PlayMusic(string audioPath)
         {
             AudioClip audioClip = AssetBundles.DataLoader.Load<AudioClip>(audioPath);
@@ -93,28 +113,44 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 播放音乐
+        /// </summary>
+        /// <param name="audioClip">音频</param>
         public void PlayMusic(AudioClip audioClip)
         {
             var musicChannel = CreateAudioChannel();
             musicChannel.Play(audioClip);
         }
 
+        /// <summary>
+        /// 停止音乐
+        /// </summary>
+        /// <param name="audioPath">音频地址</param>
         public void StopMusic(string audioPath)
         {
             var musicChannel = MusicChannels.Find(c => c.AudioClip != null && c.AudioClip.name == audioPath);
             if (musicChannel != null) musicChannel.Stop();
         }
 
+        /// <summary>
+        /// 停止音乐
+        /// </summary>
+        /// <param name="audioClip">音频</param>
         public void StopMusic(AudioClip audioClip)
         {
             var musicChannel = MusicChannels.Find(c => c.AudioClip == audioClip);
             if (musicChannel != null)
             {
                 musicChannel.Stop();
-                musicChannels.Remove(musicChannel);
+                _musicChannels.Remove(musicChannel);
             }
         }
 
+        /// <summary>
+        /// 音乐渐入
+        /// </summary>
+        /// <param name="audioPath">音频地址</param>
         public void FadeInMusic(string audioPath)
         {
             AudioClip audioClip = AssetBundles.DataLoader.Load<AudioClip>(audioPath);
@@ -124,24 +160,40 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 音乐渐入
+        /// </summary>
+        /// <param name="audioClip">音频</param>
         public void FadeInMusic(AudioClip audioClip)
         {
             var musicChannel = CreateAudioChannel();
-            musicChannel.FadeInfo = new MusicFadeInfo(MusicFadeType.FadeIn, musicVolume);
+            musicChannel.FadeInfo = new MusicFadeInfo(MusicFadeType.FadeIn, _musicVolume);
         }
 
+        /// <summary>
+        /// 音乐渐出
+        /// </summary>
+        /// <param name="audioPath">音频地址</param>
         public void FadeOutMusic(string audioPath)
         {
             var musicChannel = MusicChannels.Find(c => c.AudioClip != null && c.AudioClip.name == audioPath);
             if (musicChannel != null) musicChannel.FadeInfo = new MusicFadeInfo(MusicFadeType.FadeOut, 0);
         }
 
+        /// <summary>
+        /// 音乐渐出
+        /// </summary>
+        /// <param name="audioClip">音频</param>
         public void FadeOutMusic(AudioClip audioClip)
         {
             var musicChannel = MusicChannels.Find(c => c.AudioClip == audioClip);
             if (musicChannel != null) musicChannel.FadeInfo = new MusicFadeInfo(MusicFadeType.FadeOut, 0);
         }
 
+        /// <summary>
+        /// 播放背景音乐
+        /// </summary>
+        /// <param name="audioPath">音频地址</param>
         public void PlayBackgroundMusic(string audioPath)
         {
             AudioClip audioClip = AssetBundles.DataLoader.Load<AudioClip>(audioPath);
@@ -151,24 +203,35 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 播放背景音乐
+        /// </summary>
+        /// <param name="audioClip">音频</param>
         public void PlayBackgroundMusic(AudioClip audioClip)
         {
             var musicChannel = CreateAudioChannel();
             musicChannel.Play(audioClip);
             StopBackgroundMusic();
-            backgroundMusic = musicChannel;
+            _backgroundMusic = musicChannel;
         }
 
+        /// <summary>
+        /// 停止背景音乐
+        /// </summary>
         public void StopBackgroundMusic()
         {
-            if (backgroundMusic != null)
+            if (_backgroundMusic != null)
             {
-                backgroundMusic.Stop();
-                musicChannels.Remove(backgroundMusic);
-                backgroundMusic = null;
+                _backgroundMusic.Stop();
+                _musicChannels.Remove(_backgroundMusic);
+                _backgroundMusic = null;
             }
         }
 
+        /// <summary>
+        /// 背景音乐渐入
+        /// </summary>
+        /// <param name="audioPath">音频地址</param>
         public void FadeInBackgroundMusic(string audioPath)
         {
             AudioClip audioClip = AssetBundles.DataLoader.Load<AudioClip>(audioPath);
@@ -178,62 +241,100 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 背景音乐渐入
+        /// </summary>
+        /// <param name="audioClip">音频</param>
         public void FadeInBackgroundMusic(AudioClip audioClip)
         {
             var musicChannel = CreateAudioChannel();
-            musicChannel.FadeInfo = new MusicFadeInfo(MusicFadeType.FadeIn, musicVolume);
+            musicChannel.FadeInfo = new MusicFadeInfo(MusicFadeType.FadeIn, _musicVolume);
             FadeOutBackgroundMusic();
-            backgroundMusic = musicChannel;
+            _backgroundMusic = musicChannel;
         }
 
+        /// <summary>
+        /// 背景音乐渐出
+        /// </summary>
         public void FadeOutBackgroundMusic()
         {
-            if (backgroundMusic != null)
+            if (_backgroundMusic != null)
             {
-                backgroundMusic.FadeInfo = new MusicFadeInfo(MusicFadeType.FadeOut, 0);
-                backgroundMusic = null;
+                _backgroundMusic.FadeInfo = new MusicFadeInfo(MusicFadeType.FadeOut, 0);
+                _backgroundMusic = null;
             }
         }
     }
 
+    /// <summary>
+    /// 音乐频道
+    /// </summary>
     public class MusicChannel
     {
-        protected AudioSource audioSource;
-        public virtual AudioSource AudioSource { get { return audioSource; } }
-        public virtual AudioClip AudioClip { get { return audioSource ? audioSource.clip : null; } }
+        protected AudioSource _audioSource;
+        /// <summary>
+        /// 音源
+        /// </summary>
+        /// <returns></returns>
+        public virtual AudioSource AudioSource { get { return _audioSource; } }
+        /// <summary>
+        /// 音频
+        /// </summary>
+        /// <returns></returns>
+        public virtual AudioClip AudioClip { get { return _audioSource ? _audioSource.clip : null; } }
 
-
+        /// <summary>
+        /// 音乐渐变信息
+        /// </summary>
+        /// <returns></returns>
         public MusicFadeInfo FadeInfo { get; set; }
 
         public MusicChannel(AudioSource audioSource)
         {
             audioSource.loop = true;
-            this.audioSource = audioSource;
+            this._audioSource = audioSource;
         }
 
+        /// <summary>
+        /// 播放
+        /// </summary>
+        /// <param name="audioClip"></param>
         public void Play(AudioClip audioClip)
         {
-            audioSource.clip = audioClip;
-            audioSource.Play();
+            _audioSource.clip = audioClip;
+            _audioSource.Play();
         }
 
+        /// <summary>
+        /// 停止
+        /// </summary>
         public void Stop()
         {
-            audioSource.Stop();
-            audioSource.clip = null;
-            Object.Destroy(audioSource);
+            _audioSource.Stop();
+            _audioSource.clip = null;
+            Object.Destroy(_audioSource);
         }
 
+        /// <summary>
+        /// 暂停
+        /// </summary>
         public void Pause()
         {
-            audioSource.Pause();
+            _audioSource.Pause();
         }
 
+        /// <summary>
+        /// 继续播放
+        /// </summary>
         public void UnPause()
         {
-            audioSource.UnPause();
+            _audioSource.UnPause();
         }
 
+        /// <summary>
+        /// 设置音量
+        /// </summary>
+        /// <param name="volume"></param>
         public void SetVolume(float volume)
         {
             if (FadeInfo != null && FadeInfo.FadeType == MusicFadeType.FadeIn)
@@ -242,50 +343,73 @@ namespace GameManager
             }
             else
             {
-                audioSource.volume = volume;
+                _audioSource.volume = volume;
             }
         }
 
     }
 
+    /// <summary>
+    /// 音乐渐变信息
+    /// </summary>
     public class MusicFadeInfo
     {
-        private float fadeSpeed;
-        public float FadeSpeed { get { return fadeSpeed; } set { fadeSpeed = value; } }
-        private float fadeEndVolume;
-        public float FadeEndVolume { get { return fadeEndVolume; } set { fadeEndVolume = value; } }
-        private MusicFadeType fadeType;
-        public MusicFadeType FadeType { get { return fadeType; } }
+        private float _fadeSpeed;
+        /// <summary>
+        /// 渐变速度
+        /// </summary>
+        /// <returns></returns>
+        public float FadeSpeed { get { return _fadeSpeed; } set { _fadeSpeed = value; } }
+        private float _fadeEndVolume;
+        /// <summary>
+        /// 渐变结束音量
+        /// </summary>
+        /// <returns></returns>
+        public float FadeEndVolume { get { return _fadeEndVolume; } set { _fadeEndVolume = value; } }
+        private MusicFadeType _fadeType;
+        /// <summary>
+        /// 渐变类型
+        /// </summary>
+        /// <returns></returns>
+        public MusicFadeType FadeType { get { return _fadeType; } }
 
 
         public MusicFadeInfo(MusicFadeType fadeType, float fadeEndVolume)
         {
-            this.fadeEndVolume = fadeEndVolume;
-            this.fadeType = fadeType;
-            this.fadeSpeed = 1;
+            this._fadeEndVolume = fadeEndVolume;
+            this._fadeType = fadeType;
+            this._fadeSpeed = 1;
         }
 
+        /// <summary>
+        /// 渐变
+        /// </summary>
+        /// <param name="audioSource">音源</param>
+        /// <returns></returns>
         public bool OnFade(AudioSource audioSource)
         {
-            if (fadeType == MusicFadeType.FadeIn)
+            if (_fadeType == MusicFadeType.FadeIn)
             {
-                float fadeVolume = audioSource.volume + Time.deltaTime * fadeSpeed;
-                audioSource.volume = Mathf.Max(fadeVolume, fadeEndVolume);
-                if (audioSource.volume <= fadeEndVolume) { return true; }
+                float fadeVolume = audioSource.volume + Time.deltaTime * _fadeSpeed;
+                audioSource.volume = Mathf.Max(fadeVolume, _fadeEndVolume);
+                if (audioSource.volume <= _fadeEndVolume) { return true; }
             }
-            else if (fadeType == MusicFadeType.FadeOut)
+            else if (_fadeType == MusicFadeType.FadeOut)
             {
-                float fadeVolume = audioSource.volume - Time.deltaTime * fadeSpeed;
-                audioSource.volume = Mathf.Min(fadeVolume, fadeEndVolume);
-                if (audioSource.volume >= fadeEndVolume) { return true; }
+                float fadeVolume = audioSource.volume - Time.deltaTime * _fadeSpeed;
+                audioSource.volume = Mathf.Min(fadeVolume, _fadeEndVolume);
+                if (audioSource.volume >= _fadeEndVolume) { return true; }
             }
             return false;
         }
     }
 
+    /// <summary>
+    /// 渐变类型
+    /// </summary>
     public enum MusicFadeType
     {
-        FadeIn,
-        FadeOut,
+        FadeIn,     //渐入
+        FadeOut,    //渐出
     }
 }

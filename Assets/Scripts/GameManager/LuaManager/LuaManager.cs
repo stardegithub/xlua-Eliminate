@@ -5,6 +5,10 @@ using XLua;
 
 namespace GameManager
 {
+    /// <summary>
+    /// Lua管理器
+    /// </summary>
+    /// <typeparam name="LuaManager"></typeparam>
     public class LuaManager : GameManagerBase<LuaManager>
     {
         /// <summary>

@@ -4,6 +4,10 @@ using System.Collections;
 
 namespace GameManager
 {
+    /// <summary>
+    /// 对象池管理器
+    /// </summary>
+    /// <typeparam name="PoolManager"></typeparam>
     public class PoolManager : GameManagerBase<PoolManager>
     {
         private Dictionary<string, IObjectPool> _objectPoolDict;
@@ -616,7 +620,7 @@ namespace GameManager
         }
 
         /// <summary>
-        /// 清理元素
+        /// 清理池
         /// </summary>
         public override void ClearPool()
         {

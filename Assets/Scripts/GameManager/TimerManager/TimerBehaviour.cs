@@ -5,34 +5,43 @@ namespace GameManager
 {
     public class TimerBehaviour : MonoBehaviour, ITimerBehaviour
     {
-        private TimerInfo timerInfo;
+        private TimerInfo _timerInfo;
+        /// <summary>
+        /// 计时信息
+        /// </summary>
+        /// <returns></returns>
         public TimerInfo TimerInfo
         {
             get
             {
-                return timerInfo;
+                return _timerInfo;
             }
         }
 
-        private Action onTimerUpdate;
+        private Action _onTimerUpdate;
 
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="onTimerUpdate"></param>
+        /// <param name="className"></param>
         public void Init(Action onTimerUpdate, string className)
         {
-            timerInfo = new TimerInfo(className, this);
-            TimerManager.Instance.AddTimerEvent(timerInfo);
-            this.onTimerUpdate = onTimerUpdate;
+            _timerInfo = new TimerInfo(className, this);
+            TimerManager.Instance.AddTimerEvent(_timerInfo);
+            this._onTimerUpdate = onTimerUpdate;
         }
 
         public void TimerUpdate()
         {
-            onTimerUpdate();
+            _onTimerUpdate();
         }
 
         private void OnDestroy()
         {
             if (TimerManager.Instance)
             {
-                TimerManager.Instance.RemoveTimerEvent(timerInfo);
+                TimerManager.Instance.RemoveTimerEvent(_timerInfo);
             }
         }
     }

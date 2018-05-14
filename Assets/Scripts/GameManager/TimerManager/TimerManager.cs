@@ -5,6 +5,10 @@ using GameSystem;
 
 namespace GameManager
 {
+    /// <summary>
+    /// 计时器管理器
+    /// </summary>
+    /// <typeparam name="TimerManager"></typeparam>
     public class TimerManager : GameManagerBase<TimerManager>
     {
         private float interval = 0;
@@ -23,7 +27,7 @@ namespace GameManager
         }
 
         /// <summary>
-        /// ������ʱ��
+        /// 启动计时器
         /// </summary>
         /// <param name="interval"></param>
         public void StartTimer(float value)
@@ -33,7 +37,7 @@ namespace GameManager
         }
 
         /// <summary>
-        /// ֹͣ��ʱ��
+        /// 停止计时器
         /// </summary>
         public void StopTimer()
         {
@@ -41,7 +45,7 @@ namespace GameManager
         }
 
         /// <summary>
-        /// ���Ӽ�ʱ���¼�
+        /// 添加计时器事件
         /// </summary>
         /// <param name="name"></param>
         /// <param name="o"></param>
@@ -54,43 +58,43 @@ namespace GameManager
         }
 
         /// <summary>
-        /// ɾ����ʱ���¼�
+        /// 删除计时器事件
         /// </summary>
         /// <param name="name"></param>
         public void RemoveTimerEvent(TimerInfo info)
         {
             if (objects.Contains(info) && info != null)
             {
-                info.delete = true;
+                info.Delete = true;
             }
         }
 
         /// <summary>
-        /// ֹͣ��ʱ���¼�
+        /// 停止计时器事件
         /// </summary>
         /// <param name="info"></param>
         public void StopTimerEvent(TimerInfo info)
         {
             if (objects.Contains(info) && info != null)
             {
-                info.stop = true;
+                info.Stop = true;
             }
         }
 
         /// <summary>
-        /// ������ʱ���¼�
+        /// 继续计时器事件
         /// </summary>
         /// <param name="info"></param>
         public void ResumeTimerEvent(TimerInfo info)
         {
             if (objects.Contains(info) && info != null)
             {
-                info.delete = false;
+                info.Delete = false;
             }
         }
 
         /// <summary>
-        /// ��ʱ������
+        /// 计时器运行
         /// </summary>
         void Run()
         {
@@ -98,13 +102,13 @@ namespace GameManager
             for (int i = 0; i < objects.Count; i++)
             {
                 TimerInfo o = objects[i];
-                if (o.delete || o.stop) { continue; }
-                o.target.TimerUpdate();
-                o.tick++;
+                if (o.Delete || o.Stop) { continue; }
+                o.Target.TimerUpdate();
+                o.Tick++;
             }
             for (int i = objects.Count - 1; i >= 0; i--)
             {
-                if (objects[i].delete) { objects.Remove(objects[i]); }
+                if (objects[i].Delete) { objects.Remove(objects[i]); }
             }
         }
     }

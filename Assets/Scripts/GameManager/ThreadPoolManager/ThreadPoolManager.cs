@@ -4,15 +4,28 @@ using System;
 
 namespace GameManager
 {
+    /// <summary>
+    /// 线程池管理器
+    /// </summary>
+    /// <typeparam name="ThreadPoolManager"></typeparam>
     public class ThreadPoolManager : GameManagerBase<ThreadPoolManager>
     {
-        private int locker;
-        private int count;
+        private int _locker;
+        private int _count;
+        /// <summary>
+        /// 主线程处理函数队列
+        /// </summary>
+        /// <typeparam name="ParametricAction"></typeparam>
+        /// <returns></returns>
         private Queue<ParametricAction> TheActions = new Queue<ParametricAction>(13);
 
+        /// <summary>
+        /// 主线程处理函数数量
+        /// </summary>
+        /// <returns></returns>
         public int GetCount()
         {
-            return count;
+            return _count;
         }
 
         #region Singleton
@@ -27,20 +40,20 @@ namespace GameManager
         {
             ParametricAction? nowAction = null;
 
-            if (count > 0 && Interlocked.CompareExchange(ref locker, 1, 0) == 0)  //能够从0换成1
+            if (_count > 0 && Interlocked.CompareExchange(ref _locker, 1, 0) == 0)  //能够从0换成1
             {
                 try
                 {
-                    if (count > 0)
+                    if (_count > 0)
                     {
                         nowAction = TheActions.Dequeue();
-                        count--;
+                        _count--;
 
                     }
                 }
                 finally
                 {
-                    locker = 0;
+                    _locker = 0;
                 }
             }
 
@@ -50,14 +63,19 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 其它线程函数交给主线程处理
+        /// </summary>
+        /// <param name="obj">函数参数</param>
+        /// <param name="action">函数</param>
         public void QueueOnU3DThread(object obj, Action<object> action)
         {
         Redo:
-            if (Interlocked.CompareExchange(ref locker, 1, 0) == 0)  //能够从0换成1
+            if (Interlocked.CompareExchange(ref _locker, 1, 0) == 0)  //能够从0换成1
             {
                 TheActions.Enqueue(new ParametricAction(action, obj));
-                count++;
-                locker = 0;
+                _count++;
+                _locker = 0;
             }
             else  //CPU自旋等待
             {
@@ -65,11 +83,16 @@ namespace GameManager
             }
         }
 
+        /// <summary>
+        /// 交给其它空闲线程处理函数
+        /// </summary>
+        /// <param name="obj">函数参数</param>
+        /// <param name="action">函数</param>
         public void QueueOnOtherThread(object obj, Action<object> action)
         {
 
 #if (UNITY_WINRT_8_0 || UNITY_WINRT_8_1) && !UNITY_EDITOR
-        Windows.System.Threading.ThreadPool.RunAsync(new Windows.System.Threading.WorkItemHandler((ia) =>
+            Windows.System.Threading.ThreadPool.RunAsync(new Windows.System.Threading.WorkItemHandler((ia) =>
 #else
             System.Threading.ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback((o) =>
 #endif
