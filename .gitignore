@@ -55,6 +55,9 @@ Output/
 Shell/BuildInfo
 Shell/Upload.sh
 
+# 变更日志
+CHANGELOG.md
+
 # ReadMe
 README.html
 BuildInfo.html
