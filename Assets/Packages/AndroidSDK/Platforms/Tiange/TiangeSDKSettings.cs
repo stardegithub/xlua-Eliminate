@@ -1,4 +1,4 @@
-﻿#if (UNITY_ANDROID) && (UNITY_EDITOR)
+﻿#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System.IO;
@@ -7,6 +7,8 @@ using Common;
 using AndroidSDK.Common;
 using AndroidSDK.Common.Manifest;
 using AndroidSDK.Platforms.Tiange.Manifest;
+using BuildSystem.Options;
+using BuildSystem.Options.OneSDK;
 
 namespace AndroidSDK.Platforms.Tiange {
 
@@ -15,14 +17,13 @@ namespace AndroidSDK.Platforms.Tiange {
 	/// </summary>
 	[System.Serializable]
 	public class TiangeSDKSettingsData : AndroidSDKSettingsData {
-
 		/// <summary>
 		/// 初始化.
 		/// </summary>
 		public override void Init() {
 			base.Init ();
 
-			this.PlatformType = TPlatformType.Huawei;
+			this.PlatformType = TPlatformType.Tiange;
 			this.MinSdkVersion = 19;
 			this.MaxSdkVersion = 26;
 			this.TargetSdkVersion = 25;
@@ -48,12 +49,18 @@ namespace AndroidSDK.Platforms.Tiange {
 	}
 
 	/// <summary>
+	/// 天鸽SDK设定数据.
+	/// </summary>
+	[System.Serializable]
+	public class TiangeSDKData : OptionsDataBase<TiangeSDKSettingsData, BuildSettingOptionsData> {}
+
+	/// <summary>
 	/// 天鸽SDK设定.
 	/// </summary>
 	public class TiangeSDKSettings 
-		: AssetBase<TiangeSDKSettings, TiangeSDKSettingsData>, IAndroidSDKSettings {
+		: AssetOptionsBase<TiangeSDKSettings, TiangeSDKData, TiangeSDKSettingsData, BuildSettingOptionsData>, IAndroidSDKSettings {
 
-		private static readonly string _assetFileDir = "Assets/Packages/AndroidSDK/Platforms/Tiange/Conf";
+		public static readonly string AssetFileDir = "Assets/Packages/AndroidSDK/Platforms/Tiange/Conf";
 
 		/// <summary>
 		/// 平台类型.
@@ -61,8 +68,8 @@ namespace AndroidSDK.Platforms.Tiange {
 		public TPlatformType PlatformType {
 			get { 
 				if (null != this.Data) {
-					if ((TPlatformType.Huawei != this.Data.PlatformType)) {
-						return this.Data.PlatformType = TPlatformType.Tiange;
+					if ((TPlatformType.Tiange != this.Data.Default.PlatformType)) {
+						return this.Data.Default.PlatformType = TPlatformType.Tiange;
 					}
 				}
 				return TPlatformType.Tiange;
@@ -75,13 +82,13 @@ namespace AndroidSDK.Platforms.Tiange {
 		public int MinSdkVersion {
 			get { 
 				if (null != this.Data) {
-					return this.Data.MinSdkVersion;
+					return this.Data.Default.MinSdkVersion;
 				}
 				return -1;
 			}	
 			set { 
 				if (null != this.Data) {
-					this.Data.MinSdkVersion = value;
+					this.Data.Default.MinSdkVersion = value;
 				}
 			}
 		}
@@ -92,13 +99,13 @@ namespace AndroidSDK.Platforms.Tiange {
 		public int MaxSdkVersion {
 			get { 
 				if (null != this.Data) {
-					return this.Data.MaxSdkVersion;
+					return this.Data.Default.MaxSdkVersion;
 				}
 				return -1;
 			}	
 			set { 
 				if (null != this.Data) {
-					this.Data.MaxSdkVersion = value;
+					this.Data.Default.MaxSdkVersion = value;
 				}
 			}	
 		}
@@ -109,49 +116,15 @@ namespace AndroidSDK.Platforms.Tiange {
 		public int TargetSdkVersion {
 			get { 
 				if (null != this.Data) {
-					return this.Data.TargetSdkVersion;
+					return this.Data.Default.TargetSdkVersion;
 				}
 				return -1;
 			}
 			set { 
 				if (null != this.Data) {
-					this.Data.TargetSdkVersion = value;
+					this.Data.Default.TargetSdkVersion = value;
 				}
 			}	
-		}
-
-		/// <summary>
-		/// App ID.
-		/// </summary>
-		public string AppID {
-			get { 
-				if (null != this.Data) {
-					return this.Data.AppID;
-				}
-				return null;
-			}
-			set { 
-				if (null != this.Data) {
-					this.Data.AppID = value;
-				}
-			}	
-		}
-
-		/// <summary>
-		/// 支付ID.
-		/// </summary>
-		public string PayID {
-			get { 
-				if (null != this.Data) {
-					return this.Data.PayID;
-				}
-				return null;
-			}		
-			set { 
-				if (null != this.Data) {
-					this.Data.PayID = value;
-				}
-			}
 		}
 
 		/// <summary>
@@ -160,13 +133,13 @@ namespace AndroidSDK.Platforms.Tiange {
 		public UIOrientation Orientation {
 			get { 
 				if (null != this.Data) {
-					return this.Data.Orientation;
+					return this.Data.Default.Orientation;
 				}
 				return PlayerSettings.defaultInterfaceOrientation;
 			}	
 			set { 
 				if (null != this.Data) {
-					this.Data.Orientation = value;
+					this.Data.Default.Orientation = value;
 				}
 			}
 		}
@@ -177,13 +150,13 @@ namespace AndroidSDK.Platforms.Tiange {
 		public bool Local {
 			get { 
 				if (null != this.Data) {
-					return this.Data.Local;
+					return this.Data.Default.Local;
 				}
 				return true;
 			}	
 			set { 
 				if (null != this.Data) {
-					this.Data.Local = value;
+					this.Data.Default.Local = value;
 				}
 			}
 		}
@@ -194,13 +167,13 @@ namespace AndroidSDK.Platforms.Tiange {
 		public bool AutoSDKInit {
 			get { 
 				if (null != this.Data) {
-					return this.Data.AutoSDKInit;
+					return this.Data.Default.AutoSDKInit;
 				}
 				return true;
 			}	
 			set { 
 				if (null != this.Data) {
-					this.Data.AutoSDKInit = value;
+					this.Data.Default.AutoSDKInit = value;
 				}
 			}
 		}
@@ -211,13 +184,13 @@ namespace AndroidSDK.Platforms.Tiange {
 		public bool AutoLogin {
 			get { 
 				if (null != this.Data) {
-					return this.Data.AutoLogin;
+					return this.Data.Default.AutoLogin;
 				}
 				return true;
 			}	
 			set { 
 				if (null != this.Data) {
-					this.Data.AutoLogin = value;
+					this.Data.Default.AutoLogin = value;
 				}
 			}
 		}
@@ -229,7 +202,7 @@ namespace AndroidSDK.Platforms.Tiange {
 		/// </summary>
 		/// <returns>导入路径.</returns>
 		public override string GetImportPath () {
-			return string.Format("{0}/Json", _assetFileDir);
+			return string.Format("{0}/Json", AssetFileDir);
 		}
 
 		/// <summary>
@@ -237,7 +210,7 @@ namespace AndroidSDK.Platforms.Tiange {
 		/// </summary>
 		/// <returns>导出路径.</returns>
 		public override string GetExportPath () {
-			return string.Format("{0}/Json", _assetFileDir);
+			return string.Format("{0}/Json", AssetFileDir);
 		}
 
 		/// <summary>
@@ -253,7 +226,7 @@ namespace AndroidSDK.Platforms.Tiange {
 		/// </summary>
 		/// <param name="iData">数据.</param>
 		/// <param name="iForceClear">强制清空.</param>
-		protected override void ApplyData(TiangeSDKSettingsData iData, bool iForceClear) {
+		protected override void ApplyData(TiangeSDKData iData, bool iForceClear) {
 
 			if (null == iData) {
 				return;
@@ -264,15 +237,17 @@ namespace AndroidSDK.Platforms.Tiange {
 				this.Clear ();
 			}
 
-			this.Data.MinSdkVersion = iData.MinSdkVersion;
-			this.Data.MaxSdkVersion = iData.MaxSdkVersion;
-			this.Data.TargetSdkVersion = iData.TargetSdkVersion;
-			this.Data.AppID = iData.AppID;
-			this.Data.PayID = iData.PayID;
-			this.Data.Orientation = iData.Orientation;
-			this.Data.Local = iData.Local;
-			this.Data.AutoSDKInit = iData.AutoSDKInit;
-			this.Data.AutoLogin = iData.AutoLogin;
+			this.Data.Default.MinSdkVersion = iData.Default.MinSdkVersion;
+			this.Data.Default.MaxSdkVersion = iData.Default.MaxSdkVersion;
+			this.Data.Default.TargetSdkVersion = iData.Default.TargetSdkVersion;
+			this.Data.Default.Orientation = iData.Default.Orientation;
+			this.Data.Default.Local = iData.Default.Local;
+			this.Data.Default.AutoSDKInit = iData.Default.AutoSDKInit;
+			this.Data.Default.AutoLogin = iData.Default.AutoLogin;
+
+			this.Data.Options.OptionsSettings = iData.Options.OptionsSettings;
+			this.Data.Options.OneSDK.ZyClassName = iData.Options.OneSDK.ZyClassName;
+			this.Data.Options.OneSDK.MetaDatas.AddRange(iData.Options.OneSDK.MetaDatas);
 
 			UtilsAsset.SetAssetDirty (this);
 
@@ -301,7 +276,7 @@ namespace AndroidSDK.Platforms.Tiange {
 		public bool InitSettings() {
 
 			// 路径
-			this._path = _assetFileDir;
+			this._path = AssetFileDir;
 
 			return true; 
 		}
@@ -439,13 +414,33 @@ namespace AndroidSDK.Platforms.Tiange {
 			string CopyFromDir = GetAndroidCopyFromDir ();
 			string CopyToDir = GetAndroidCopyToDir ();
 
-			// Libs
-			string[] files = Directory.GetFiles (CopyFromDir);
+			// 拷贝资源文件包含子文件夹中的内容
+			this.CopyAllFiles(CopyFromDir, CopyToDir);
+
+		}
+
+		/// <summary>
+		/// 拷贝所有文件.
+		/// </summary>
+		/// <param name="iFromDir">拷贝源目录.</param>
+		/// <param name="iToDir">拷贝目标目录.</param>
+		private void CopyAllFiles(string iFromDir, string iToDir) {
+
+			if (false == Directory.Exists (iToDir)) {
+				Directory.CreateDirectory (iToDir);
+			}
+
+			// 源目录下的文件
+			string[] files = Directory.GetFiles (iFromDir);
 			foreach (string file in files) {
-				if (true == file.EndsWith ("AndroidManifest.xml")) {
+
+				if (true == file.EndsWith (".meta")) {
 					continue;
 				}
-				if (true == file.EndsWith (".meta")) {
+				if (true == file.EndsWith (".DS_Store")) {
+					continue;
+				}
+				if (true == file.EndsWith ("AndroidManifest.xml")) {
 					continue;
 				}
 
@@ -455,7 +450,7 @@ namespace AndroidSDK.Platforms.Tiange {
 					continue;
 				}
 
-				string copyToFile = string.Format ("{0}/{1}", CopyToDir, fileName);
+				string copyToFile = string.Format ("{0}/{1}", iToDir, fileName);
 				if (true == File.Exists (copyToFile)) {
 					File.Delete (copyToFile);
 				}
@@ -465,10 +460,15 @@ namespace AndroidSDK.Platforms.Tiange {
 				File.Copy (file, copyToFile);
 			}
 
-			// res
-			string CopyRes = string.Format ("{0}/res", CopyFromDir);
-			if (true == Directory.Exists (CopyRes)) {
-				UtilsAsset.CopyDirectory (CopyRes, CopyToDir);
+			// 源目录下的子文件夹
+			string[] _dirs = Directory.GetDirectories(iFromDir);
+			foreach (string dir in _dirs) {
+				DirectoryInfo _dirInfo = new DirectoryInfo (dir);
+				if (null == _dirInfo) {
+					continue;
+				}
+				CopyAllFiles (_dirInfo.FullName, 
+					string.Format("{0}/{1}", iToDir, _dirInfo.Name));
 			}
 		}
 

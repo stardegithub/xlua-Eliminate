@@ -121,10 +121,30 @@ namespace IAP
 		/// 转换为文字串.
 		/// </summary>
 		/// <returns>文字串</returns>
-		public string ToString() {
+		public virtual string ToString() {
 			return string.Format ("ProductID::{0} Title::{1} Description::{2} Price::{3} PriceAsString::{4} CurrencySymbol::{5} CurrencyCode::{6} LocaleIdentifier::{7} CountryCode::{8}",
 				this.ProductID, this.Title, this.Description, this.Price, this.PriceAsString,
 				this.CurrencySymbol, this.CurrencyCode, this.LocaleIdentifier, this.CountryCode);
+		}
+	}
+		
+	/// <summary>
+	/// 产品定义.
+	/// </summary>
+	public class ProductAndroid : Product {
+
+		/// <summary>
+		/// 数量.
+		/// </summary>
+		public int Count { get; set; }
+
+		/// <summary>
+		/// 转换为文字串.
+		/// </summary>
+		/// <returns>文字串</returns>
+		public override string ToString() {
+			return string.Format ("{0} Count:{1}",
+				base.ToString(), Count);
 		}
 	}
 }

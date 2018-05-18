@@ -5,9 +5,12 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Collections;
+using System.Collections.Generic;
 using BuildSystem;
 using AndroidSDK.Common.Manifest;
 using AndroidSDK.Platforms.Huawei;
+using BuildSystem.Options;
+using BuildSystem.Options.OneSDK;
 
 namespace AndroidSDK.Platforms.Tiange.Manifest {
 
@@ -105,56 +108,85 @@ namespace AndroidSDK.Platforms.Tiange.Manifest {
 
 			// 本地设定
 			{
-				string name = "Tiange_Local";
-				string value = HuaweiSDKSettings.GetInstance ().Local.ToString();
+				string name = "Local";
+				string value = TiangeSDKSettings.GetInstance ().Local.ToString();
 				if (false == string.IsNullOrEmpty (value)) {
 					this.AddUserDefineNode (name, value, false);
 				}
-				if (HuaweiSDKSettings.GetInstance ().Local == false) {
+				if (TiangeSDKSettings.GetInstance ().Local == false) {
 					return;
 				}
 			}
 
 			// 游戏名
 			{
-				string name = "Tiange_GameName";
+				string name = "GameName";
 				string value = iGameName;
 				if (false == string.IsNullOrEmpty (value)) {
 					this.AddUserDefineNode (name, value);
 				}
 			}
 
-			// 自动登录
+			// SDK自动初始化
 			{
-				string name = "Tiange_AutoLogin";
-				string value = HuaweiSDKSettings.GetInstance ().AutoLogin.ToString();
+				string name = "AutoSDKInit";
+				string value = TiangeSDKSettings.GetInstance ().AutoSDKInit.ToString();
 				if (false == string.IsNullOrEmpty (value)) {
 					this.AddUserDefineNode (name, value, false);
 				}
-				if (HuaweiSDKSettings.GetInstance ().Local == false) {
+				if (TiangeSDKSettings.GetInstance ().Local == false) {
 					return;
 				}
 			}
 
-			// AppID
+			// 自动登录
 			{
-				string name = "Tiange_AppID";
-				string value = HuaweiSDKSettings.GetInstance().AppID;
+				string name = "AutoLogin";
+				string value = TiangeSDKSettings.GetInstance ().AutoLogin.ToString();
 				if (false == string.IsNullOrEmpty (value)) {
-					this.AddUserDefineNode (name, value);
+					this.AddUserDefineNode (name, value, false);
+				}
+				if (TiangeSDKSettings.GetInstance ().Local == false) {
+					return;
 				}
 			}
 			// 屏幕方向
 			{
-				string name = "Tiange_Orientation";
+				string name = "Orientation";
 				string value = "1";
-				UIOrientation _Orientation = HuaweiSDKSettings.GetInstance ().Orientation;
+				UIOrientation _Orientation = TiangeSDKSettings.GetInstance ().Orientation;
 				if ((UIOrientation.LandscapeLeft == _Orientation) ||
 					(UIOrientation.LandscapeRight == _Orientation)) {
 					value = "2";
 				}
 				if (false == string.IsNullOrEmpty (value)) {
 					this.AddUserDefineNode (name, value, false);
+				}
+			}
+
+			// 易接SDK 设定
+			if (true == TiangeSDKSettings.GetInstance ().Data.Options.isOptionValid (TSDKOptions.OneSDK)) {
+
+				// 易接SDK Key
+				{
+					string name = "zy_class_name";
+					string value = TiangeSDKSettings.GetInstance ().Data.Options.OneSDK.ZyClassName;
+					if (false == string.IsNullOrEmpty (value)) {
+						this.AddUserDefineNode (name, value);
+					}
+				}
+
+				// 易接SDK MetaDatas
+				{
+
+					List<MetaDataInfo> _metaDatas = TiangeSDKSettings.GetInstance ().Data.Options.OneSDK.MetaDatas;
+					foreach (MetaDataInfo _metaData in _metaDatas) {
+						if ((null != _metaData) && 
+							(false == string.IsNullOrEmpty (_metaData.Name)) && 
+							(false == string.IsNullOrEmpty (_metaData.Value))) {
+							this.AddUserDefineNode (_metaData.Name, _metaData.Value, false);
+						}
+					}
 				}
 			}
 

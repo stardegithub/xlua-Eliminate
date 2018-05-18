@@ -94,6 +94,8 @@ namespace CommandLine {
 			if (false == string.IsNullOrEmpty (_defines)) {
 				PlayerSettings.SetScriptingDefineSymbolsForGroup (iTargetGroup, _defines); 
 				UtilsLog.Info ("DefinesSetting", "SetDefines -> Target:{0} Defines:{1}", iTargetGroup, _defines);
+				BuildLogger.LogMessage ("DefinesSetting()::Defines({0}):{1}",
+					iTargetGroup.ToString(), _defines);
 			}
 		}
 	}

@@ -292,7 +292,7 @@ namespace Common {
 
 			// 删除数据文件
 			if (true == iIsFileDelete) {
-				UtilsAsset.DeleteFile<BuildInfoData> ();
+				UtilsAsset.DeleteFile<T1> ();
 			}
 
 			UtilsAsset.SetAssetDirty (this);

@@ -36,16 +36,6 @@ namespace AndroidSDK.Common {
 		public int TargetSdkVersion;
 
 		/// <summary>
-		/// App ID.
-		/// </summary>
-		public string AppID;
-
-		/// <summary>
-		/// 支付ID.
-		/// </summary>
-		public string PayID;
-
-		/// <summary>
 		/// 屏幕方向.
 		/// </summary>
 		public UIOrientation Orientation;
@@ -73,19 +63,10 @@ namespace AndroidSDK.Common {
 			MinSdkVersion = -1;
 			MaxSdkVersion = -1;
 			TargetSdkVersion = -1;
-			AppID = null;
-			PayID = null;
 			Orientation = PlayerSettings.defaultInterfaceOrientation;
 			Local = false;
 			AutoSDKInit = true;
 			AutoLogin = true;
-		}
-
-		/// <summary>
-		/// 重置.
-		/// </summary>
-		public override void Reset() {
-			
 		}
 
 		/// <summary>

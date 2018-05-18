@@ -224,7 +224,7 @@ namespace AssetBundles {
 			foreach (BundleMap loop in maps) {
 				foreach (string filePath in loop.Targets) {
 					
-					string Key = this.GetKeyOfMapByFilePath(filePath.ToLower ());
+					string Key = GetKeyOfMapByFilePath(filePath);
 
 					// Scene文件
 					if (filePath.EndsWith (_FILE_SUNFFIX_SCENE) == true) {
@@ -260,7 +260,7 @@ namespace AssetBundles {
 						this._jsonFilesMap [Key] = loop.ID;
 					}
 
-					this._bundlesMap [filePath] = loop.ID;
+					this._bundlesMap [Key] = loop.ID;
 				}
 			}
 		}
@@ -270,13 +270,14 @@ namespace AssetBundles {
 		/// </summary>
 		/// <returns>文件名.</returns>
 		/// <param name="iFilePath">文件路径.</param>
-		private string GetKeyOfMapByFilePath(string iFilePath) {
+		public static string GetKeyOfMapByFilePath(string iFilePath) {
 			int lastIndex = iFilePath.LastIndexOf ("/");
 			string fileName = iFilePath.Substring(lastIndex + 1);
 			lastIndex = fileName.LastIndexOf (".");
 			if (-1 >= lastIndex) {
 				return fileName;
 			}
+				
 			fileName = fileName.Substring(0, lastIndex);
 			return fileName;
 		}
@@ -965,8 +966,13 @@ namespace AssetBundles {
 		/// <param name="iFilePath">文件路径.</param>
 		public UnityEngine.Object LoadAssetBundle(string iFilePath) {
 
+			string _fileName = AssetBundlesManager.GetKeyOfMapByFilePath (iFilePath);
+			if (true == string.IsNullOrEmpty (_fileName)) {
+				return null;
+			}
+
 			UnityEngine.Object objTmp = this.LoadFromAssetBundle<UnityEngine.Object> (
-				iFilePath, TAssetBundleType.None);
+				_fileName, TAssetBundleType.None);
 			if (objTmp != null) {
 				return objTmp;
 			}
@@ -979,8 +985,13 @@ namespace AssetBundles {
 		/// <param name="iFilePath">文件路径.</param>
 		public T LoadAssetBundle<T>(string iFilePath) where T : UnityEngine.Object {
 
+			string _fileName = AssetBundlesManager.GetKeyOfMapByFilePath (iFilePath);
+			if (true == string.IsNullOrEmpty (_fileName)) {
+				return null;
+			}
+
 			T objTmp = this.LoadFromAssetBundle<T> (
-				iFilePath, TAssetBundleType.None);
+				_fileName, TAssetBundleType.None);
 			if (objTmp != null) {
 				return objTmp;
 			}
@@ -1031,7 +1042,7 @@ namespace AssetBundles {
 			}
 			return bundle;
 		}
-
+		 
 		/// <summary>
 		/// 加载AssetBundle.
 		/// </summary>
