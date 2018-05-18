@@ -1,20 +1,22 @@
-﻿using System.Collections;
-using System.IO;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.IO;
+using System.Collections;
 using Common;
 using AssetBundles;
 using Download;
 using AndroidSDK;
 using AndroidSDK.Common;
 using AndroidSDK.Platforms.Huawei;
+#if UNITY_ANDROID
 using AndroidSDK.Platforms.Tiange;
+#endif
 using BuildSystem;
-using Upload;
-using NetWork.Servers;
 using Common;
+using NetWork.Servers;
+using Upload;
 
 namespace CommandLine {
 	/// <summary>
@@ -186,9 +188,10 @@ namespace CommandLine {
 			} else {
 				BuildLogger.LogMessage("Android Build Successed.");
 			}
+
 			BuildLogger.CloseBlock();
 		}
-			
+
 		static void InitForAndroidBuild() {
 
 			// 清空下载目录
@@ -198,6 +201,8 @@ namespace CommandLine {
 			}
 			// 初始化打包信息
 			BuildSettings.GetInstance (BuildSettings.AssetFileDir);
+
+			#if UNITY_ANDROID
 
 			// 设定选项
 			// 天鸽的场合
@@ -231,9 +236,13 @@ namespace CommandLine {
 				BuildLogger.LogWarning("Android SDK invalid!!");
 			}
 
+			#endif
+
 			// 刷新
 			UtilsAsset.AssetsRefresh ();
 		}
+			
+#if UNITY_ANDROID
 
 		/// <summary>
 		/// 清空Plugins/Android目录.
@@ -332,6 +341,8 @@ namespace CommandLine {
 
 			return settings;
 		}
+
+#endif
 
 		#endregion
 
