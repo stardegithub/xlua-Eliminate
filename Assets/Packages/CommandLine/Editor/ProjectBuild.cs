@@ -1,9 +1,9 @@
-﻿using System.Collections;
-using System.IO;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.IO;
+using System.Collections;
 using Common;
 using AssetBundles;
 using Download;
@@ -11,11 +11,13 @@ using AndroidSDK;
 using AndroidSDK.Common;
 using AndroidSDK.OneSDK;
 using AndroidSDK.Platforms.Huawei;
+#if UNITY_ANDROID
 using AndroidSDK.Platforms.Tiange;
+#endif
 using BuildSystem;
-using Upload;
-using NetWork.Servers;
 using Common;
+using NetWork.Servers;
+using Upload;
 
 namespace CommandLine {
 	/// <summary>
@@ -62,6 +64,8 @@ namespace CommandLine {
 
 			// 设定打包信息
 			SetBuildInfoFromParameters();
+
+#if UNITY_ANDROID
 
 			TBuildMode buildMode = BuildInfo.GetInstance().BuildMode;
 			BuildLogger.LogMessage ("BuildMode:{0}", buildMode.ToString());
@@ -183,9 +187,19 @@ namespace CommandLine {
 			} else {
 				BuildLogger.LogMessage("Android Build Successed.");
 			}
+
+#else
+
+			BuildLogger.LogError("The platform for build is not android.");
+
+#endif
+
 			BuildLogger.CloseBlock();
 		}
 			
+
+		#if UNITY_ANDROID
+
 		static void InitForAndroidBuild() {
 
 			// 清空下载目录
@@ -313,6 +327,8 @@ namespace CommandLine {
 
 			return settings;
 		}
+
+#endif
 
 		#endregion
 
