@@ -84,7 +84,11 @@ namespace IAP
 		/// </summary>
 		static IAPMsgSwitch () {
 			if(Application.isMobilePlatform == true) {
+
+#if (UNITY_IOS || UNITY_IPHONE)
 				IAPSetCallbacks (CreateProduct, TransactionUpdated, RestoreFinished, IAPFailed);
+#endif
+
 			}
 		}
 
@@ -99,10 +103,10 @@ namespace IAP
 #region MonoPInvokeCallback
 
 		[MonoPInvokeCallback (typeof (IAPCreateProductCallback))]
-		static void CreateProduct(string title, string description, string identifier, float price, string priceString, 
+		public static void CreateProduct(string title, string description, string identifier, float price, string priceString, 
 			string currency, string code, string locale, string iCountryCode)
 		{
-			UtilsLog.Info ("IAPiOS", "[CreateProduct] Title:{0} Description:{1} Identifier:{2} Price:{3} PriceString:{4} Currency:{5} Code:{6} Locale:{7} CountryCode:{8}",
+			UtilsLog.Info ("IAPMsgSwitch", "[CreateProduct] Title:{0} Description:{1} Identifier:{2} Price:{3} PriceString:{4} Currency:{5} Code:{6} Locale:{7} CountryCode:{8}",
 				title, description, identifier, price.ToString(), priceString, currency, code, locale, iCountryCode);
 			if (string.IsNullOrEmpty(identifier) == false) 
 			{	
@@ -134,9 +138,9 @@ namespace IAP
 		}
 
 		[MonoPInvokeCallback (typeof (IAPTransactionUpdatedCallback))]
-		static void TransactionUpdated(string productID, TransactionState state, string transactionID, string receipt, Int32 quantity)
+		public static void TransactionUpdated(string productID, TransactionState state, string transactionID, string receipt, Int32 quantity)
 		{
-			UtilsLog.Info ("IAPiOS", "[TransactionUpdated] ProductID:{0}({1}) State:{2} TransactionID:{3} Receipt:{4}",
+			UtilsLog.Info ("IAPMsgSwitch", "[TransactionUpdated] ProductID:{0}({1}) State:{2} TransactionID:{3} Receipt:{4}",
 				((true == string.IsNullOrEmpty(productID)) ? "null" : productID), 
 				quantity, state.ToString(), 
 				((true == string.IsNullOrEmpty(transactionID)) ? "null" : transactionID), 
@@ -181,17 +185,17 @@ namespace IAP
 		}
 
 		[MonoPInvokeCallback (typeof (IAPRestoreFinishedCallback))]
-		static void RestoreFinished()
+		public static void RestoreFinished()
 		{
-			UtilsLog.Info ("IAPiOS", "[RestoreFinished]");
+			UtilsLog.Info ("IAPMsgSwitch", "[RestoreFinished]");
 			if ((null != IAPInstance) && (null != IAPInstance.OnRestoreFinished)) {
 				IAPInstance.OnRestoreFinished ();
 			}
 		}
 
 		[MonoPInvokeCallback (typeof (IAPFailedCallback))]
-		static void IAPFailed(IAPErrorCode iErrorCode, Int32 iErrorDetailCode, string iErrorDetailInfo) {
-			UtilsLog.Info ("IAPiOS", "[IAPFailed] ErrorCode::{0} ErrorDetailCode::{1} ErrorDetail::{2}",
+		public static void IAPFailed(IAPErrorCode iErrorCode, Int32 iErrorDetailCode, string iErrorDetailInfo) {
+			UtilsLog.Info ("IAPMsgSwitch", "[IAPFailed] ErrorCode::{0} ErrorDetailCode::{1} ErrorDetail::{2}",
 				iErrorCode, iErrorDetailCode, iErrorDetailInfo);
 			if ((null != IAPInstance) && (null != IAPInstance.OnFailed)) {
 				IAPInstance.OnFailed (iErrorCode, iErrorDetailCode, iErrorDetailInfo);
@@ -202,10 +206,12 @@ namespace IAP
 
 #region DllImport
 
+#if (UNITY_IOS || UNITY_IPHONE)
+
 		[DllImport ("__Internal")]
 		static extern void IAPSetCallbacks(
-			IAPCreateProductCallback callback, IAPTransactionUpdatedCallback callback2, 
-			IAPRestoreFinishedCallback callback3, IAPFailedCallback callback4);
+		IAPCreateProductCallback callback, IAPTransactionUpdatedCallback callback2, 
+		IAPRestoreFinishedCallback callback3, IAPFailedCallback callback4);
 
 		[DllImport ("__Internal")]
 		public static extern void IAPValidateProducts(string[] productIDs, Int16 count);
@@ -230,6 +236,31 @@ namespace IAP
 
 		[DllImport ("__Internal")]
 		public static extern bool IAPIsEnabled();
+
+#else
+
+		[DllImport ("__Internal")]
+		public static extern void IAPBuyWithProductID(string product, Int32 quantity);
+
+		[DllImport ("__Internal")]
+		public static extern void IAPRestoreTransactions();
+
+		[DllImport ("__Internal")]
+		public static extern void IAPFinalizeTransaction(string transactionID);
+
+		[DllImport ("__Internal")]
+		public static extern bool IAPVerifyTransaction(string transactionID);
+
+		[DllImport ("__Internal")]
+		public static extern void IAPStartProcessing();
+
+		[DllImport ("__Internal")]
+		public static extern void IAPStopProcessing();
+
+		[DllImport ("__Internal")]
+		public static extern bool IAPIsEnabled();
+
+#endif
 
 #endregion
 	}
@@ -505,7 +536,7 @@ namespace IAP
 
 		protected abstract void ValidateIAPProducts(string[] iProducts);
 
-		protected abstract void BuyIAPWithProductID (string iProductId, Int32 iQuantity);
+		public abstract void BuyIAPWithProductID (string iProductId, Int32 iQuantity);
 
 		protected abstract void FinalizeIAPTransaction (string iTransactionID);
 

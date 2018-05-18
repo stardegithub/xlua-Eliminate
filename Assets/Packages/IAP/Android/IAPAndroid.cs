@@ -23,7 +23,7 @@ namespace IAP
 			// IAPStopProcessing();
 		}
 
-		protected override void BuyIAPWithProductID(string productId, Int32 quantity)
+		public override void BuyIAPWithProductID(string productId, Int32 quantity)
 		{
 			// IAPBuyWithProductID(productId, quantity);
 		}

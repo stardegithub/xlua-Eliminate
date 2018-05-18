@@ -19,6 +19,16 @@ namespace AndroidSDK.Platforms.Huawei {
 	public class HuaweiSDKSettingsData : AndroidSDKSettingsData {
 
 		/// <summary>
+		/// App ID.
+		/// </summary>
+		public string AppID;
+
+		/// <summary>
+		/// 支付ID.
+		/// </summary>
+		public string PayID;
+
+		/// <summary>
 		/// 浮标密钥(CP必须存储在服务端，然后通过安全网络（如https）获取下来，存储到内存中，否则存在私钥泄露风险).
 		/// </summary>
 		public string BuoySecret;
@@ -50,6 +60,8 @@ namespace AndroidSDK.Platforms.Huawei {
 			base.Init ();
 
 			this.PlatformType = TPlatformType.Huawei;
+			this.AppID = null;
+			this.PayID = null;
 			this.BuoySecret = null;
 			this.PayPrivateRsa = null;
 			this.PayPublicRsa = null;
@@ -64,6 +76,8 @@ namespace AndroidSDK.Platforms.Huawei {
 			base.Reset ();
 
 			this.PlatformType = TPlatformType.Huawei;
+			this.AppID = null;
+			this.PayID = null;
 			this.MinSdkVersion = 19;
 			this.MaxSdkVersion = 26;
 			this.TargetSdkVersion = 25;
@@ -86,7 +100,7 @@ namespace AndroidSDK.Platforms.Huawei {
 	[System.Serializable]
 	public class HuaweiSDKSettings : AssetBase<HuaweiSDKSettings, HuaweiSDKSettingsData>, IAndroidSDKSettings {
 
-		private static readonly string _assetFileDir = "Assets/Packages/AndroidSDK/Platforms/Huawei/Conf";
+		public static readonly string AssetFileDir = "Assets/Packages/AndroidSDK/Platforms/Huawei/Conf";
 
 		/// <summary>
 		/// 平台类型.
@@ -349,7 +363,7 @@ namespace AndroidSDK.Platforms.Huawei {
 		/// </summary>
 		/// <returns>导入路径.</returns>
 		public override string GetImportPath () {
-			return string.Format("{0}/Json", _assetFileDir);
+			return string.Format("{0}/Json", AssetFileDir);
 		}
 
 		/// <summary>
@@ -357,7 +371,7 @@ namespace AndroidSDK.Platforms.Huawei {
 		/// </summary>
 		/// <returns>导出路径.</returns>
 		public override string GetExportPath () {
-			return string.Format("{0}/Json", _assetFileDir);
+			return string.Format("{0}/Json", AssetFileDir);
 		}
 
 		/// <summary>
@@ -425,7 +439,7 @@ namespace AndroidSDK.Platforms.Huawei {
 		public bool InitSettings() {
 
 			// 路径
-			this._path = _assetFileDir;
+			this._path = AssetFileDir;
 
 			return true; 
 		}

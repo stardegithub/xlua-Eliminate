@@ -86,7 +86,7 @@ namespace Common {
 		/// <param name="iSubTag">次标签.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数列表.</param>
-		public static void Warning(string iSubTag, string iFormat, params object[] iArgs) {
+		private static void Warning(string iSubTag, string iFormat, params object[] iArgs) {
 			// 初始化
 			Init();
 
@@ -111,7 +111,7 @@ namespace Common {
 		/// <param name="iSubTag">次标签.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数列表.</param>
-		public static void Error(string iSubTag, string iFormat, params object[] iArgs) {
+		private static void Error(string iSubTag, string iFormat, params object[] iArgs) {
 			// 初始化
 			Init();
 

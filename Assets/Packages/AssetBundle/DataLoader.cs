@@ -89,7 +89,12 @@ namespace AssetBundles {
 			}
 			T objRet = default(T);
 
-			objRet = AssetBundlesManager.Instance.LoadFromAssetBundle<T>(iPath);
+			string _fileName = AssetBundlesManager.GetKeyOfMapByFilePath (iPath);
+			if (true == string.IsNullOrEmpty (_fileName)) {
+				return default(T);
+			}
+
+			objRet = AssetBundlesManager.Instance.LoadFromAssetBundle<T>(_fileName);
 			if (null == objRet) {
 				objRet = ResourcesLoad.Load<T>(iPath);
 			}

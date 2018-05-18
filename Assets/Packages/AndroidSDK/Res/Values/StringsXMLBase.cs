@@ -5,8 +5,6 @@ using System.Collections;
 using BuildSystem;
 using Common;
 
-#if UNITY_EDITOR
-
 namespace AndroidSDK {
 
 	/// <summary>
@@ -124,4 +122,3 @@ namespace AndroidSDK {
 	}
 
 }
-#endif

@@ -9,7 +9,6 @@ using AssetBundles;
 using Download;
 using AndroidSDK;
 using AndroidSDK.Common;
-using AndroidSDK.OneSDK;
 using AndroidSDK.Platforms.Huawei;
 #if UNITY_ANDROID
 using AndroidSDK.Platforms.Tiange;
@@ -64,8 +63,6 @@ namespace CommandLine {
 
 			// 设定打包信息
 			SetBuildInfoFromParameters();
-
-#if UNITY_ANDROID
 
 			TBuildMode buildMode = BuildInfo.GetInstance().BuildMode;
 			BuildLogger.LogMessage ("BuildMode:{0}", buildMode.ToString());
@@ -143,6 +140,10 @@ namespace CommandLine {
 			int buildNumber = BuildInfo.GetInstance().BuildNumber;
 			BuildLogger.LogMessage ("BuildNumber:{0}", buildNumber.ToString());
 
+			// 输出宏定义
+			BuildLogger.LogMessage("Defines:{0}", 
+				PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android));
+
 			string apkPath = string.Format ("{0}/{1}_{2}_v{3}_-_{4}_{5}.apk", 
 				outputDir, 
 				projectName, 
@@ -188,12 +189,6 @@ namespace CommandLine {
 				BuildLogger.LogMessage("Android Build Successed.");
 			}
 
-#else
-
-			BuildLogger.LogError("The platform for build is not android.");
-
-#endif
-
 			BuildLogger.CloseBlock();
 		}
 			
@@ -207,7 +202,23 @@ namespace CommandLine {
 			if (_instance != null) {
 				_instance.Clear (true);
 			}
+			// 初始化打包信息
 			BuildSettings.GetInstance (BuildSettings.AssetFileDir);
+
+			// 设定选项
+			// 天鸽的场合
+			if(TPlatformType.Tiange == BuildInfo.GetInstance().PlatformType) {
+
+				// 初始化SDK设定信息&导入最新
+				TiangeSDKSettings.GetInstance (TiangeSDKSettings.AssetFileDir).ImportFromJsonFile(true);
+				BuildLogger.LogMessage("TiangeSDKSettings -> ImportFromJsonFile().");
+				BuildLogger.LogMessage("TiangeSDKSettings::OneSDK:{0}(MetaData:{1}).",
+					TiangeSDKSettings.GetInstance().Data.Options.isOptionValid(BuildSystem.Options.TSDKOptions.OneSDK).ToString(),
+					TiangeSDKSettings.GetInstance().Data.Options.OneSDK.MetaDatas.Count.ToString());
+
+				TiangeSDKSettings.GetInstance ().Data.Options.OptionsSettings =
+					BuildInfo.GetInstance ().Data.Options.OptionsSettings;
+			}
 
 			// 清空Plugins/Android目录
 			ClearPluginsAndroid();
@@ -306,14 +317,14 @@ namespace CommandLine {
 				// 华为
 			case TPlatformType.Huawei:
 				{
-					settings = HuaweiSDKSettings.GetInstance ();
+					settings = HuaweiSDKSettings.GetInstance (HuaweiSDKSettings.AssetFileDir);
 				}
 				break;
 
 				// 天鸽
 			case TPlatformType.Tiange:
 				{
-					settings = TiangeSDKSettings.GetInstance ();
+					settings = TiangeSDKSettings.GetInstance (TiangeSDKSettings.AssetFileDir);
 				}
 				break;
 			case TPlatformType.None:
@@ -411,6 +422,10 @@ namespace CommandLine {
 			// 中心服务器版本号
 			string centerVersion = BuildInfo.GetInstance ().CenterVersion;
 			BuildLogger.LogMessage ("CenterVersion:{0}", centerVersion);
+
+			// 输出宏定义
+			BuildLogger.LogMessage("Defines:{0}", 
+				PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS));
 
 			// XCode工程目录
 			string XcodeProject = string.Format("{0}/XcodeProject", outputDir);

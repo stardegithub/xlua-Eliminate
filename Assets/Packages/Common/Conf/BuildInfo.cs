@@ -5,6 +5,7 @@ using UnityEditor;
 using System.Collections;
 using BuildSystem;
 using AssetBundles;
+using BuildSystem.Options;
 
 namespace Common {
 
@@ -53,7 +54,7 @@ namespace Common {
 	/// 打包数据.
 	/// </summary>
 	[System.Serializable]
-	public class BuildInfoData : JsonDataBase {
+	public class BuildDefaultData : JsonDataBase {
 		/// <summary>
 		/// BuildMode.
 		/// </summary>
@@ -118,10 +119,22 @@ namespace Common {
 	}
 
 	/// <summary>
+	/// 选项定义.
+	/// </summary>
+	[System.Serializable]
+	public class BuildOptionData : OptionsBaseData {}
+
+	/// <summary>
+	/// 打包信息.
+	/// </summary>
+	[System.Serializable]
+	public class BuildInfoData : OptionsDataBase<BuildDefaultData, BuildOptionData> {}
+
+	/// <summary>
 	/// 打包信息设定类
 	/// </summary>
 	[System.Serializable]
-	public class BuildInfo : AssetBase<BuildInfo, BuildInfoData> {
+	public class BuildInfo : AssetOptionsBase<BuildInfo, BuildInfoData, BuildDefaultData, BuildOptionData> {
 
 		/// <summary>
 		/// BuildMode.
@@ -129,13 +142,13 @@ namespace Common {
 		public TBuildMode BuildMode {
 			get { 
 				if (null != this.Data) {
-					return this.Data.BuildMode;
+					return this.Data.Default.BuildMode;
 				}
 				return TBuildMode.Debug;
 			}
 			set { 
 				if (null != this.Data) {
-					this.Data.BuildMode = value;
+					this.Data.Default.BuildMode = value;
 				}
 			}
 		}
@@ -146,13 +159,13 @@ namespace Common {
 		public string BuildName {
 			get { 
 				if (null != this.Data) {
-					return this.Data.BuildName;
+					return this.Data.Default.BuildName;
 				}
 				return null;
 			}
 			set { 
 				if (null != this.Data) {
-					this.Data.BuildName = value;
+					this.Data.Default.BuildName = value;
 				}
 			}
 		}
@@ -163,13 +176,13 @@ namespace Common {
 		public string BuildID {
 			get { 
 				if (null != this.Data) {
-					return this.Data.BuildID;
+					return this.Data.Default.BuildID;
 				}
 				return null;
 			}
 			set {  
 				if (null != this.Data) {
-					this.Data.BuildID = value;
+					this.Data.Default.BuildID = value;
 				}
 			}
 		}
@@ -180,13 +193,13 @@ namespace Common {
 		public string BuildVersion {
 			get { 
 				if (null != this.Data) {
-					return this.Data.BuildVersion;
+					return this.Data.Default.BuildVersion;
 				}
 				return null;
 			}
 			set { 
 				if (null != this.Data) {
-					this.Data.BuildVersion = value;
+					this.Data.Default.BuildVersion = value;
 				}
 			}
 		}
@@ -197,7 +210,7 @@ namespace Common {
 		public string BuildShortVersion {
 			get { 
 				if (null != this.Data) {
-					return this.Data.BuildShortVersion;
+					return this.Data.Default.BuildShortVersion;
 				}
 				return null;
 			}
@@ -209,13 +222,13 @@ namespace Common {
 		public int BuildVersionCode {
 			get { 
 				if (null != this.Data) {
-					return this.Data.BuildVersionCode;
+					return this.Data.Default.BuildVersionCode;
 				}
 				return -1;
 			}
 			set { 
 				if (null != this.Data) {
-					this.Data.BuildVersionCode = value;
+					this.Data.Default.BuildVersionCode = value;
 				}
 			}
 		}
@@ -226,13 +239,13 @@ namespace Common {
 		public string CenterVersion {
 			get { 
 				if (null != this.Data) {
-					return this.Data.CenterVersion;
+					return this.Data.Default.CenterVersion;
 				}
 				return null;
 			}
 			set { 
 				if (null != this.Data) {
-					this.Data.CenterVersion = value;
+					this.Data.Default.CenterVersion = value;
 				}
 			}
 		}
@@ -243,13 +256,13 @@ namespace Common {
 		public TPlatformType PlatformType {
 			get { 
 				if (null != this.Data) {
-					return this.Data.PlatformType;
+					return this.Data.Default.PlatformType;
 				}
 				return TPlatformType.None;
 			}
 			set { 
 				if (null != this.Data) {
-					this.Data.PlatformType = value;
+					this.Data.Default.PlatformType = value;
 				}
 			}
 		}
@@ -259,14 +272,14 @@ namespace Common {
 		/// </summary>
 		public int BuildNumber {
 			get { 
-				if ((null != this.Data) && (null != this.Data.TempInfo)) {
-					return this.Data.TempInfo.BuildNumber;
+				if ((null != this.Data) && (null != this.Data.Default.TempInfo)) {
+					return this.Data.Default.TempInfo.BuildNumber;
 				}
 				return -1;
 			} 
 			set { 
-				if ((null != this.Data) && (null != this.Data.TempInfo)) {
-					this.Data.TempInfo.BuildNumber = value;
+				if ((null != this.Data) && (null != this.Data.Default.TempInfo)) {
+					this.Data.Default.TempInfo.BuildNumber = value;
 				}
 			}
 		}
@@ -280,41 +293,36 @@ namespace Common {
 		public override bool InitAsset () {
 
 			// 打包ID
-			if(string.IsNullOrEmpty(this.Data.BuildID) == false) {
+			if(string.IsNullOrEmpty(this.Data.Default.BuildID) == false) {
 #if UNITY_EDITOR
 #if UNITY_5_5_OR_NEWER
-                PlayerSettings.applicationIdentifier = this.Data.BuildID;
+				PlayerSettings.applicationIdentifier = this.Data.Default.BuildID;
 #else
-				PlayerSettings.bundleIdentifier = this.Data.BuildID;
+				PlayerSettings.bundleIdentifier = this.Data.Default.BuildID;
 #endif
 #endif
 			}
 
 			// 版本号
-			if(string.IsNullOrEmpty(this.Data.BuildVersion) == false) {
+			if(string.IsNullOrEmpty(this.Data.Default.BuildVersion) == false) {
 #if UNITY_EDITOR && UNITY_EDITOR
-				PlayerSettings.bundleVersion = this.Data.BuildVersion;
+				PlayerSettings.bundleVersion = this.Data.Default.BuildVersion;
 #endif
 			}
 
 			// 版本号
-			if(-1 != this.Data.BuildVersionCode) {
+			if(-1 != this.Data.Default.BuildVersionCode) {
 
 #if UNITY_IOS && UNITY_EDITOR
 				PlayerSettings.iOS.buildNumber = this.BuildVersionCode.ToString();
 #endif
 #if UNITY_ANDROID && UNITY_EDITOR
-				PlayerSettings.Android.bundleVersionCode = this.Data.BuildVersionCode;
+				PlayerSettings.Android.bundleVersionCode = this.Data.Default.BuildVersionCode;
 #endif
 
 			}
 
-			UtilsLog.Info ("BuildInfo", "BuildName : {0}", (this.Data.BuildName == null) ? "null" : this.Data.BuildName);
-			UtilsLog.Info ("BuildInfo", "BuildID : {0}", (this.Data.BuildID == null) ? "null" : this.Data.BuildID);
-			UtilsLog.Info ("BuildInfo", "BuildVersion : {0}", (this.Data.BuildVersion == null) ? "null" : this.Data.BuildVersion);
-			UtilsLog.Info ("BuildInfo", "BuildShortVersion : {0}", (this.Data.BuildShortVersion == null) ? "null" : this.Data.BuildShortVersion);
-			UtilsLog.Info ("BuildInfo", "BuildVersionCode : {0}", this.Data.BuildVersionCode);
-			UtilsLog.Info ("BuildInfo", "CenterVersion : {0}", (this.Data.CenterVersion == null) ? "null" : this.Data.CenterVersion);
+			this.Info ("Data : {0}", this.Data.ToString());
 
 			return true;
 		}
@@ -335,12 +343,16 @@ namespace Common {
 				this.Clear ();
 			}
 
-			this.Data.BuildName = iData.BuildName;
-			this.Data.BuildID = iData.BuildID;
-			this.Data.BuildVersion = iData.BuildVersion;
-			this.Data.BuildShortVersion = iData.BuildShortVersion;
-			this.Data.BuildVersionCode = iData.BuildVersionCode;
-			this.Data.CenterVersion = iData.CenterVersion;
+			// 默认数据
+			this.Data.Default.BuildName = iData.Default.BuildName;
+			this.Data.Default.BuildID = iData.Default.BuildID;
+			this.Data.Default.BuildVersion = iData.Default.BuildVersion;
+			this.Data.Default.BuildShortVersion = iData.Default.BuildShortVersion;
+			this.Data.Default.BuildVersionCode = iData.Default.BuildVersionCode;
+			this.Data.Default.CenterVersion = iData.Default.CenterVersion;
+
+			// 选项数据
+			this.Data.Options.OptionsSettings = iData.Options.OptionsSettings;
 
 			UtilsAsset.SetAssetDirty (this);
 		}

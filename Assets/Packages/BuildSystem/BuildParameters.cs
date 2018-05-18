@@ -185,9 +185,10 @@ namespace BuildSystem {
 				}
 				for(int idx = 0; idx < args.Length; idx++)
 				{
-					if(args[idx] == "-Huawei")
-					{
+					if(args[idx] == "-Huawei") {
 						return TPlatformType.Huawei;
+					} else if (args[idx] == "-Tiange") {
+						return TPlatformType.Tiange;
 					}
 				}
 				return TPlatformType.None;
