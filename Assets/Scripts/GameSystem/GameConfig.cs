@@ -41,6 +41,9 @@ namespace GameSystem
         public int gameFrameRate = 60;
         public int timerInterval = 1;
 
+        public string firstGameState = "GameStateLogin";
+        public string exceptionGameState = "GameStateException";
+
         public string uiRootName = "UIRoot";
         public string uiRootPath = "UI/Global/UIRoot";
         public string uiCameraName = "UICamera";

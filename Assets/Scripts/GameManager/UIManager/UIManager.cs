@@ -53,6 +53,12 @@ namespace GameManager
         public void CreateUIRoot()
         {
             var prefab = DataLoader.Load<GameObject>(GameConfig.Instance.uiRootPath);
+            if (prefab == null)
+            {
+                Error("CreateUIRoot(): UIRoot prefab cannot find: {0}", GameConfig.Instance.uiRootPath);
+                return;
+            }
+
             UIRoot = UnityEngine.Object.Instantiate(prefab);
             UIRoot.name = prefab.name;
             UICamera = GameObject.Find(GameConfig.Instance.uiCameraName).GetComponent<Camera>();
@@ -309,7 +315,10 @@ namespace GameManager
                     currUI.Close();
 
                     currUI = this._uiShowStack.Peek();
-                    currUI.Open();
+                    if (null != currUI)
+                    {
+                        currUI.Open();
+                    }
                     break;
                 }
                 currUI = this._uiShowStack.Pop();

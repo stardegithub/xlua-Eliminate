@@ -1,0 +1,7 @@
+function enter()
+	print("game state single player enter")
+end
+
+function exit()
+    print("game state single player exit")
+end
