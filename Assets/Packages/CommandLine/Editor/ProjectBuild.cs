@@ -191,9 +191,6 @@ namespace CommandLine {
 
 			BuildLogger.CloseBlock();
 		}
-			
-
-		#if UNITY_ANDROID
 
 		static void InitForAndroidBuild() {
 
@@ -204,6 +201,8 @@ namespace CommandLine {
 			}
 			// 初始化打包信息
 			BuildSettings.GetInstance (BuildSettings.AssetFileDir);
+
+			#if UNITY_ANDROID
 
 			// 设定选项
 			// 天鸽的场合
@@ -237,9 +236,13 @@ namespace CommandLine {
 				BuildLogger.LogWarning("Android SDK invalid!!");
 			}
 
+			#endif
+
 			// 刷新
 			UtilsAsset.AssetsRefresh ();
 		}
+			
+#if UNITY_ANDROID
 
 		/// <summary>
 		/// 清空Plugins/Android目录.
