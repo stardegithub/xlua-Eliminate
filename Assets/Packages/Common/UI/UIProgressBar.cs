@@ -149,10 +149,10 @@ namespace Common.UI
 
 			if(this._detailTxt != null) {
 				this._detailTxt.text = "";
-#if DEVELOPMENT_BUILD
+#if BUILD_DEBUG
 				this._detailTxt.gameObject.SetActive(true);
 #else
-				this._detailTxt.gameObject.SetActive(true);
+				this._detailTxt.gameObject.SetActive(false);
 #endif
 			}
 		}

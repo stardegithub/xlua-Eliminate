@@ -64,8 +64,8 @@ namespace Common {
 			base.Clear ();
 		}
 
-		public virtual string ToString() {
-			return null;
+		public override string ToString() {
+			return base.ToString();
 		}
 
 	}
@@ -132,8 +132,8 @@ namespace Common {
 		}
 
 		public override string ToString() {
-			return string.Format("Status:{0} Error:{1}({2})",
-				Status, ErrorDetailCode, 
+			return string.Format("{0} Status:{1} Error:{2}({3})",
+				base.ToString(), Status, ErrorDetailCode, 
 				(true == string.IsNullOrEmpty(ErrorDetail)) ? "null" : ErrorDetail);
 		}
 

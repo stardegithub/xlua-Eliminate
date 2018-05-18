@@ -1,6 +1,4 @@
-﻿#if UNITY_EDITOR
-
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.IO;
 using System.Xml;
@@ -9,6 +7,37 @@ using Common;
 using BuildSystem;
 
 namespace AndroidSDK.Common.Manifest {
+
+	/// <summary>
+	/// AndroidManifest.xml中 <meta-data/>节点数据定义.
+	/// </summary>
+	[System.Serializable]
+	public class MetaDataInfo : JsonDataBase {
+
+		/// <summary>
+		/// 属性：android:name.
+		/// </summary>
+		public string Name = null;
+
+		/// <summary>
+		/// 属性：android:value.
+		/// </summary>
+		public string Value = null;
+					
+		/// <summary>
+		/// 清空.
+		/// </summary>
+		public override void Clear() {
+			base.Clear ();
+			Name = null;
+			Value = null;
+		}
+
+		public override string ToString () {
+			return string.Format ("{0} Name:{1} Value:{2}",
+				base.ToString(), this.Name, this.Value);	
+		}
+	}
 
 	/// <summary>
 	/// 安卓配置文件
@@ -334,5 +363,3 @@ namespace AndroidSDK.Common.Manifest {
 	}
 
 }
-
-#endif

@@ -467,7 +467,7 @@ namespace IAP {
 		/// <summary>
 		/// IAP实例对象（iOS/Android）.
 		/// </summary>
-		private IAPBase _IAPInstance = null;
+		protected IAPBase _IAPInstance = null;
 
 #region MonoBehaviour Method
 
@@ -803,12 +803,9 @@ namespace IAP {
 		/// </summary>
 		/// <returns><c>true</c>, OK, <c>false</c> NG.</returns>
 		private bool initIAPInstance() {
-			
-#if UNITY_IOS || UNITY_IPHONE
-			this._IAPInstance = new IAPiOS();
-#elif UNITY_ANDROID
-			this._IAPInstance = new IAPAndroid();
-#endif
+
+			// 创建IAP实例
+			this._IAPInstance = this.CreateInstance ();
 			if (null == this._IAPInstance) {
 				return false;
 			}
@@ -1035,6 +1032,12 @@ namespace IAP {
 		}
 
 #region Manager Abstract
+
+		/// <summary>
+		/// 创建IAP实例.
+		/// </summary>
+		/// <returns>IAP实例.</returns>
+		protected abstract IAPBase CreateInstance();
 
 		/// <summary>
 		/// 初始化Products列表.

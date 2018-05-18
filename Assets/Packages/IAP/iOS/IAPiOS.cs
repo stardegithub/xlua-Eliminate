@@ -42,7 +42,7 @@ namespace IAP
 			IAPMsgSwitch.IAPStopProcessing();
 		}
 
-		protected override void BuyIAPWithProductID(string productId, Int32 quantity)
+		public override void BuyIAPWithProductID(string productId, Int32 quantity)
 		{
 			this.Info ("BuyIAPWithProductID():ProductId::{0} Quantity::{1}", productId, quantity);
 			if(Application.isMobilePlatform == false) {

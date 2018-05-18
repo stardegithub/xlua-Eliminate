@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AssetBundles;
 using GameManager.UIComponent;
+//using GameManager.UIComponent.Android;
 using GameSystem;
 using UnityEngine;
 using UnityEngine.Events;

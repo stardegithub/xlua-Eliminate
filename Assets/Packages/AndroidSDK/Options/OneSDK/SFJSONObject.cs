@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections;
 using Common;
 
-namespace OneSDK {
+namespace AndroidSDK.Options.OneSDK {
 
 	/// <summary>
 	/// 易接专用JSON对象.
