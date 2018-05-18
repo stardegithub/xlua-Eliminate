@@ -28,7 +28,7 @@ namespace GameSystem
             _dynamicManagers = new List<IGameManager>();
             _evtOnExceptionPopupContinue = delegate ()
             {
-                GameStateManager.Instance.SetNextState("GameStateException");
+                GameStateManager.Instance.SetNextState(GameConfig.Instance.exceptionGameState);
             };
             _evtOnExceptionPopupConfirm = delegate ()
             {
@@ -99,7 +99,7 @@ namespace GameSystem
                 _initialized = true;
                 if (_initException == null)
                 {
-                    GameStateManager.Instance.SetNextState("GameStateLogin");
+                    GameStateManager.Instance.SetNextState(GameConfig.Instance.firstGameState);
                 }
                 else
                 {
