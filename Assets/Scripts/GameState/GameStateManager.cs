@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using GameState;
+using GameState.Conf;
 using EC.Common;
 using EC.System;
 
@@ -26,15 +27,18 @@ namespace EC.GameState
         #region Singleton
         protected override void SingletonAwake()
         {
-            if (GameConfig.Instance == null)
+			GameStateConf _instance = GameStateConf.GetInstance ();
+			if (null == _instance)
             {
-                this.Error("GameConfig is not found {0}", GameConfig.GAME_CONFIG_PATH);
+				this.Error("GameStateConf is not found!!!");
+				return;
             }
 
-            _gameStates = GameStateHelper.GetGameStates(GameConfig.Instance.gameStateInfos);
+			_gameStates = GameStateHelper.GetGameStates(_instance.States);
             if (_gameStates == null || _gameStates.Count == 0)
             {
-				this.Error("gameStates is empty");
+				this.Error("The game states conf is empty");
+				return;
             }
             _initialized = true;
         }

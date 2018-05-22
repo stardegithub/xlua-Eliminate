@@ -5,6 +5,7 @@ using AssetBundles;
 using UnityEngine;
 using UnityEngine.Events;
 using GameState;
+using GameState.Conf;
 using EC.Common;
 using EC.System;
 using EC.UI.Component;
@@ -24,9 +25,15 @@ namespace EC.UI
         #region Singleton
         protected override void SingletonAwake()
         {
+			GameStateConf _stateConf = GameStateConf.GetInstance ();
+			if (null == _stateConf) {
+				this.Error ("SingletonAwake()::The game state conf is invalid!!!");
+				return;
+			}
+
             if (UIRoot == null)
             {
-                UIRoot = GameObject.Find(GameConfig.Instance.uiRootName);
+				UIRoot = GameObject.Find(_stateConf.Data.uiRootName);
             }
 
             if (UIRoot == null)
@@ -36,7 +43,7 @@ namespace EC.UI
 
             if (UICamera == null)
             {
-                UICamera = GameObject.Find(GameConfig.Instance.uiCameraName).GetComponent<Camera>();
+				UICamera = GameObject.Find(_stateConf.Data.uiCameraName).GetComponent<Camera>();
             }
 
             _initialized = true;
@@ -53,16 +60,22 @@ namespace EC.UI
         /// </summary>
         public void CreateUIRoot()
         {
-            var prefab = DataLoader.Load<GameObject>(GameConfig.Instance.uiRootPath);
+			GameStateConf _stateConf = GameStateConf.GetInstance ();
+			if (null == _stateConf) {
+				this.Error ("CreateUIRoot()::The game state conf is invalid!!!");
+				return;
+			}
+
+			var prefab = DataLoader.Load<GameObject>(_stateConf.Data.uiRootPath);
             if (prefab == null)
             {
-                Error("CreateUIRoot(): UIRoot prefab cannot find: {0}", GameConfig.Instance.uiRootPath);
+				Error("CreateUIRoot(): UIRoot prefab cannot find: {0}", _stateConf.Data.uiRootPath);
                 return;
             }
 
             UIRoot = UnityEngine.Object.Instantiate(prefab);
             UIRoot.name = prefab.name;
-            UICamera = GameObject.Find(GameConfig.Instance.uiCameraName).GetComponent<Camera>();
+			UICamera = GameObject.Find(_stateConf.Data.uiCameraName).GetComponent<Camera>();
             foreach (var uiInfo in _uiMainPool)
             {
                 uiInfo.Value.SetParent(UIRoot.transform);

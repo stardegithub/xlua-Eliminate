@@ -3,40 +3,57 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
+using GameState.Conf;
 using GameState.Lua;
-using EC.System;
 
 namespace GameState {
 
 	public class GameStateHelper : ClassExtension
 	{
-		public static Dictionary<string, IGameState> GetGameStates(GameConfig.GameStateInfo[] gameStateInfos)
-		{
-			if (gameStateInfos == null) return null;
-			var gameStates = new Dictionary<string, IGameState>();
 
-			for (int i = 0; i < gameStateInfos.Length; i++)
+		/// <summary>
+		/// 取得游戏状态.
+		/// </summary>
+		/// <returns>游戏状态.</returns>
+		/// <param name="gameStateInfos">游戏状态信息.</param>
+		public static Dictionary<string, IGameState> GetGameStates(List<GameStateInfo> iGameStateInfos)
+		{
+			if (iGameStateInfos == null) return null;
+			var _gameStates = new Dictionary<string, IGameState>();
+
+			foreach(GameStateInfo _state in iGameStateInfos) 
 			{
-				if (gameStateInfos[i].type == GameConfig.GameStateType.Inherit)
-				{
-					Type type = Type.GetType(gameStateInfos[i].context);
-					gameStates[gameStateInfos[i].name] = Activator.CreateInstance(type) as IGameState;
+				if (null == _state) {
+					continue;
 				}
-				else if (gameStateInfos[i].type == GameConfig.GameStateType.Script)
-				{
-					gameStates[gameStateInfos[i].name] = new ScriptGameState(gameStateInfos[i].name, gameStateInfos[i].context);
-				}
-				else if (gameStateInfos[i].type == GameConfig.GameStateType.Lua)
-				{
-					var ta = AssetBundles.DataLoader.Load<TextAsset>(gameStateInfos[i].context);
-					if (ta != null)
+				switch (_state.Type) {
+				case GameStateType.Inherit:
 					{
-						gameStates[gameStateInfos[i].name] = new LuaGameState(gameStateInfos[i].name, ta.text);
+						Type type = Type.GetType(_state.Context);
+						_gameStates[_state.Name] = Activator.CreateInstance(type) as IGameState;
 					}
+					break;
+				case GameStateType.CsScript:
+					{
+						_gameStates[_state.Name] = new ScriptGameState(_state.Name, _state.Context);
+					}
+					break;
+				case GameStateType.Lua:
+					{
+						var ta = AssetBundles.DataLoader.Load<TextAsset>(_state.Context);
+						if (ta != null)
+						{
+							_gameStates[_state.Name] = new LuaGameState(_state.Name, ta.text);
+						}
+					}
+					break;
+				default:
+					{}
+					break;
 				}
 			}
 
-			return gameStates;
+			return _gameStates;
 		}
 	}
 }
