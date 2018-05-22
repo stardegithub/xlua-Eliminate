@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Common;
 using GameState;
 using EC.Common;
 
@@ -9,7 +10,7 @@ namespace EC.Sound
     /// 音乐管理器
     /// </summary>
     /// <typeparam name="MusicManager"></typeparam>
-    public class MusicManager : GameManagerBase<MusicManager>
+	public class MusicManager : SingletonMonoBehaviourBase<MusicManager>
     {
         private const string VOLUMEKEY = "GameMusicVolume";
         private float _musicVolume;

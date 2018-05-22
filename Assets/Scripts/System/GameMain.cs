@@ -13,13 +13,10 @@ namespace EC.System
 {
     public class GameMain : SingletonMonoBehaviourBase<GameMain>
     {
-        private bool _initialized;
-        public bool Initialized { get { return _initialized; } }
-
         private GameObject _constManagerLayer;
         private GameObject _dynamicManagerLayer;
-        private List<IGameManager> _constManagers;
-        private List<IGameManager> _dynamicManagers;
+		private List<IManagerBase> _constManagers;
+		private List<IManagerBase> _dynamicManagers;
         private Action _evtOnExceptionPopupContinue;
         private Action _evtOnExceptionPopupConfirm;
         private Exception _initException = null;
@@ -28,19 +25,26 @@ namespace EC.System
 
         protected override void SingletonAwake()
         {
-            _constManagers = new List<IGameManager>();
-            _dynamicManagers = new List<IGameManager>();
+			base.SingletonAwake();
+
+			_constManagers = new List<IManagerBase>();
+			_dynamicManagers = new List<IManagerBase>();
+
+			// 异常场景委托
             _evtOnExceptionPopupContinue = delegate ()
             {
 				GameStateManager.Instance.SetNextState(GameStateConf.GetInstance().ExceptionGameState);
             };
             _evtOnExceptionPopupConfirm = delegate ()
             {
-                _loadLevelExceptionCount--;
+				--_loadLevelExceptionCount;
             };
 
-            base.SingletonAwake();
-            gameObject.AddComponent<DontDestroy>();
+			// 挂接不释放脚本
+			DontDestroy _dontDestroy = this.GetComponent<DontDestroy>();
+			if (null == _dontDestroy) {
+				this.gameObject.AddComponent<DontDestroy> ();
+			}
 
             DownLoad(DownLoadSuccess, DownLoadFail);
         }
@@ -170,8 +174,8 @@ namespace EC.System
         private void AddManager(string[] typeNames, bool constant)
         {
             GameObject go = constant ? _constManagerLayer : _dynamicManagerLayer;
-            List<IGameManager> managerPool = constant ? _constManagers : _dynamicManagers;
-            Type managerBaseType = typeof(IGameManager);
+			List<IManagerBase> managerPool = constant ? _constManagers : _dynamicManagers;
+			Type managerBaseType = typeof(IManagerBase);
             for (int i = 0; i < typeNames.Length; i++)
             {
                 string name = typeNames[i];
@@ -185,11 +189,11 @@ namespace EC.System
                         {
                             GameObject node = new GameObject(type.Name);
                             node.transform.parent = go.transform;
-                            managerPool.Add(node.AddComponent(type) as IGameManager);
+							managerPool.Add(node.AddComponent(type) as IManagerBase);
                         }
                         else
                         {
-                            IGameManager mgr = GameManageHelper.GetCustomManage(type);
+							IManagerBase mgr = GameManageHelper.GetCustomManage(type);
                             if (mgr != null)
                             {
                                 managerPool.Add(mgr);
@@ -249,7 +253,7 @@ namespace EC.System
 
             for (int i = 0; i < _constManagers.Count; i++)
             {
-                IGameManager manager = _constManagers[i];
+				IManagerBase manager = _constManagers[i];
                 try
                 {
                     manager.OnBeginStateEnter(currStateName, nextStateName);
@@ -262,7 +266,7 @@ namespace EC.System
 
             for (int i = 0; i < _dynamicManagers.Count; i++)
             {
-                IGameManager mgr = _dynamicManagers[i];
+				IManagerBase mgr = _dynamicManagers[i];
                 try
                 {
                     mgr.OnBeginStateEnter(currStateName, nextStateName);
@@ -285,7 +289,7 @@ namespace EC.System
             _loadLevelExceptionCount = 0;
             for (int i = 0; i < _constManagers.Count; i++)
             {
-                IGameManager mamager = _constManagers[i];
+				IManagerBase mamager = _constManagers[i];
                 try
                 {
                     mamager.OnEndStateExit(currStateName, nextStateName);

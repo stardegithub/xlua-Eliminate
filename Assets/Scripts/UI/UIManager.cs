@@ -1,9 +1,10 @@
+using UnityEngine;
+using UnityEngine.Events;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using AssetBundles;
-using UnityEngine;
-using UnityEngine.Events;
+using Common;
 using GameState;
 using GameState.Conf;
 using EC.Common;
@@ -12,7 +13,7 @@ using EC.UI.Component;
 
 namespace EC.UI
 {
-    public class UIManager : GameManagerBase<UIManager>
+	public class UIManager : SingletonMonoBehaviourBase<UIManager>
     {
         public GameObject UIRoot;
 

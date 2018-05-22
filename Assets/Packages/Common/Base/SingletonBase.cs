@@ -69,11 +69,28 @@ namespace Common
         private static T _instance;
         public static T Instance { get { return _instance; } }
 
+		/// <summary>
+		/// 初始化标志位.
+		/// </summary>
+		protected bool _initialized = false;
+
+		/// <summary>
+		/// 初始化标志位.
+		/// </summary>
+		public bool Initialized
+		{
+			get
+			{
+				return _initialized;
+			}
+		}
+
         private void Awake()
         {
             if (_instance != null)
             {
-                Error("duplicate singleton:{0}, current:{1}, new:{2}, destroy new", typeof(T), _instance.transform.GetInstanceID(), transform.GetInstanceID());
+                this.Error("duplicate singleton:{0}, current:{1}, new:{2}, destroy new", 
+					typeof(T), _instance.transform.GetInstanceID(), transform.GetInstanceID());
                 Destroy(this);
                 return;
             }
@@ -89,9 +106,17 @@ namespace Common
                 _instance = null;
             }
         }
+			
+#region virtual
 
+		protected virtual void SingletonAwake() { 
+			this.Info ("SingletonAwake()");
+		}
+		protected virtual void SingletonDestroy() { 
+			this.Info ("SingletonDestroy()");
+		}
 
-        protected virtual void SingletonAwake() { }
-        protected virtual void SingletonDestroy() { }
-    }
+#endregion
+
+	}
 }

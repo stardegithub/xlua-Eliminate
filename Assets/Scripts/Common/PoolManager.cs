@@ -1,8 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
-using EC;
+using Common;
 using GameState;
+using EC;
 
 namespace EC.Common
 {
@@ -10,7 +11,7 @@ namespace EC.Common
     /// 对象池管理器
     /// </summary>
     /// <typeparam name="PoolManager"></typeparam>
-    public class PoolManager : GameManagerBase<PoolManager>
+	public class PoolManager : SingletonMonoBehaviourBase<PoolManager>
     {
         private Dictionary<string, IObjectPool> _objectPoolDict;
 
