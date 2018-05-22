@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Common;
 using Facade;
 using GameState;
+using GameState.Conf;
 using EC.Common;
 using EC.GameState;
 
@@ -31,7 +32,7 @@ namespace EC.System
             _dynamicManagers = new List<IGameManager>();
             _evtOnExceptionPopupContinue = delegate ()
             {
-                GameStateManager.Instance.SetNextState(GameConfig.Instance.exceptionGameState);
+				GameStateManager.Instance.SetNextState(GameStateConf.GetInstance().ExceptionGameState);
             };
             _evtOnExceptionPopupConfirm = delegate ()
             {
@@ -77,21 +78,22 @@ namespace EC.System
         /// </summary>
         void InitGame()
         {
-            if (GameConfig.Instance == null)
+			GameStateConf _conf = GameStateConf.GetInstance ();
+			if (null ==  _conf)
             {
-                Error("game config asset not found");
+                this.Error("the Game config asset not found!!");
                 return;
             }
 
-            Screen.sleepTimeout = GameConfig.Instance.sleepTimeout;
-            Application.targetFrameRate = GameConfig.Instance.gameFrameRate;
+			Screen.sleepTimeout = _conf.SleepTimeout;
+			Application.targetFrameRate = _conf.FPS;
 
             _constManagerLayer = new GameObject("Constant");
             _constManagerLayer.transform.parent = transform;
 
             try
             {
-                AddConstantManager(GameConfig.Instance.constManagers);
+				AddConstantManager(_conf.Managers.ToArray());
             }
             catch (Exception e)
             {
@@ -102,7 +104,7 @@ namespace EC.System
                 _initialized = true;
                 if (_initException == null)
                 {
-                    GameStateManager.Instance.SetNextState(GameConfig.Instance.firstGameState);
+					GameStateManager.Instance.SetNextState(_conf.FirstGameState);
                 }
                 else
                 {
@@ -219,15 +221,24 @@ namespace EC.System
         {
             _loadLevelExceptionCount = 0;
             CreateDynamicManager();
-            var nextStateInfo = Array.Find(GameConfig.Instance.gameStateInfos, c => c.name == nextStateName);
-            if (nextStateInfo != null)
+
+			GameStateConf _stateConf = GameStateConf.GetInstance ();
+			if (null == _stateConf) {
+				this.Error ("OnBeginStateEnter()::The game state conf is invalid!!!");
+				return;
+			}
+
+			GameStateInfo _nextStateInfo = Array.Find(
+				_stateConf.States.ToArray(), c => c.Name == nextStateName);
+			
+			if (null != _nextStateInfo)
             {
-                string[] managerNames = nextStateInfo.dynamicManagers;
-                if (managerNames != null)
+				List<string> _managerNames = _nextStateInfo.Managers;
+				if ((null != _managerNames) && (0 < _managerNames.Count))
                 {
                     try
                     {
-                        AddDynamicManager(managerNames);
+						AddDynamicManager(_managerNames.ToArray());
                     }
                     catch (Exception e)
                     {
