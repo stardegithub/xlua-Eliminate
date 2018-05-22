@@ -13,6 +13,7 @@ using Foundation.Databinding;
 using UnityEditor;
 using UnityEngine;
 using XLua;
+using Foundation.Databinding.Lua;
 
 namespace Foundation.Editor
 {
@@ -93,7 +94,7 @@ namespace Foundation.Editor
             var labels = new System.Collections.Generic.List<string>();
             var names = new System.Collections.Generic.List<string>();
 
-            if (!Target.Context.DataType.IsAssignableFrom(typeof(GameSystem.LuaObservableBehaviour)))
+            if (!Target.Context.DataType.IsAssignableFrom(typeof(LuaObservableBehaviour)))
             {
 
                 var members = new MemberInfo[0];
@@ -120,7 +121,7 @@ namespace Foundation.Editor
             }
             else
             {
-                var luaObervableBehaviour = Target.Context.DataInstance as GameSystem.LuaObservableBehaviour;
+                var luaObervableBehaviour = Target.Context.DataInstance as LuaObservableBehaviour;
                 string luaScript = luaObervableBehaviour.GetLuaScript();
                 if (!string.IsNullOrEmpty(luaScript))
                 {
