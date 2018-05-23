@@ -73,11 +73,6 @@ namespace Device {
 		}
 
 		/// <summary>
-		/// 敞亮定义.
-		/// </summary>
-		public static DisplaySafePadding Zero = DisplaySafePadding.Create(0, 0, 0, 0);
-
-		/// <summary>
 		/// 构造函数（禁止外部New）.
 		/// </summary>
 		protected DisplaySafePadding() {
@@ -124,6 +119,17 @@ namespace Device {
 			Padding = null;
 			isRetina = false;
 			RetinaScale = 1.0f;
+		}
+
+		/// <summary>
+		/// 边距是否都为0.
+		/// </summary>
+		/// <returns><c>true</c> 是; 否, <c>false</c>.</returns>
+		public bool IsZero() {
+			return ((0 == this.Padding.left) &&
+				(0 == this.Padding.right) &&
+				(0 == this.Padding.top) &&
+				(0 == this.Padding.bottom));
 		}
 
 		/// <summary>

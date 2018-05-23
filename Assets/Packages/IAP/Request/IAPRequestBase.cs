@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Common;
+using NetWork;
 
 namespace IAP {
 
@@ -25,7 +26,6 @@ namespace IAP {
 				this.Error ("SendRequest():The callback of response is null!!!");
 				return;
 			}
-
 			// 发送请求
 			this.SendIAPRequest (iData, iOnResponsed);
 		}

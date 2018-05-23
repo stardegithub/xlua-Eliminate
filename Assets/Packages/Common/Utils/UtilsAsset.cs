@@ -337,7 +337,7 @@ namespace Common {
 					jsonString = File.ReadAllText(iJsonFilePath);
 				}
 				if(false == string.IsNullOrEmpty(jsonString)) {
-					objRet = JsonConvert<T>.ConvertFromJsonString(jsonString);
+					objRet = UtilsJson<T>.ConvertFromJsonString(jsonString); 
 					UtilsLog.Info ("UtilityAsset", "ImportDataByPath. <- Path:{0}", iJsonFilePath);
 					UtilsLog.Info ("UtilityAsset", "ImportDataByPath. <- Data:{0}", jsonString);
 				}
@@ -372,7 +372,7 @@ namespace Common {
 					File.Delete (jsonFilePath);
 				}
 				// 导出JSON文件
-				string jsonString = JsonConvert<T>.ConvertToJsonString(iInstance);
+				string jsonString = UtilsJson<T>.ConvertToJsonString(iInstance);
 				File.WriteAllText (jsonFilePath, jsonString);
 
 				UtilsLog.Info ("UtilityAsset", "ExportData. -> Path:{0}", jsonFilePath);
