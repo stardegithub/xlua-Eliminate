@@ -20,6 +20,10 @@ namespace AutoResize {
 			UIAutoResizeController _target = target as UIAutoResizeController; 
 			if (null != _target) {
 
+				if (null == _target.Padding) {
+					_target.Padding = new RectOffset (0, 0, 0, 0);
+				}
+
 #if BUILD_DEBUG
 				EditorGUILayout.BeginHorizontal ();
 				EditorGUILayout.LabelField ("IsDebugTest", 
