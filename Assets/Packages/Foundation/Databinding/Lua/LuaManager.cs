@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using Common;
 using XLua;
 using GameState;
 
@@ -10,7 +11,7 @@ namespace Foundation.Databinding.Lua
     /// Lua管理器
     /// </summary>
     /// <typeparam name="LuaManager"></typeparam>
-    public class LuaManager : GameManagerBase<LuaManager>
+	public class LuaManager : SingletonMonoBehaviourBase<LuaManager>
     {
         /// <summary>
         /// lua gc 间隔

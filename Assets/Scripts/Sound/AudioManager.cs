@@ -1,6 +1,7 @@
+using UnityEngine;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using Common;
 using GameState;
 using EC.Common;
 
@@ -10,7 +11,7 @@ namespace EC.Sound
     /// 声音管理器
     /// </summary>
     /// <typeparam name="AudioManager"></typeparam>
-    public class AudioManager : GameManagerBase<AudioManager>
+	public class AudioManager : SingletonMonoBehaviourBase<AudioManager>
     {
         private const string VOLUMEKEY = "GameAudioVolume";
         private float _audioVolume;

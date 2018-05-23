@@ -1,9 +1,10 @@
 using UnityEngine;
-using System.Collections;
-using System;
 using UnityEngine.Events;
+using System;
+using System.Collections;
 using System.Reflection;
 using System.Collections.Generic;
+using Common;
 using XLua;
 using Foundation.Databinding.Lua;
 using EC.System;
@@ -18,7 +19,7 @@ namespace GameState
         /// <summary>
         /// 名字
         /// </summary>
-        string StateName { get; }
+        string Name { get; }
 
         /// <summary>
         /// 开始
@@ -34,43 +35,61 @@ namespace GameState
         /// 退出
         /// </summary>
         void Exit();
+
+		/// <summary>
+		/// 判断是否为同一状态.
+		/// </summary>
+		/// <returns><c>true</c> 同一状态; 非同一状态, <c>false</c>.</returns>
+		/// <param name="iState">状态.</param>
+		bool IsSame (IGameState iState);
     }
 
     /// <summary>
     /// 游戏状态基类
     /// </summary>
-    public abstract class GameStateBase : IGameState
+	public abstract class GameStateBase : ClassExtension, IGameState
     {
-        protected string stateName;
+        protected string name;
 
         /// <summary>
-        /// 名字
+        /// 状态名
         /// </summary>
-        public virtual string StateName
+        public string Name
         {
-            get { return stateName; }
+			get { return name; }
+			protected set { name = value; }
         }
+			
+		/// <summary>
+		/// 判断是否为同一状态.
+		/// </summary>
+		/// <returns><c>true</c> 同一状态; 非同一状态, <c>false</c>.</returns>
+		/// <param name="iState">状态.</param>
+		public bool IsSame (IGameState iState) {
+			if ((null == iState) || 
+				(false == string.IsNullOrEmpty(iState.Name))) {
+				return false;
+			}
+			if (true == string.IsNullOrEmpty (this.Name)) {
+				return false;
+			}
+			return this.Name.Equals (iState.Name);
+		}
 
         /// <summary>
         /// 开始
         /// </summary>
-        public virtual void Enter()
-        {
-        }
+		public abstract void Enter();
 
         /// <summary>
         /// 更新
         /// </summary>
-        public virtual void Update()
-        {
-        }
+		public abstract void Update();
 
         /// <summary>
         /// 退出
         /// </summary>
-        public virtual void Exit()
-        {
-        }
+		public abstract void Exit();
     }
 
     /// <summary>
@@ -86,7 +105,7 @@ namespace GameState
 
         public ScriptGameState(string stateName, string stateType)
         {
-            this.stateName = stateName;
+            this.Name = stateName;
             this.stateType = stateType;
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using Common;
 using GameState;
 
 namespace EC.Common
@@ -9,7 +10,7 @@ namespace EC.Common
     /// 线程池管理器
     /// </summary>
     /// <typeparam name="ThreadPoolManager"></typeparam>
-    public class ThreadPoolManager : GameManagerBase<ThreadPoolManager>
+	public class ThreadPoolManager : SingletonMonoBehaviourBase<ThreadPoolManager>
     {
         private int _locker;
         private int _count;

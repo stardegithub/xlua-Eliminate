@@ -3,12 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
+using Common;
 using GameState;
 using EC.Common;
 
 namespace EC.NetWork
 {
-    public class TcpSocketManager : GameManagerBase<TcpSocketManager>
+	public class TcpSocketManager : SingletonMonoBehaviourBase<TcpSocketManager>
     {
         public const int RECEIVE_BUFFER_MAX_SIZE = 8192;
 

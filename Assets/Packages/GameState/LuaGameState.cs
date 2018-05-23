@@ -22,7 +22,7 @@ namespace GameState.Lua {
 
 		public LuaGameState(string stateName, string luaScript)
 		{
-			this.stateName = stateName;
+			this.Name = stateName;
 			this.luaScript = luaScript;
 		}
 
