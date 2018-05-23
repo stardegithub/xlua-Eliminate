@@ -698,7 +698,7 @@ namespace AndroidSDK.Options.OneSDK {
 			_checkInfo.Apply (iUserInfo);
 
 			// 详细数据
-			string _jsonData = JsonConvert<OneSDKLoginCheckInfo>.ConvertToJsonString(_checkInfo);
+			string _jsonData = UtilsJson<OneSDKLoginCheckInfo>.ConvertToJsonString(_checkInfo);
 			if (true == string.IsNullOrEmpty (_jsonData)) {
 				this.Error ("createLoginCheckURL():JsonConvert Failed!!!(Data:{0})",
 					_checkInfo.ToString());

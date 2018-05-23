@@ -38,7 +38,7 @@ namespace Device {
 		/// <param name="iIsDebugTest">Debug测试标志位.</param>
 		public DisplaySafePadding GetSafePadding (bool iIsDebugTest = false) {
 			if (null == _device) {
-				return DisplaySafePadding.Zero;
+				return null;
 			}
 			return _device.GetSafePadding (iIsDebugTest);
 		}

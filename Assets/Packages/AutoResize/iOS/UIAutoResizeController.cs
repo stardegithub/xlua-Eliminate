@@ -70,7 +70,7 @@ namespace AutoResize {
 		{
 			this.Info ("ApplySafePadding():{0}", iSafePadding.ToString());
 				
-			if (true == DisplaySafePadding.Zero.Equal (this._defaultPadding)) {
+			if (true == this._defaultPadding.IsZero()) {
 				this._defaultPadding.Padding.left = (int)this._uiPanel.offsetMin.x;
 				this._defaultPadding.Padding.right = (int)this._uiPanel.offsetMax.x;
 				this._defaultPadding.Padding.top = (int)this._uiPanel.offsetMax.y;
