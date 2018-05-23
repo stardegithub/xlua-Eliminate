@@ -58,6 +58,8 @@ namespace Device {
 			bool iIsRetina = false, float iRetinaScale = 1.0f) {
 			DisplaySafePadding _padding = new DisplaySafePadding ();
 			if (null != _padding) {
+				// 初始化
+				_padding.Init ();
 				_padding.Padding.left = iLeft;
 				_padding.Padding.right = iRight;
 				_padding.Padding.top = iTop;
@@ -85,7 +87,7 @@ namespace Device {
 		/// <summary>
 		/// 边距.
 		/// </summary>
-		public RectOffset Padding = new RectOffset();
+		public RectOffset Padding = null;
 
 		/// <summary>
 		/// 是否为Retina屏幕.
@@ -102,10 +104,13 @@ namespace Device {
 		/// </summary>
 		public override void Init() {
 			base.Init ();
+
+			Padding = new RectOffset ();
 			Padding.left = 0;
 			Padding.right = 0;
 			Padding.top = 0;
 			Padding.right = 0;
+
 			isRetina = false;
 			RetinaScale = 1.0f;
 		}
@@ -115,10 +120,8 @@ namespace Device {
 		/// </summary>
 		public override void Clear() {
 			base.Clear ();
-			Padding.left = 0;
-			Padding.right = 0;
-			Padding.top = 0;
-			Padding.right = 0;
+
+			Padding = null;
 			isRetina = false;
 			RetinaScale = 1.0f;
 		}

@@ -28,7 +28,7 @@ namespace AutoResize {
 		/// <summary>
 		/// 边距.
 		/// </summary>
-		public RectOffset Padding = new RectOffset (0, 0, 0, 0);
+		public RectOffset Padding = null;
 
 		/// <summary>
 		/// 位置偏移.
@@ -40,14 +40,21 @@ namespace AutoResize {
 		/// <summary>
 		/// 上一个安全边距.
 		/// </summary>
-		private DisplaySafePadding _defaultPadding = DisplaySafePadding.Create(0, 0, 0, 0);
+		private DisplaySafePadding _defaultPadding = null;
 		private bool _applyed = false;
 
 		void Awake () {
-						
+					
+			if (null == this.Padding) {
+				this.Padding = new RectOffset (0, 0, 0, 0);
+			}
+			if (null == this._defaultPadding) {
+				this._defaultPadding = DisplaySafePadding.Create (0, 0, 0, 0);
+			}
 			_uiPanel = this.GetComponent<RectTransform> ();
 			if (null == _uiPanel) {
 				this.Error ("Awake():There is no component which is RectTransform!!!");
+				return;
 			}
 		}
 
