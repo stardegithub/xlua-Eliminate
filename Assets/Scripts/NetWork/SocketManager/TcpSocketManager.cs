@@ -9,7 +9,7 @@ using EC.Common;
 
 namespace EC.NetWork
 {
-	public class TcpSocketManager : SingletonMonoBehaviourBase<TcpSocketManager>
+	public class TcpSocketManager : ManagerBehaviourBase<TcpSocketManager>
     {
         public const int RECEIVE_BUFFER_MAX_SIZE = 8192;
 

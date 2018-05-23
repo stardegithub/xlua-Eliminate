@@ -2,7 +2,7 @@ local loginui
 
 function enter()
     print("game state login enter")
-    local obj = CS.GameManager.UIManager.Instance:OpenUI("UI/Login/UI_Login")
+    local obj = CS.EC.UI.UIManager.Instance:OpenUI("Prefab/Login/UI_Login")
     -- local obj = CS.AssetBundles.DataLoader.LoadData("Assets/Resources/UI/Login/UI_Login.prefab")
     -- loginui = CS.UnityEngine.Object.Instantiate(obj)
 end

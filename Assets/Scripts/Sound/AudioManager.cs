@@ -11,7 +11,7 @@ namespace EC.Sound
     /// 声音管理器
     /// </summary>
     /// <typeparam name="AudioManager"></typeparam>
-	public class AudioManager : SingletonMonoBehaviourBase<AudioManager>
+	public class AudioManager : ManagerBehaviourBase<AudioManager>
     {
         private const string VOLUMEKEY = "GameAudioVolume";
         private float _audioVolume;

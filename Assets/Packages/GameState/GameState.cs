@@ -67,7 +67,7 @@ namespace GameState
 		/// <param name="iState">状态.</param>
 		public bool IsSame (IGameState iState) {
 			if ((null == iState) || 
-				(false == string.IsNullOrEmpty(iState.Name))) {
+				(true == string.IsNullOrEmpty(iState.Name))) {
 				return false;
 			}
 			if (true == string.IsNullOrEmpty (this.Name)) {

@@ -2,9 +2,9 @@ using System;
 
 namespace Common
 {
-	/// <summary>
-	/// 管理器（基类）.
-	/// </summary>
+    /// <summary>
+    /// 管理器（基类）.
+    /// </summary>
     public interface IManagerBase
     {
         bool Initialized { get; }
@@ -14,9 +14,25 @@ namespace Common
         void OnMemoryWarning(float currMem, float devMem, float perc);
     }
 
+    public abstract class ManagerBehaviourBase<T> : SingletonMonoBehaviourBase<T>, IManagerBase where T : ManagerBehaviourBase<T>
+    {
+        public virtual void OnBeginStateEnter(string currStateName, string nextStateName)
+        {
+        }
+
+        public virtual void OnEndStateExit(string currStateName, string nextStateName)
+        {
+        }
+
+        public virtual void OnMemoryWarning(float currMem, float devMem, float perc)
+        {
+        }
+    }
+
+
     public class GameManageHelper
     {
-		public static IManagerBase GetCustomManage(Type type)
+        public static IManagerBase GetCustomManage(Type type)
         {
             // if (type == typeof(ThreadPoolManager))
             // {
