@@ -10,7 +10,7 @@ namespace EC.Sound
     /// 音乐管理器
     /// </summary>
     /// <typeparam name="MusicManager"></typeparam>
-	public class MusicManager : SingletonMonoBehaviourBase<MusicManager>
+	public class MusicManager : ManagerMonoBehaviourBase<MusicManager>
     {
         private const string VOLUMEKEY = "GameMusicVolume";
         private float _musicVolume;

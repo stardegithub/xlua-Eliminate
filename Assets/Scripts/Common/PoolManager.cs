@@ -11,7 +11,7 @@ namespace EC.Common
     /// 对象池管理器
     /// </summary>
     /// <typeparam name="PoolManager"></typeparam>
-	public class PoolManager : SingletonMonoBehaviourBase<PoolManager>
+	public class PoolManager : ManagerMonoBehaviourBase<PoolManager>
     {
         private Dictionary<string, IObjectPool> _objectPoolDict;
 

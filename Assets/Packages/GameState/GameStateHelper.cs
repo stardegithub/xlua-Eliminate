@@ -29,18 +29,18 @@ namespace GameState {
 				switch (_state.Type) {
 				case GameStateType.Inherit:
 					{
-						Type type = Type.GetType(_state.Context);
+						Type type = Type.GetType(_state.ClassName);
 						_gameStates[_state.Name] = Activator.CreateInstance(type) as IGameState;
 					}
 					break;
 				case GameStateType.CsScript:
 					{
-						_gameStates[_state.Name] = new ScriptGameState(_state.Name, _state.Context);
+						_gameStates[_state.Name] = new ScriptGameState(_state.Name, _state.ClassName);
 					}
 					break;
 				case GameStateType.Lua:
 					{
-						var ta = AssetBundles.DataLoader.Load<TextAsset>(_state.Context);
+						var ta = AssetBundles.DataLoader.Load<TextAsset>(_state.LuaPath);
 						if (ta != null)
 						{
 							_gameStates[_state.Name] = new LuaGameState(_state.Name, ta.text);
