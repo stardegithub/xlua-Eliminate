@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Common;
 using Upload;
+using NetWork;
 using NetWork.Servers;
 
 namespace IAP {
