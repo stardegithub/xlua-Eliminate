@@ -48,7 +48,7 @@ namespace Download {
 				downloader.Init (iDownloadUrl, iOnStart, iOnSuccessed, iOnFailed, iType);
 				return downloader;
 			} else {
-				UtilsLog.Error ("Create", "Downloader Create failed!!");
+				UtilsLog.Error ("WWWDownloader", "Create()::Downloader Create failed!!");
 				return null;
 			}
 		}
@@ -71,7 +71,7 @@ namespace Download {
 				downloader.Init (iTargetInfo, iOnStart, iOnSuccessed, iOnFailed);
 				return downloader;
 			} else {
-				UtilsLog.Error ("Create", "Downloader Create failed!!");
+				UtilsLog.Error ("WWWDownloader", "Create()::Downloader Create failed!!");
 				return null;
 			}
 		}

@@ -341,7 +341,7 @@ namespace Download {
 					yield return new WaitForEndOfFrame ();
 				}
 			} else {
-				UtilsLog.Error ("DownloadCheck", "Failed:State:{0}", this._State);
+				this.Warning ("DownloadCheck()::Failed:State:{0}", this._State);
 			}
 
 			if ((false == iDownloadPreCheck) && (TRunState.OK == this._State)) { 
@@ -368,7 +368,7 @@ namespace Download {
 					this.isStarted = false;
 					this._isCompleted = false;
 
-					UtilsLog.Info ("DownloadCheck", "There is no download target or all already be downloaded!");
+					this.Info ("DownloadCheck()::There is no download target or all already be downloaded!");
 					this.DownloadCompleteNotification (false);
 				}
 			
@@ -423,7 +423,7 @@ namespace Download {
 					
 				// 下载出错则停止
 				if (TRunState.OK != this._State) {
-					UtilsLog.Error ("DownloadFiles", "Download Failed!!! State:{0}", this._State.ToString());
+					this.Error ("DownloadFiles()::Download Failed!!! State:{0}", this._State.ToString());
 					// 取消现有下载线程
 					isCanceled = true;
 					yield break;
@@ -443,7 +443,7 @@ namespace Download {
 
 				// 下载出错则停止
 				if (TRunState.OK != this._State) {
-					UtilsLog.Error ("DownloadFiles", "Download Failed!!! State:{0}", this._State.ToString());
+					this.Error ("DownloadFiles()::Download Failed!!! State:{0}", this._State.ToString());
 					// 取消现有下载线程
 					isCanceled = true;
 					yield break;
@@ -466,7 +466,7 @@ namespace Download {
 				.ToArray ();
 			if ((downloadTargets == null) || (downloadTargets.Length <= 0)) {
 				this._State = TRunState.NoDownloadTarget;
-				UtilsLog.Warning ("initDownloadQueue", "There is no target to download!!!");
+				this.Warning ("initDownloadQueue()::There is no target to download!!!");
 			}
 			yield return new WaitForEndOfFrame ();
 
@@ -603,9 +603,9 @@ namespace Download {
 			}
 			if (false == Directory.Exists (iDir)) {
 				Directory.CreateDirectory (iDir);
-				UtilsLog.Info ("CheckDownloadDirs", " Create Dir:{0}", iDir);
+				this.Info ("CheckDownloadDirs()::Create Dir:{0}", iDir);
 				if (false == Directory.Exists (iDir)) {
-					UtilsLog.Error ("CheckDownloadDirs", " Create Dir Failed!! Dir:{0}", iDir);
+					this.Error ("CheckDownloadDirs()::Create Dir Failed!! Dir:{0}", iDir);
 				}
 			}
 		}
@@ -791,7 +791,7 @@ namespace Download {
 					}
 				}
 
-				UtilsLog.Error ("OnDownloadFailedByUrl", "Download Failed!!! DownloadUrl:{0} Detail:{1}", iDownloadUrl, errsStr);
+				this.Error ("OnDownloadFailedByUrl()::Download Failed!!! DownloadUrl:{0} Detail:{1}", iDownloadUrl, errsStr);
 
 				this._errors.AddRange (iErrors);
 				this._State = TRunState.Error;
@@ -808,7 +808,7 @@ namespace Download {
 		/// </summary>
 		/// <param name="iDownloadUrl">下载URL.</param>
 		public void OnDownloadSuccessedByUrl(DownloaderBase iDownloader, string iDownloadUrl) {
-			UtilsLog.Info ("OnDownloadSuccessedByUrl", "Download Successed. DownloadUrl:{0}", iDownloadUrl);
+			this.Info ("OnDownloadSuccessedByUrl()::Download Successed. DownloadUrl:{0}", iDownloadUrl);
 		}
 
 		/// <summary>
@@ -832,7 +832,7 @@ namespace Download {
 					}
 				}
 
-				UtilsLog.Error ("OnDownloadFail", "Download Failed!!! {0} \n Detail:{1}",
+				this.Error ("OnDownloadFail()::Download Failed!!! {0} \n Detail:{1}",
 					iDownloadInfo.toString(), errsStr);
 
 				this._errors.AddRange (iErrors);
@@ -850,7 +850,7 @@ namespace Download {
 		/// <param name="iDownloadInfo">下载信息.</param>
 		/// <param name="iRetries">重试次数.</param>
 		public void OnDownloadSuccessed(DownloaderBase iDownloader, DownloadTargetInfo iDownloadInfo, int iRetries) {
-			UtilsLog.Info ("OnDownloadSuccessed", "Download Successed. {0} Retries:{1}",
+			this.Info ("OnDownloadSuccessed()::Download Successed. {0} Retries:{1}",
 				iDownloadInfo.toString(), iRetries);
 
 			DownloadList.GetInstance ().DownloadCompleted (iDownloadInfo.ID, iDownloadInfo.FileType);

@@ -27,7 +27,7 @@ namespace Upload {
 	/// <summary>
 	/// 上传管理者.
 	/// </summary>
-	public class UploadManager : MonoBehaviour {
+	public class UploadManager : MonoBehaviourExtension {
 
 		/// <summary>
 		/// 上传进度条.
@@ -156,7 +156,7 @@ namespace Upload {
 					.ToArray ();
 				if ((uploadTargets == null) || (uploadTargets.Length <= 0)) {
 					this._State = TRunState.NoUploadTarget;
-					UtilsLog.Warning ("InitUploadQueue", "There is no target to upload!!!");
+					this.Warning ("InitUploadQueue()::There is no target to upload!!!");
 				}
 				yield return new WaitForEndOfFrame ();
 
@@ -282,7 +282,7 @@ namespace Upload {
 
 				// 上传出错则停止
 				if (TRunState.OK != this._State) {
-					UtilsLog.Error ("UploadFiles", "Failed!!! State:{0} Detail:{1}", 
+					this.Error ("UploadFiles()::Failed!!! State:{0} Detail:{1}", 
 						this._State.ToString(), this._errors.ToString());
 					// 取消现有上传线程
 					isCanceled = true;
@@ -298,7 +298,7 @@ namespace Upload {
 
 				// 上传出错则停止
 				if (TRunState.OK != this._State) {
-					UtilsLog.Error ("UploadFiles", "Failed!!! State:{0} Detail:{1}", 
+					this.Error ("UploadFiles()::Failed!!! State:{0} Detail:{1}", 
 						this._State.ToString(), this._errors.ToString());
 					// 取消现有上传线程
 					isCanceled = true;
@@ -373,10 +373,10 @@ namespace Upload {
 				string fileName = iBackupFilePath.Substring (lastIndex + 1);
 				string backUpFileFullPath = string.Format ("{0}/{1}", backupDir, fileName);
 
-				UtilsLog.Info ("BackupFile", "Successed. {0} -> {1}", iBackupFilePath, backUpFileFullPath);
+				this.Info ("BackupFile()::Successed. {0} -> {1}", iBackupFilePath, backUpFileFullPath);
 				File.Copy (iBackupFilePath, backUpFileFullPath, true);
 				if (File.Exists (backUpFileFullPath) == false) {
-					UtilsLog.Error ("BackupFile", "Failed!!! {0} -> {1}", iBackupFilePath, backUpFileFullPath);
+					this.Error ("BackupFile()::Failed!!! {0} -> {1}", iBackupFilePath, backUpFileFullPath);
 					return false;
 				}
 				this._uploadState = string.Format ("[BackUp] -> {0}", fileName);
@@ -634,25 +634,25 @@ namespace Upload {
 				}
 
 				if(TDirState.NotExist == state) {
-					UtilsLog.Info("GetDirStateOnFtpServer", "State:{0} ParentUrl:{1} TargetDir:{2}", 
+					this.Info("GetDirStateOnFtpServer()::State:{0} ParentUrl:{1} TargetDir:{2}", 
 						state.ToString(), iParentUrl, iTargetDir);
 				}
 			}
 			catch (WebException exp) 
 			{
-				UtilsLog.Exception ("GetDirStateOnFtpServer", "ParentUrl:{0} TargetDir:{1} \n WebException: \n {2}",
+				this.Fatal ("GetDirStateOnFtpServer()::ParentUrl:{0} TargetDir:{1} \n WebException: \n {2}",
 					iParentUrl, iTargetDir, exp.Message);
 				state = TDirState.Exception;
 			}
 			catch(IOException exp) 
 			{
-				UtilsLog.Exception ("GetDirStateOnFtpServer", "ParentUrl:{0} TargetDir:{1} \n IOException: \n {2}",
+				this.Fatal ("GetDirStateOnFtpServer()::ParentUrl:{0} TargetDir:{1} \n IOException: \n {2}",
 					iParentUrl, iTargetDir, exp.Message);
 				state = TDirState.Exception;
 			}
 			catch (Exception exp) 
 			{
-				UtilsLog.Exception ("GetDirStateOnFtpServer", "ParentUrl:{0} TargetDir:{1} \n Exception: \n {2}",
+				this.Fatal ("GetDirStateOnFtpServer()::ParentUrl:{0} TargetDir:{1} \n Exception: \n {2}",
 					iParentUrl, iTargetDir, exp.Message);
 				state = TDirState.Exception;
 			} 
@@ -693,23 +693,23 @@ namespace Upload {
 				response = ftpRequest.GetResponse() as FtpWebResponse;
 
 				state = TDirState.Created;
-				UtilsLog.Info("CreateDirOnFtpServer", "Successed Url:{0}", iUrl);
+				this.Info("CreateDirOnFtpServer()::Successed Url:{0}", iUrl);
 			}
 			catch (WebException exp) 
 			{
-				UtilsLog.Exception ("CreateDirOnFtpServer", "Failed!!! Url:{0} \n WebException: \n {1}",
+				this.Fatal ("CreateDirOnFtpServer()::Failed!!! Url:{0} \n WebException: \n {1}",
 					iUrl, exp.Message);
 				state = TDirState.Exception;
 			}
 			catch(IOException exp) 
 			{
-				UtilsLog.Exception ("CreateDirOnFtpServer", "Failed!!! Url:{0} \n IOException: \n {1}",
+				this.Fatal ("CreateDirOnFtpServer()::Failed!!! Url:{0} \n IOException: \n {1}",
 					iUrl, exp.Message);
 				state = TDirState.Exception;
 			}
 			catch (Exception exp) 
 			{
-				UtilsLog.Exception ("CreateDirOnFtpServer", "Failed!!! Url:{0} \n Exception: \n {1}",
+				this.Fatal ("CreateDirOnFtpServer()::Failed!!! Url:{0} \n Exception: \n {1}",
 					iUrl, exp.Message);
 				state = TDirState.Exception;
 			} 
@@ -730,7 +730,7 @@ namespace Upload {
 
 			// 导出文件
 			string inputFilePath = BundlesMap.GetInstance ().ExportToJsonFile ();
-			UtilsLog.Info("UploadBundlesMapFile", "ExportToJsonFile(Path:{0})", inputFilePath);
+			this.Info("UploadBundlesMapFile()::ExportToJsonFile(Path:{0})", inputFilePath);
 
 			// 上传URL
 			string uploadUrl = ServersConf.GetUploadListBaseUrl(iServerInfo);
@@ -745,14 +745,14 @@ namespace Upload {
 				this._State = UpLoadFileToFtpServer (
 					uploadUrl, inputFilePath, iServerInfo.AccountId, iServerInfo.Pwd);
 				if (TRunState.OK != this._State) {
-					UtilsLog.Error("UploadBundlesMapFile", "Upload Failed!!! \n {0} -> {1}", inputFilePath, uploadUrl);
+					this.Error("UploadBundlesMapFile()::Upload Failed!!! \n {0} -> {1}", inputFilePath, uploadUrl);
 					return null;
 				} else {
 					this._uploadState = string.Format ("[Upload] {0}", fileName);
 					return inputFilePath;
 				}
 			} else {
-				UtilsLog.Error("UploadBundlesMapFile", "Upload Failed!!! \n Upload file is not exist!!!(Path:{0})", inputFilePath);
+				this.Error("UploadBundlesMapFile()::Upload Failed!!! \n Upload file is not exist!!!(Path:{0})", inputFilePath);
 				return null;
 			}
 		}
@@ -765,7 +765,7 @@ namespace Upload {
 
 			// 导出Json文件，保存至(Resources/Conf)
 			string inputFilePath = UploadList.GetInstance().ExportToJsonFile();
-			UtilsLog.Info("UploadUploadListFile", "ExportToJsonFile(Path:{0})", inputFilePath);
+			this.Info("UploadUploadListFile()::ExportToJsonFile(Path:{0})", inputFilePath);
 
 			// 打包信息URL
 			string uploadUrl = ServersConf.GetUploadListBaseUrl(iServerInfo);
@@ -780,7 +780,7 @@ namespace Upload {
 					uploadUrl, inputFilePath, iServerInfo.AccountId, iServerInfo.Pwd);
 
 				if (TRunState.OK != this._State) {
-					UtilsLog.Error("UploadUploadListFile", "Upload Failed!!! \n {0} -> {1}", inputFilePath, uploadUrl);
+					this.Error("UploadUploadListFile()::Upload Failed!!! \n {0} -> {1}", inputFilePath, uploadUrl);
 					return null;
 				} else {
 					this._uploadState = string.Format ("[Upload] {0}", fileName);
@@ -788,7 +788,7 @@ namespace Upload {
 				}
 
 			} else {
-				UtilsLog.Error("UploadUploadListFile", "Upload Failed!!! \n Upload file is not exist!!!(Path:{0})", inputFilePath);
+				this.Error("UploadUploadListFile()::Upload Failed!!! \n Upload file is not exist!!!(Path:{0})", inputFilePath);
 				return null;
 			}
 		}
@@ -830,25 +830,25 @@ namespace Upload {
 				// 发出请求
 				response = ftpRequest.GetResponse() as FtpWebResponse;
 
-				UtilsLog.Info("UpLoadFileToFtpServer", "Successed. UploadUrl:{0} \n InputPath:{1}", 
+				this.Info("UpLoadFileToFtpServer()::Successed. UploadUrl:{0} \n InputPath:{1}", 
 					iUploadUrl, iInputPath);
 
 			}
 			catch (WebException exp) 
 			{
-				UtilsLog.Exception ("UpLoadFileToFtpServer", "Failed!!! UploadUrl:{0} \n InputPath:{1} \n WebException: \n {2}",
+				this.Fatal ("UpLoadFileToFtpServer()::Failed!!! UploadUrl:{0} \n InputPath:{1} \n WebException: \n {2}",
 					iUploadUrl, iInputPath, exp.Message);
 				state = TRunState.Exception;
 			}
 			catch(IOException exp) 
 			{
-				UtilsLog.Exception ("UpLoadFileToFtpServer", "Failed!!! UploadUrl:{0} \n InputPath:{1} \n IOException: \n {2}",
+				this.Fatal ("UpLoadFileToFtpServer()::Failed!!! UploadUrl:{0} \n InputPath:{1} \n IOException: \n {2}",
 					iUploadUrl, iInputPath, exp.Message);
 				state = TRunState.Exception;
 			}
 			catch (Exception exp) 
 			{
-				UtilsLog.Exception ("UpLoadFileToFtpServer", "Failed!!! UploadUrl:{0} \n InputPath:{1} \n Exception: \n {2}",
+				this.Fatal ("UpLoadFileToFtpServer()::Failed!!! UploadUrl:{0} \n InputPath:{1} \n Exception: \n {2}",
 					iUploadUrl, iInputPath, exp.Message);
 				state = TRunState.Exception;
 			} 
@@ -1060,7 +1060,7 @@ namespace Upload {
 
 			lock (_errorLock) {
 				
-				UtilsLog.Error ("OnUploadFailed", "{0} State:{1} Retries:{2} Detail:{3}",
+				this.Error("OnUploadFailed()::{0} State:{1} Retries:{2} Detail:{3}",
 					iTargetInfo.toString(), this._State, iRetries, iErrors.ToString());
 				
 				this._errors.AddRange(iErrors);
@@ -1084,7 +1084,7 @@ namespace Upload {
 		/// <param name="iRetries">剩余重试次数.</param>
 		public void OnUploadSuccessed(Uploader iUploader, UploadItem iTargetInfo, int iRetries) {
 
-			UtilsLog.Info ("OnUploadSuccessed", "No:{0} State:{1} Retries:{2}",
+			this.Info ("OnUploadSuccessed()::No:{0} State:{1} Retries:{2}",
 				iTargetInfo.toString(), this._State, iRetries);
 
 			UploadList.GetInstance ().UploadCompleted (iTargetInfo.ID, iTargetInfo.FileType);

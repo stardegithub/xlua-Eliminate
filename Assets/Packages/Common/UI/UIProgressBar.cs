@@ -459,7 +459,7 @@ namespace Common.UI
 	/// <summary>
 	/// 进度计数器.
 	/// </summary>
-	public class ProgressCounter {
+	public class ProgressCounter : ClassExtension {
 
 		/// <summary>
 		/// 文件下载总数.
@@ -517,7 +517,7 @@ namespace Common.UI
 			this.TotalDatasize = iTotalDatasize;
 			this.DidDatasize = 0;
 
-			UtilsLog.Info ("Init", "{0}/{1} {2}/{3}",
+			this.Info ("Init()::{0}/{1} {2}/{3}",
 				this.DidCount, this.TotalCount,
 				this.DidDatasize, this.TotalDatasize);
 		}

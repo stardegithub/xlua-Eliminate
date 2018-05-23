@@ -731,7 +731,7 @@ namespace AssetBundles {
 				bur.Path = iUnResourcePath;
 				UtilsAsset.SetAssetDirty (this);
 			} else {
-				UtilsLog.Error ("AddUnResource", "Failed!!!(Path:{0})",
+				this.Error ("AddUnResource()::Failed!!!(Path:{0})",
 					iUnResourcePath);
 			}
 			return bur;

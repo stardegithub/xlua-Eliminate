@@ -3,7 +3,7 @@ using Common;
 
 namespace BuildSystem.BuildLoggerImpl
 {
-	public class ConsoleBuildLogger : IBuildLogger
+	public class ConsoleBuildLogger : ClassExtension, IBuildLogger
 	{
 		#region IBuildLogger implementation
 		
@@ -56,26 +56,22 @@ namespace BuildSystem.BuildLoggerImpl
 				switch (iType) {
 				case TLogType.kInfo:
 					{
-						UtilsLog.Info ("ConsoleBuildLogger", 
-							message);
+						this.Info ("Log()::{0}", message);
 					}
 					break;
 				case TLogType.kWarning:
 					{
-						UtilsLog.Warning ("ConsoleBuildLogger", 
-							message);
+						this.Warning ("Log()::{0}", message);
 					}
 					break;
 				case TLogType.kError:
 					{
-						UtilsLog.Error ("ConsoleBuildLogger", 
-							message);
+						this.Error ("Log()::{0}", message);
 					}
 					break;
 				case TLogType.kException:
 					{
-						UtilsLog.Exception ("ConsoleBuildLogger", 
-							 message);
+						this.Fatal ("Log()::{0}", message);
 					}
 					break;
 				default:

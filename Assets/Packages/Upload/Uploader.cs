@@ -68,7 +68,7 @@ namespace Upload {
 	/// <summary>
 	/// 上传者.
 	/// </summary>
-	public sealed class Uploader : IDisposable {
+	public sealed class Uploader : ClassExtension, IDisposable {
 
 		/// <summary>
 		/// 服务器信息.
@@ -376,25 +376,25 @@ namespace Upload {
 				// 发出请求
 				response = ftpRequest.GetResponse() as FtpWebResponse;
 
-				UtilsLog.Info("UpLoadFileToFtpServer", "Successed. UploadUrl:{0} \n InputPath:{1}", 
+				this.Info("UpLoadFileToFtpServer()::Successed. UploadUrl:{0} \n InputPath:{1}", 
 					iUploadUrl, iInputPath);
 
 			}
 			catch (WebException exp) 
 			{
-				UtilsLog.Exception ("UpLoadFileToFtpServer", "Failed!!! Retries:{0} \n UploadUrl:{1} \n InputPath:{2} \n WebException: \n {3}",
+				this.Fatal ("UpLoadFileToFtpServer()::Failed!!! Retries:{0} \n UploadUrl:{1} \n InputPath:{2} \n WebException: \n {3}",
 					this.Retries, iUploadUrl, iInputPath, exp.Message);
 				state = TRunState.Exception;
 			}
 			catch(IOException exp) 
 			{
-				UtilsLog.Exception ("UpLoadFileToFtpServer", "Failed!!! Retries:{0} \n UploadUrl:{1} \n InputPath:{2} \n WebException: \n {3}",
+				this.Fatal ("UpLoadFileToFtpServer()::Failed!!! Retries:{0} \n UploadUrl:{1} \n InputPath:{2} \n WebException: \n {3}",
 					this.Retries, iUploadUrl, iInputPath, exp.Message);
 				state = TRunState.Exception;
 			}
 			catch (Exception exp) 
 			{
-				UtilsLog.Exception ("UpLoadFileToFtpServer", "Failed!!! Retries:{0} \n UploadUrl:{1} \n InputPath:{2} \n WebException: \n {3}",
+				this.Fatal ("UpLoadFileToFtpServer()::Failed!!! Retries:{0} \n UploadUrl:{1} \n InputPath:{2} \n WebException: \n {3}",
 					this.Retries, iUploadUrl, iInputPath, exp.Message);
 				state = TRunState.Exception;
 			} 

@@ -35,8 +35,8 @@ namespace BuildSystem
 
 #if UNITY_EDITOR
 			if (string.IsNullOrEmpty (iBuildLogFile) == true) {
-				UtilsLog.Error ("OpenConsoleStream", 
-					"The path of build log file is null");
+				UtilsLog.Error ("BuildLogger", 
+					"OpenConsoleStream()::The path of build log file is null");
 				return;
 			}
 

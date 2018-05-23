@@ -454,7 +454,7 @@ namespace AndroidSDK.Platforms.Tiange {
 				if (true == File.Exists (copyToFile)) {
 					File.Delete (copyToFile);
 				}
-				UtilsLog.Info ("CopyResources", "Copy Libs : {0} -> {1}",
+				this.Info ("CopyAllFiles()::Copy Libs : {0} -> {1}",
 					file, copyToFile);
 
 				File.Copy (file, copyToFile);

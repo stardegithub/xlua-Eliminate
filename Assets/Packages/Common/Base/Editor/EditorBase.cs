@@ -9,8 +9,6 @@ namespace Common {
 	/// </summary>
 	public class EditorBase : Editor, ILogExtension {
 
-#if BUILD_DEBUG
-
 		/// <summary>
 		/// 类名.
 		/// </summary>
@@ -24,55 +22,65 @@ namespace Common {
 				return _className;
 			}
 		}
-
-#endif
+			
+		/// <summary>
+		/// Debug日志.
+		/// </summary>
+		/// <param name="iScript">脚本.</param>
+		/// <param name="iFormat">格式.</param>
+		/// <param name="iArgs">参数.</param>
+		public void DebugLog(string iFormat, params object[] iArgs) {
+			UtilsLog.DebugLog (this.ClassName, iFormat, iArgs);
+		}
 
 		/// <summary>
-		/// 日志输出：消息.
+		/// 信息日志(默认：运行日志).
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
 		public void Info(string iFormat, params object[] iArgs) {
-#if BUILD_DEBUG
 			UtilsLog.Info (this.ClassName, iFormat, iArgs);
-#endif
 		}
 
 		/// <summary>
-		/// 日志输出：警告.
+		/// 警告日志.
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
 		public void Warning(string iFormat, params object[] iArgs) {
-#if BUILD_DEBUG
 			UtilsLog.Warning (this.ClassName, iFormat, iArgs);
-#endif
 		}
 
 		/// <summary>
-		/// 日志输出：错误.
+		/// 信息:逻辑(LI).
+		/// </summary>
+		/// <param name="iScript">脚本.</param>
+		/// <param name="iFormat">格式.</param>
+		/// <param name="iArgs">参数.</param>
+		public void LInfo(string iFormat, params object[] iArgs) {
+			UtilsLog.LInfo (this.ClassName, iFormat, iArgs);
+		}
+
+		/// <summary>
+		/// 错误日志.
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
 		public void Error(string iFormat, params object[] iArgs) {
-#if BUILD_DEBUG
 			UtilsLog.Error (this.ClassName, iFormat, iArgs);
-#endif
 		}
 
 		/// <summary>
-		/// 日志输出：异常.
+		/// 致命日志.
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
-		public void Exception(string iFormat, params object[] iArgs) {
-#if BUILD_DEBUG
-			UtilsLog.Exception (this.ClassName, iFormat, iArgs);
-#endif
+		public void Fatal(string iFormat, params object[] iArgs) {
+			UtilsLog.Fatal (this.ClassName, iFormat, iArgs);
 		}
 
 	}

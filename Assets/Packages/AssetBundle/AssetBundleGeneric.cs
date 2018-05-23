@@ -237,7 +237,7 @@ namespace AssetBundles
 				break;
 			}
 
-			UtilsLog.Info("ProcessBaseURL", "result:{0}", result);
+			UtilsLog.Info("AssetBundleConst", "ProcessBaseURL()::result:{0}", result);
 
 			return result;
 		}

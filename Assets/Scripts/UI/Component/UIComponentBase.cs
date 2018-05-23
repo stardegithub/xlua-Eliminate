@@ -179,13 +179,13 @@ namespace EC.UI.Component
             var prefab = DataLoader.Load<GameObject>(uiPrefabName);
             if (prefab == null)
             {
-                UtilsLog.Error("UIComponentData.LoadData():Prefab Load Failed!!!(Path:{0})", uiPrefabName);
+				UtilsLog.Error("UIComponentData", "LoadData()::Prefab Load Failed!!!(Path:{0})", uiPrefabName);
                 return null;
             }
             var prefabComponent = prefab.GetComponent<UIComponentBase>();
             if (prefabComponent == null)
             {
-                UtilsLog.Error("UIComponentData.LoadData():Prefab do not exist UIComponentBase !!!(Path:{0})", uiPrefabName);
+				UtilsLog.Error("UIComponentData", "LoadData()::Prefab do not exist UIComponentBase !!!(Path:{0})", uiPrefabName);
                 return null;
             }
             if (prefabComponent.Data.Prefab == null)

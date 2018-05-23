@@ -91,16 +91,16 @@ namespace Common {
 				_instance = UtilsAsset.ReadSetting<T1>(iPath);
 				string _name = typeof(T1).Name;
 				if ((null != _instance) && (true == _instance.Init ())) {
-					UtilsLog.Info (_name, "GetInstance Successed!!!");
+					UtilsLog.Info (_name, "GetInstance()::Successed!!!(Path:{0})",
+						(true == string.IsNullOrEmpty(iPath)) ? "null" : iPath);
 				} else {
-					UtilsLog.Error (_name, "GetInstance Failed!!!");
+					UtilsLog.Error (_name, "GetInstance()::Failed!!!(Path:{0})",
+						(true == string.IsNullOrEmpty(iPath)) ? "null" : iPath);
 					return null;
 				}
 			}
 			return _instance;
 		}
-
-#if BUILD_DEBUG
 
 		/// <summary>
 		/// 类名.
@@ -115,8 +115,6 @@ namespace Common {
 				return _className;
 			}
 		}
-
-#endif
 
 		/// <summary>
 		/// 数据.
@@ -320,27 +318,45 @@ namespace Common {
 #endregion
 
 		/// <summary>
-		/// 日志输出：消息.
+		/// Debug日志.
+		/// </summary>
+		/// <param name="iScript">脚本.</param>
+		/// <param name="iFormat">格式.</param>
+		/// <param name="iArgs">参数.</param>
+		public void DebugLog(string iFormat, params object[] iArgs) {
+#if BUILD_DEBUG
+			UtilsLog.DebugLog (this.ClassName, iFormat, iArgs);
+#endif
+		}
+
+		/// <summary>
+		/// 信息日志(默认：运行日志).
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
 		public void Info(string iFormat, params object[] iArgs) {
-#if BUILD_DEBUG
 			UtilsLog.Info (this.ClassName, iFormat, iArgs);
-#endif
 		}
 
 		/// <summary>
-		/// 日志输出：警告.
+		/// 信息:逻辑(LI).
+		/// </summary>
+		/// <param name="iScript">脚本.</param>
+		/// <param name="iFormat">格式.</param>
+		/// <param name="iArgs">参数.</param>
+		public void LInfo(string iFormat, params object[] iArgs) {
+			UtilsLog.LInfo (this.ClassName, iFormat, iArgs);
+		}
+
+		/// <summary>
+		/// 错误日志.
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
 		public void Warning(string iFormat, params object[] iArgs) {
-#if BUILD_DEBUG
 			UtilsLog.Warning (this.ClassName, iFormat, iArgs);
-#endif
 		}
 
 		/// <summary>
@@ -350,21 +366,17 @@ namespace Common {
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
 		public void Error(string iFormat, params object[] iArgs) {
-#if BUILD_DEBUG
 			UtilsLog.Error (this.ClassName, iFormat, iArgs);
-#endif
 		}
 
 		/// <summary>
-		/// 日志输出：异常.
+		/// 致命日志.
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
-		public void Exception(string iFormat, params object[] iArgs) {
-#if BUILD_DEBUG
-			UtilsLog.Exception (this.ClassName, iFormat, iArgs);
-#endif
+		public void Fatal(string iFormat, params object[] iArgs) {
+			UtilsLog.Fatal (this.ClassName, iFormat, iArgs);
 		}
 	}
 		
@@ -392,16 +404,16 @@ namespace Common {
 				_instance = UtilsAsset.ReadSetting<T1>(iPath);
 				string _name = typeof(T1).Name;
 				if ((null != _instance) && (true == _instance.Init ())) {
-					UtilsLog.Info (_name, "GetInstance Successed!!!");
+					UtilsLog.Info (_name, "GetInstance()::Successed!!!(Path:{0})",
+						(true == string.IsNullOrEmpty(iPath)) ? "null" : iPath);
 				} else {
-					UtilsLog.Error (_name, "GetInstance Failed!!!");
+					UtilsLog.Error (_name, "GetInstance()::Failed!!!(Path:{0})",
+						(true == string.IsNullOrEmpty(iPath)) ? "null" : iPath);
 					return null;
 				}
 			}
 			return _instance;
 		}
-
-#if BUILD_DEBUG
 
 		/// <summary>
 		/// 类名.
@@ -416,8 +428,6 @@ namespace Common {
 				return _className;
 			}
 		}
-
-#endif
 
 		/// <summary>
 		/// 数据.
@@ -492,7 +502,7 @@ namespace Common {
 			}
 		}
 
-		#region virtual
+#region virtual
 
 		/// <summary>
 		/// 取得导入路径.
@@ -607,9 +617,9 @@ namespace Common {
 		/// <returns><c>true</c>, OK, <c>false</c> NG.</returns>
 		public virtual bool InitAsset () { return true; }
 
-		#endregion
+#endregion
 
-		#region abstract
+#region abstract
 
 		/// <summary>
 		/// 用用数据.
@@ -618,54 +628,68 @@ namespace Common {
 		/// <param name="iForceClear">强制清空标志位.</param>
 		protected abstract void ApplyData (T2 iData, bool iForceClear);
 
-		#endregion
+#endregion
 
 		/// <summary>
-		/// 日志输出：消息.
+		/// Debug日志.
+		/// </summary>
+		/// <param name="iScript">脚本.</param>
+		/// <param name="iFormat">格式.</param>
+		/// <param name="iArgs">参数.</param>
+		public void DebugLog(string iFormat, params object[] iArgs) {
+#if BUILD_DEBUG
+			UtilsLog.DebugLog (this.ClassName, iFormat, iArgs);
+#endif
+		}
+			
+		/// <summary>
+		/// 信息日志(默认：运行日志).
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
 		public void Info(string iFormat, params object[] iArgs) {
-			#if BUILD_DEBUG
 			UtilsLog.Info (this.ClassName, iFormat, iArgs);
-			#endif
 		}
 
 		/// <summary>
-		/// 日志输出：警告.
+		/// 警告日志
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
 		public void Warning(string iFormat, params object[] iArgs) {
-			#if BUILD_DEBUG
 			UtilsLog.Warning (this.ClassName, iFormat, iArgs);
-			#endif
 		}
 
 		/// <summary>
-		/// 日志输出：错误.
+		/// 信息:逻辑(LI).
+		/// </summary>
+		/// <param name="iScript">脚本.</param>
+		/// <param name="iFormat">格式.</param>
+		/// <param name="iArgs">参数.</param>
+		public void LInfo(string iFormat, params object[] iArgs) {
+			UtilsLog.LInfo (this.ClassName, iFormat, iArgs);
+		}
+
+		/// <summary>
+		/// 错误日志.
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
 		public void Error(string iFormat, params object[] iArgs) {
-			#if BUILD_DEBUG
 			UtilsLog.Error (this.ClassName, iFormat, iArgs);
-			#endif
 		}
 
 		/// <summary>
-		/// 日志输出：异常.
+		/// 致命日志.
 		/// </summary>
 		/// <param name="iScript">脚本.</param>
 		/// <param name="iFormat">格式.</param>
 		/// <param name="iArgs">参数.</param>
-		public void Exception(string iFormat, params object[] iArgs) {
-			#if BUILD_DEBUG
-			UtilsLog.Exception (this.ClassName, iFormat, iArgs);
-			#endif
+		public void Fatal(string iFormat, params object[] iArgs) {
+			UtilsLog.Fatal (this.ClassName, iFormat, iArgs);
 		}
 	}
 }

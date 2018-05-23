@@ -218,7 +218,7 @@ namespace AssetBundles {
 			// 初始化Bundle包文件依赖关系列表
 			List<BundleMap> maps = BundlesMap.GetInstance().Maps;
 			if ((maps == null) || (maps.Count <= 0)) {
-				this.Error ("Init():There is no info in BundlesMap!!!");
+				this.Warning ("Init():There is no info in BundlesMap!!!");
 				return;
 			}
 			foreach (BundleMap loop in maps) {

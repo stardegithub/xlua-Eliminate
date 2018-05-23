@@ -84,7 +84,7 @@ namespace Download {
 	/// <summary>
 	/// 下载器接口.
 	/// </summary>
-	public abstract class DownloaderBase : IDisposable {
+	public abstract class DownloaderBase : ClassExtension, IDisposable {
 
 		/// <summary>
 		/// 下载缓存大小.
@@ -328,7 +328,7 @@ namespace Download {
 					Uri _url = new Uri(iDownloadUrl);
 					request = WebRequest.Create (_url) as HttpWebRequest;
 					if(null == request) {
-						UtilsLog.Error ("DownloaderBase", "GetFileDataSize:HttpWebRequest Create Failed!!!");
+						this.Error ("GetFileDataSize()::HttpWebRequest Create Failed!!!");
 					}
 					if(TRunState.OK == ret) {
 						request.Timeout = this.TimeOut;
@@ -358,7 +358,7 @@ namespace Download {
 					}
 				} catch (Exception exp) {
 
-					UtilsLog.Exception ("DownloaderBase", "GetFileDataSize Type:{0} Message:{1} StackTrace:{2}", 
+					this.Fatal ("GetFileDataSize()::Type:{0} Message:{1} StackTrace:{2}", 
 						exp.GetType().ToString(), exp.Message, exp.StackTrace);
 
 					ErrorDetail error = new ErrorDetail ();
@@ -389,7 +389,7 @@ namespace Download {
 				}
 
 				if (0 < iFileSize) {
-					UtilsLog.Info ("DownloaderBase", "GetFileDataSize Size:{0} ({1})", 
+					this.Info ("GetFileDataSize()::Size:{0} ({1})", 
 						iFileSize.ToString (), iDownloadUrl);
 				}
 			}
@@ -490,9 +490,9 @@ namespace Download {
 							error.Retries = this.Retries;
 							this._errors.Add (error);
 
-							UtilsLog.Error ("DownloadFileByWWW", "File Check -> NG (File:{0} Retries:{1})", iFileName, this.Retries);
+							this.Error ("DownloadFileByWWW()::File Check -> NG (File:{0} Retries:{1})", iFileName, this.Retries);
 						} else {
-							UtilsLog.Info ("DownloadFileByWWW", "File Check -> OK (File:{0} Retries:{1})", iFileName, this.Retries);
+							this.Info ("DownloadFileByWWW()::File Check -> OK (File:{0} Retries:{1})", iFileName, this.Retries);
 						}
 					}
 
@@ -547,7 +547,7 @@ namespace Download {
 						Uri _url = new Uri(downloadUrl);
 						request = WebRequest.Create (_url) as HttpWebRequest;
 						if(null == request) {
-							UtilsLog.Error ("DownloaderBase", "DownloadFileByHttp:HttpWebRequest Create Failed!!!");
+							this.Error ("DownloadFileByHttp()::HttpWebRequest Create Failed!!!");
 						}
 						request.Timeout = this.TimeOut;
 						request.ReadWriteTimeout = this.TimeOut;
@@ -665,14 +665,14 @@ namespace Download {
 					fs.Dispose ();
 					fs = null;
 
-					UtilsLog.Info ("DownloaderBase", "DownloadFileByHttp:File Close -> File:{0}", iFileName);
+					this.Info ("DownloadFileByHttp()::File Close -> File:{0}", iFileName);
 				}
 				if(stream != null) {
 					stream.Close ();
 					stream.Dispose ();
 					stream = null;
 
-					UtilsLog.Info ("DownloaderBase", "DownloadFileByHttp:Stream Close -> File:{0}", iFileName);
+					this.Info ("DownloadFileByHttp()::Stream Close -> File:{0}", iFileName);
 				}
 
 				if ((TRunState.OK == this.State) && 
@@ -694,9 +694,9 @@ namespace Download {
 						error.Retries = this.Retries;
 						this._errors.Add(error);
 
-						UtilsLog.Error ("DownloaderBase", "DownloadFileByHttp:File Check -> NG (File:{0} Retries:{1})", iFileName, this.Retries);
+						this.Error ("DownloadFileByHttp()::File Check -> NG (File:{0} Retries:{1})", iFileName, this.Retries);
 					} else {
-						UtilsLog.Info ("DownloaderBase", "DownloadFileByHttp:File Check -> OK (File:{0} Retries:{1})", iFileName, this.Retries);
+						this.Info ("DownloadFileByHttp()::File Check -> OK (File:{0} Retries:{1})", iFileName, this.Retries);
 					}
 				}
 			}
@@ -759,7 +759,7 @@ namespace Download {
 			switch (UploadList.GetInstance ().CheckMode) {
 			case TCheckMode.Unity3d_Hash128:
 				{
-					UtilsLog.Info ("CheckFileByCheckMode", "The Unity3d_Hash128 of check mode has not been supported yet!!!");
+					this.Info ("CheckFileByCheckMode()::The Unity3d_Hash128 of check mode has not been supported yet!!!");
 					isCheckOK = false;
 				}
 				break;

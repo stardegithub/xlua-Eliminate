@@ -105,7 +105,7 @@ namespace AndroidSDK.Common.Manifest {
 				this.ApplyUserData(iGameName);
 
 			} catch (Exception e) {
-				UtilsLog.Exception ("Init", "Failed!!! Exeption:{0}",
+				UtilsLog.Fatal ("ManifestBase", "Init()::Failed!!! Exeption:{0}",
 					e.Message);
 				return false;
 			}

@@ -55,7 +55,7 @@ namespace AndroidSDK {
 				this.Load(iPath);
 
 			} catch (Exception e) {
-				UtilsLog.Exception ("StringsXMLBase", "Init():Failed!!! Exeption:{0}",
+				UtilsLog.Fatal ("StringsXMLBase", "Init()::Failed!!! Exeption:{0}",
 					e.Message);
 				return false;
 			}

@@ -25,7 +25,7 @@ namespace BuildSystem
 		public static void OnPostprocessiOSBuild(BuildTarget target, string iBuiltProjectPath)
 		{
 			UtilsLog.Info ("PostProcessor", 
-				"OnPostprocessiOSBuild Target:{0} ProPath:{1}", target.ToString(), iBuiltProjectPath);
+				"OnPostprocessiOSBuild()::Target:{0} ProPath:{1}", target.ToString(), iBuiltProjectPath);
 #if UNITY_EDITOR
 
 			if (target != BuildTarget.iOS) {

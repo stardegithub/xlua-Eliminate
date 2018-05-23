@@ -852,7 +852,7 @@ namespace NetWork.Servers {
 					this.ServersDirs.Add (targetServer);
 				} else {
 					if (servers.Length > 1) {
-						UtilsLog.Error ("AddCreatedDir", "There are multiple id exist!!![ID:{0}]", iServerId);
+						this.Error ("AddCreatedDir()::There are multiple id exist!!![ID:{0}]", iServerId);
 					}
 					targetServer = servers [0];
 				}
@@ -903,49 +903,49 @@ namespace NetWork.Servers {
 		public override bool InitAsset () {
 			
 			DownloadRootDir = Application.temporaryCachePath;
-			UtilsLog.Info("InitAsset", "DownloadRootDir:{0}", DownloadRootDir);
+			this.Info("InitAsset()::DownloadRootDir:{0}", DownloadRootDir);
 
 			// 下载目录
 			DownloadDir = string.Format ("{0}/Downloads", DownloadRootDir);
-			UtilsLog.Info("InitAsset", "DownloadDir:{0}", DownloadDir);
+			this.Info("InitAsset()::DownloadDir:{0}", DownloadDir);
 
 			// 下载目录(Normal)
 			DownloadDirOfNormal = string.Format ("{0}/{1}", DownloadDir, 
 				UploadList.AssetBundleDirNameOfNormal);
-			UtilsLog.Info("InitAsset", "DownloadDirOfNormal:{0}", DownloadDirOfNormal);
+			this.Info("InitAsset()::DownloadDirOfNormal:{0}", DownloadDirOfNormal);
 
 			// 下载目录(Scenes)
 			DownloadDirOfScenes = string.Format ("{0}/{1}", DownloadDir, 
 				UploadList.AssetBundleDirNameOfScenes);
-			UtilsLog.Info("InitAsset", "DownloadDirOfScenes:{0}", DownloadDirOfScenes);
+			this.Info("InitAsset()::DownloadDirOfScenes:{0}", DownloadDirOfScenes);
 
 			// Bundles目录
 			BundlesDir = string.Format ("{0}/Bundles", Application.persistentDataPath);
-			UtilsLog.Info("InitAsset", "BundlesDir:{0}", BundlesDir);
+			this.Info("InitAsset()::BundlesDir:{0}", BundlesDir);
 
 			// Bundles目录(Normal)
 			BundlesDirOfNormal = string.Format ("{0}/{1}", BundlesDir, 
 				UploadList.AssetBundleDirNameOfNormal);
-			UtilsLog.Info("InitAsset", "BundlesDirOfNormal:{0}", BundlesDirOfNormal);
+			this.Info("InitAsset()::BundlesDirOfNormal:{0}", BundlesDirOfNormal);
 
 			// Scene
 			BundlesDirOfScenes = string.Format ("{0}/{1}", BundlesDir, 
 				UploadList.AssetBundleDirNameOfScenes);
-			UtilsLog.Info("InitAsset", "BundlesDirOfScenes:{0}", BundlesDirOfScenes);
+			this.Info("InitAsset()::BundlesDirOfScenes:{0}", BundlesDirOfScenes);
 
 			// 解压缩
 			DecompressedDir = string.Format ("{0}/Decompressed", DownloadRootDir);
-			UtilsLog.Info("InitAsset", "DecompressedDir:{0}", DecompressedDir);
+			this.Info("InitAsset()::DecompressedDir:{0}", DecompressedDir);
 
 			// 解压缩(Normal)
 			DecompressedDirOfNormal = string.Format ("{0}/{1}", DecompressedDir, 
 				UploadList.AssetBundleDirNameOfNormal);
-			UtilsLog.Info("InitAsset", "DecompressedDirOfNormal:{0}", DecompressedDirOfNormal);
+			this.Info("InitAsset()::DecompressedDirOfNormal:{0}", DecompressedDirOfNormal);
 
 			// 解压缩(Scenes)
 			DecompressedDirOfScenes = string.Format ("{0}/{1}", DecompressedDir, 
 				UploadList.AssetBundleDirNameOfScenes);
-			UtilsLog.Info("InitAsset", "DecompressedDirOfScenes:{0}", DecompressedDirOfScenes);
+			this.Info("InitAsset()::DecompressedDirOfScenes:{0}", DecompressedDirOfScenes);
 
 			UtilsAsset.SetAssetDirty (this);
 

@@ -1,1 +1,1 @@
-{"Defines":[{"Name":"BUILD_DEBUG","Android":true,"iOS":true},{"Name":"LOCALIZATION","Android":true,"iOS":true},{"Name":"LOCALIZATION_CN","Android":true,"iOS":true}]}
+{"Defines":[{"Name":"BUILD_DEBUG","Android":true,"iOS":true},{"Name":"LOCALIZATION","Android":true,"iOS":true},{"Name":"LOCALIZATION_CN","Android":true,"iOS":true},{"Name":"UI_DEBUG_BORDER","Android":false,"iOS":false}]}

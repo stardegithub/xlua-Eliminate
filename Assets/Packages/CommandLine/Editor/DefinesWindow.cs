@@ -130,7 +130,7 @@ namespace CommandLine {
 				if (false == isExist) {
 					DefineInfo _define = new DefineInfo (defineName, iAndroid, iIOS);
 					this.Defines.Add (_define);
-					UtilsLog.Info ("DefinesWindow", "AddDefine -> Name:{0} Andorid:{1} iOS:{2}", 
+					UtilsLog.Info ("DefinesData", "AddDefine -> Name:{0} Andorid:{1} iOS:{2}", 
 						defineName, iAndroid, iIOS);
 				}
 			}
@@ -294,7 +294,7 @@ namespace CommandLine {
         {
             if (false == this.Init(_jsonFileDir))
             {
-                UtilsLog.Error(this.ClassName, "DefinesWindow Failed!!!");
+				UtilsLog.Error(this.ClassName, "Awake()::DefinesWindow Failed!!!");
             }
         }   
 
@@ -348,7 +348,7 @@ namespace CommandLine {
 			// 按名字排序
 			this.Defines.Sort((x,y) => (x.Name.CompareTo(y.Name)));
 
-			UtilsLog.Info ("DefinesWindow", "DelDefine -> Name:{0} Andorid:{1} iOS:{2}", 
+			UtilsLog.Info (this.ClassName, "DelDefine -> Name:{0} Andorid:{1} iOS:{2}", 
 				_delDefine.Name, _delDefine.Android, _delDefine.iOS);
 			isPause = false;
 		}
