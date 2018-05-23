@@ -11,7 +11,7 @@ namespace Foundation.Databinding.Lua
     /// Lua管理器
     /// </summary>
     /// <typeparam name="LuaManager"></typeparam>
-	public class LuaManager : ManagerMonoBehaviourBase<LuaManager>
+	public class LuaManager : ManagerBehaviourBase<LuaManager>
     {
         /// <summary>
         /// lua gc 间隔

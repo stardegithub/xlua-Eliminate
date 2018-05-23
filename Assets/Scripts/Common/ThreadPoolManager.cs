@@ -10,7 +10,7 @@ namespace EC.Common
     /// 线程池管理器
     /// </summary>
     /// <typeparam name="ThreadPoolManager"></typeparam>
-	public class ThreadPoolManager : ManagerMonoBehaviourBase<ThreadPoolManager>
+	public class ThreadPoolManager : ManagerBehaviourBase<ThreadPoolManager>
     {
         private int _locker;
         private int _count;

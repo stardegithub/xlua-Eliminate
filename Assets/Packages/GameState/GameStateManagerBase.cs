@@ -11,7 +11,7 @@ namespace GameState
     /// 游戏状态管理器.
     /// </summary>
     public abstract class GameStateManagerBase<T>
-        : ManagerMonoBehaviourBase<T> where T : GameStateManagerBase<T>
+        : ManagerBehaviourBase<T> where T : GameStateManagerBase<T>
     {
 
         /// <summary>

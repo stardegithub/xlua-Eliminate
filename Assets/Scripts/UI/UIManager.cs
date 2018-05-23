@@ -13,7 +13,7 @@ using EC.UI.Component;
 
 namespace EC.UI
 {
-	public class UIManager : ManagerMonoBehaviourBase<UIManager>
+	public class UIManager : ManagerBehaviourBase<UIManager>
     {
         public GameObject UIRoot;
 

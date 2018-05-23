@@ -14,7 +14,7 @@ namespace Common
         void OnMemoryWarning(float currMem, float devMem, float perc);
     }
 
-    public abstract class ManagerMonoBehaviourBase<T> : SingletonMonoBehaviourBase<T>, IManagerBase where T : ManagerMonoBehaviourBase<T>
+    public abstract class ManagerBehaviourBase<T> : SingletonMonoBehaviourBase<T>, IManagerBase where T : ManagerBehaviourBase<T>
     {
         public virtual void OnBeginStateEnter(string currStateName, string nextStateName)
         {
