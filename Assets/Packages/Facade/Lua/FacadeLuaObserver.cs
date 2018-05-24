@@ -11,10 +11,13 @@ namespace Facade.Lua
 {
     public class FacadeLuaObserver : ObserverBehaviour
     {
-        [SerializeField]
-        protected string luaFilePath;
-        protected LuaTable luaTable;
-        protected Dictionary<string, Action<object>> messageMethodMap = new Dictionary<string, Action<object>>();
+        [HideInInspector]
+        public TextAsset LuaText;
+        [HideInInspector]
+        public string LuaTextPath;
+        protected string _tableName;
+        protected LuaTable _luaTable;
+        protected Dictionary<string, Action<object>> _messageMethodMap = new Dictionary<string, Action<object>>();
         protected Action awakeMethod, startMethod, onenableMethod, ondisableMethod, ondestroyMethod, updateMethod;
 
         void Awake()
@@ -61,7 +64,7 @@ namespace Facade.Lua
             }
 
             Facade.Instance.RemoveObserver(this, ObserverMessages);
-            messageMethodMap = null;
+            _messageMethodMap = null;
 
             awakeMethod = null;
             startMethod = null;
@@ -69,13 +72,13 @@ namespace Facade.Lua
             ondisableMethod = null;
             ondestroyMethod = null;
             updateMethod = null;
-            if (luaTable != null)
+            if (_luaTable != null)
             {
-                luaTable.Dispose();
+                _luaTable.Dispose();
             }
             if (LuaManager.Instance != null)
             {
-                LuaManager.Instance.RemoveTable(luaFilePath);
+                LuaManager.Instance.RemoveTable(_tableName);
             }
         }
 
@@ -89,43 +92,49 @@ namespace Facade.Lua
 
         protected string LoadLuaScript()
         {
-            if (string.IsNullOrEmpty(luaFilePath))
+            if (LuaText == null)
             {
-                return null;
+                if (string.IsNullOrEmpty(LuaTextPath))
+                {
+                    return null;
+                }
+                LuaText = AssetBundles.DataLoader.Load<TextAsset>(LuaTextPath);
             }
-            var ta = AssetBundles.DataLoader.Load<TextAsset>(luaFilePath);
-            if (ta == null) return null;
-            return ta.text;
+
+            if (LuaText == null) return null;
+            _tableName = LuaText.name;
+            return LuaText.text;
         }
+
 
         protected void BindMethod()
         {
             string luaScript = LoadLuaScript();
             if (string.IsNullOrEmpty(luaScript)) { return; }
 
-            luaTable = LuaManager.Instance.CreateExpandTable(luaFilePath);
-            if (luaTable == null) { return; }
+            _luaTable = LuaManager.Instance.CreateExpandTable(_tableName);
+            if (_luaTable == null) { return; }
 
-            luaTable.Set("gameObject", this.gameObject);
-            LuaManager.Instance.DoString(luaScript, luaFilePath, luaTable);
+            _luaTable.Set("gameObject", this.gameObject);
+            LuaManager.Instance.DoString(luaScript, _tableName, _luaTable);
 
             string[] messages;
-            luaTable.Get("observermessages", out messages);
+            _luaTable.Get("observermessages", out messages);
             if (messages != null)
             {
                 ObserverMessages = new List<string>(messages);
                 foreach (var message in ObserverMessages)
                 {
-                    messageMethodMap[message] = luaTable.Get<Action<object>>(message);
+                    _messageMethodMap[message] = _luaTable.Get<Action<object>>(message);
                 }
             }
 
-            luaTable.Get("awake", out awakeMethod);
-            luaTable.Get("start", out startMethod);
-            luaTable.Get("onenable", out onenableMethod);
-            luaTable.Get("ondisable", out ondisableMethod);
-            luaTable.Get("ondestroy", out ondestroyMethod);
-            luaTable.Get("update", out updateMethod);
+            _luaTable.Get("awake", out awakeMethod);
+            _luaTable.Get("start", out startMethod);
+            _luaTable.Get("onenable", out onenableMethod);
+            _luaTable.Get("ondisable", out ondisableMethod);
+            _luaTable.Get("ondestroy", out ondestroyMethod);
+            _luaTable.Get("update", out updateMethod);
         }
 
         /// <summary>
@@ -134,7 +143,7 @@ namespace Facade.Lua
         /// <param name="message"></param>
         public override void OnMessage(IMessage message)
         {
-            var method = messageMethodMap[message.Name];
+            var method = _messageMethodMap[message.Name];
             if (method != null)
             {
                 method(message.Body);
