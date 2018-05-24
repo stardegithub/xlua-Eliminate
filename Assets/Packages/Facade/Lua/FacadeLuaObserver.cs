@@ -7,9 +7,9 @@ using Common;
 using Facade.Core;
 using Foundation.Databinding.Lua;
 
-namespace Facade.Databinding
+namespace Facade.Lua
 {
-	public class FacadeObserverBehaviour : ObserverBehaviour
+    public class FacadeLuaObserver : ObserverBehaviour
     {
         [SerializeField]
         protected string luaFilePath;
@@ -19,12 +19,7 @@ namespace Facade.Databinding
 
         void Awake()
         {
-            string luaScript = GetLuaScript();
-            if (string.IsNullOrEmpty(luaScript))
-            {
-                return;
-            }
-            BindMethod(luaScript);
+            BindMethod();
             Facade.Instance.RemoveObserver(this, ObserverMessages);
             Facade.Instance.RegisterObserver(this, ObserverMessages);
 
@@ -78,6 +73,10 @@ namespace Facade.Databinding
             {
                 luaTable.Dispose();
             }
+            if (LuaManager.Instance != null)
+            {
+                LuaManager.Instance.RemoveTable(luaFilePath);
+            }
         }
 
         void Update()
@@ -88,7 +87,7 @@ namespace Facade.Databinding
             }
         }
 
-        protected string GetLuaScript()
+        protected string LoadLuaScript()
         {
             if (string.IsNullOrEmpty(luaFilePath))
             {
@@ -99,16 +98,16 @@ namespace Facade.Databinding
             return ta.text;
         }
 
-        protected void BindMethod(string luaScript)
+        protected void BindMethod()
         {
-            luaTable = LuaManager.Instance.LuaEnv.NewTable();
-            LuaTable metaTable = LuaManager.Instance.LuaEnv.NewTable();
-            metaTable.Set("__index", LuaManager.Instance.LuaEnv.Global);
-            luaTable.SetMetaTable(metaTable);
-            metaTable.Dispose();
+            string luaScript = LoadLuaScript();
+            if (string.IsNullOrEmpty(luaScript)) { return; }
 
-            luaTable.Set("self", this.gameObject);
-            LuaManager.Instance.LuaEnv.DoString(luaScript, "LuaObserverView", luaTable);
+            luaTable = LuaManager.Instance.CreateExpandTable(luaFilePath);
+            if (luaTable == null) { return; }
+
+            luaTable.Set("gameObject", this.gameObject);
+            LuaManager.Instance.DoString(luaScript, luaFilePath, luaTable);
 
             string[] messages;
             luaTable.Get("observermessages", out messages);

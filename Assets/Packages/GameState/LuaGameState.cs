@@ -6,83 +6,88 @@ using GameState;
 using Foundation.Databinding.Lua;
 using XLua;
 
-namespace GameState.Lua {
-	
-	/// <summary>
-	/// 游戏状态(lua)
-	/// </summary>
-	public class LuaGameState : GameStateBase
-	{
-		protected string luaScript;
-		protected LuaTable luaTable;
+namespace GameState.Lua
+{
 
-		protected Action enterMethod;
-		protected Action updateMethod;
-		protected Action exitMethod;
+    /// <summary>
+    /// 游戏状态(lua)
+    /// </summary>
+    public class LuaGameState : GameStateBase
+    {
+        protected string luaScript;
+        protected LuaTable luaTable;
 
-		public LuaGameState(string stateName, string luaScript)
-		{
-			this.Name = stateName;
-			this.luaScript = luaScript;
-		}
+        protected Action enterMethod;
+        protected Action updateMethod;
+        protected Action exitMethod;
 
-		protected void BindMethod()
-		{
-			luaTable = LuaManager.Instance.LuaEnv.NewTable();
-			LuaTable metaTable = LuaManager.Instance.LuaEnv.NewTable();
-			metaTable.Set("__index", LuaManager.Instance.LuaEnv.Global);
-			luaTable.SetMetaTable(metaTable);
-			metaTable.Dispose();
-			LuaManager.Instance.LuaEnv.DoString(luaScript, "LuaGameState", luaTable);
+        public LuaGameState(string stateName, string luaScript)
+        {
+            this.Name = stateName;
+            this.luaScript = luaScript;
+        }
 
-			luaTable.Get("enter", out enterMethod);
-			luaTable.Get("update", out updateMethod);
-			luaTable.Get("exit", out exitMethod);
-		}
+        protected void BindMethod()
+        {
+            luaTable = LuaManager.Instance.CreateExpandTable(Name);
+            if (luaTable == null) { return; }
+            LuaManager.Instance.DoString(luaScript, Name, luaTable);
 
-		void LuaTableForEach<TKey, TValue>(TKey k, TValue v)
-		{
+            luaTable.Get("enter", out enterMethod);
+            luaTable.Get("update", out updateMethod);
+            luaTable.Get("exit", out exitMethod);
+        }
 
-		}
+        void LuaTableForEach<TKey, TValue>(TKey k, TValue v)
+        {
 
-		/// <summary>
-		/// 开始
-		/// </summary>
-		public override void Enter()
-		{
-			BindMethod();
+        }
 
-			if (enterMethod != null)
-			{
-				enterMethod();
-			}
-		}
+        /// <summary>
+        /// 开始
+        /// </summary>
+        public override void Enter()
+        {
+            BindMethod();
 
-		/// <summary>
-		/// 更新
-		/// </summary>
-		public override void Update()
-		{
-			if (updateMethod != null)
-			{
-				updateMethod();
-			}
-		}
+            if (enterMethod != null)
+            {
+                enterMethod();
+            }
+        }
 
-		/// <summary>
-		/// 退出
-		/// </summary>
-		public override void Exit()
-		{
-			if (exitMethod != null)
-			{
-				exitMethod();
-			}
+        /// <summary>
+        /// 更新
+        /// </summary>
+        public override void Update()
+        {
+            if (updateMethod != null)
+            {
+                updateMethod();
+            }
+        }
 
-			enterMethod = null;
-			updateMethod = null;
-			exitMethod = null;
-			luaTable.Dispose();
-		}
-	}
+        /// <summary>
+        /// 退出
+        /// </summary>
+        public override void Exit()
+        {
+            if (exitMethod != null)
+            {
+                exitMethod();
+            }
+
+            enterMethod = null;
+            updateMethod = null;
+            exitMethod = null;
+            if (luaTable != null)
+            {
+                luaTable.Dispose();
+            }
+            if (LuaManager.Instance != null)
+            {
+                LuaManager.Instance.RemoveTable(Name);
+            }
+        }
+    }
 }
