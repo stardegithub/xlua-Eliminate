@@ -43,8 +43,8 @@ sysinfo.txt
 .svn/
 
 # meta
-*.meta
-!*.*.meta
+# *.meta
+# !*.*.meta
 
 # デフォルト設定
 *.ipa
