@@ -151,6 +151,33 @@ namespace BuildSystem {
 		}
 
 		/// <summary>
+		/// 日志等级(格式：-logLevel 数字(0~6)).
+		/// </summary>
+		/// <value>日志等级(格式：-logLevel 数字(0~6)).</value>
+		public static LogLevel LogLevel {
+			get
+			{ 
+				string[] args = System.Environment.GetCommandLineArgs();
+				if ((args == null) || (args.Length <= 0)) {
+					return LogLevel.Invalid;
+				}
+				for(int idx = 0; idx < args.Length; idx++)
+				{
+					if((args[idx] == "-logLevel") && (args.Length > idx + 1))
+					{
+						string _value = args [idx + 1];
+						if(true == string.IsNullOrEmpty(_value)) {
+							return LogLevel.Invalid;
+						}
+						int _valueTmp = Convert.ToInt32(args[idx + 1]);
+						return (LogLevel)_valueTmp;
+					}
+				}
+				return LogLevel.Invalid;
+			}
+		}
+
+		/// <summary>
 		/// Center Version(格式：-centerVersion version).
 		/// </summary>
 		/// <value>Center Version(格式：-centerVersion version).</value>

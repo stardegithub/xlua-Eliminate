@@ -491,7 +491,7 @@ namespace Upload {
 				dataSize = fileInfo.Length.ToString();
 
 			} else {
-				UtilsLog.Warning ("AddTarget", "Target File is not exist!!!(target:{0})", filePath);
+				this.Warning ("AddTarget()::Target File is not exist!!!(target:{0})", filePath);
 			}
 
 			bool _exist = this.isTargetExist (iTarget.ID, iFileType, out _item);
@@ -614,7 +614,7 @@ namespace Upload {
 
 			if(false == File.Exists(iFilePath))
 			{
-				UtilsLog.Error("GetFileMD5", "The file is not exist!!!(File:{0})", iFilePath);
+				UtilsLog.Error("UploadList", "GetFileMD5()::The file is not exist!!!(File:{0})", iFilePath);
 				return null;
 			}
 
@@ -675,10 +675,10 @@ namespace Upload {
 				.ToArray ();
 
 			if ((targets == null) || (targets.Length <= 0)) {
-				UtilsLog.Info("UpdateLocalInfoForDownload", "There is no target to download！！！");
+				this.Info("UpdateLocalInfoForDownload()::There is no target to download！！！");
 				return;
 			} 
-			UtilsLog.Info("UpdateLocalInfoForDownload", "Targets Count:{0}", targets.Length.ToString());
+			this.Info("UpdateLocalInfoForDownload()::Targets Count:{0}", targets.Length.ToString());
 
 			foreach (UploadItem Loop in targets) {
 				DownloadList.GetInstance ().AddTarget (Loop);
@@ -770,8 +770,7 @@ namespace Upload {
 				return false;
 			}
 			if (1 != targets.Length) {
-				UtilsLog.Warning("isTargetExist", 
-					"There is duplicate id exist in upload list!!!(Bundle ID:{0})", iTargetID);
+				this.Warning("isTargetExist()::There is duplicate id exist in upload list!!!(Bundle ID:{0})", iTargetID);
 			}
 			iTarget = targets [0];
 			return true;

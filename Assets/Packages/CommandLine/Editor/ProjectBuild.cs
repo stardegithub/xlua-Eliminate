@@ -610,6 +610,12 @@ namespace CommandLine {
 				BuildInfo.GetInstance ().CenterVersion = centerVersion;
 			}
 
+			// 日志等级
+			LogLevel _logLevel = BuildParameters.LogLevel;
+			if (LogLevel.Invalid != _logLevel) {
+				BuildInfo.GetInstance ().LogLevel = _logLevel;
+			}
+
 			// 打包号
 			int buildNumber = BuildParameters.BuildNumber;
 			if (-1 < buildNumber) {

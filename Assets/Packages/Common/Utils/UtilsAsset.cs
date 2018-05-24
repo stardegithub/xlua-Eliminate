@@ -103,7 +103,7 @@ namespace Common {
 				}
 			}
 			catch(UnityException exp) {
-				UtilsLog.Exception ("UtilityAsset", "CreateAsset Failed!!! DetailInfo ClassName:{0} \n AssetFile:{1} \n Error:{2}",
+				UtilsLog.Fatal ("UtilityAsset", "CreateAsset()::Failed!!! DetailInfo ClassName:{0} \n AssetFile:{1} \n Error:{2}",
 					typeof(T).ToString (), 
 					(assetFullPath == null) ? "null" : assetFullPath, 
 					exp.Message);
@@ -218,7 +218,7 @@ namespace Common {
 			}
 			catch(System.IO.DirectoryNotFoundException exp)
 			{
-				UtilsLog.Exception ("UtilityAsset", "ReadSetting Failed!!! DetailInfo ClassName:{0} \n AssetFile:{1} \n Error:{2}",
+				UtilsLog.Fatal ("UtilityAsset", "ReadSetting()::Failed!!! DetailInfo ClassName:{0} \n AssetFile:{1} \n Error:{2}",
 					typeof(T).ToString (), 
 					(path == null) ? "null" : path, 
 					exp.Message);
@@ -343,7 +343,7 @@ namespace Common {
 				}
 			}
 			catch (System.Exception exp) {
-				UtilsLog.Exception ("UtilityAsset", "ImportData Failed!!! \n ClassName:{0} \n AssetFile:{1} \n Exception:{2} \n StackTrace:{3}",
+				UtilsLog.Fatal ("UtilityAsset", "ImportDataByPath()::Failed!!! \n ClassName:{0} \n AssetFile:{1} \n Exception:{2} \n StackTrace:{3}",
 					typeof(T).ToString (), 
 					(iJsonFilePath == null) ? "null" : iJsonFilePath, 
 					exp.Message, exp.StackTrace);
@@ -379,7 +379,7 @@ namespace Common {
 				UtilsLog.Info ("UtilityAsset", "ExportData. -> Data:{0}", jsonString);
 			}
 			catch (System.Exception exp) {
-				UtilsLog.Exception ("UtilityAsset", "ExportData Failed!!! ClassName:{0} AssetFile:{1} Exception:{2} StackTrace:{3}",
+				UtilsLog.Fatal ("UtilityAsset", "ExportData()::Failed!!! ClassName:{0} AssetFile:{1} Exception:{2} StackTrace:{3}",
 					typeof(T).ToString (), 
 					(jsonFilePath == null) ? "null" : jsonFilePath, 
 					exp.Message, exp.StackTrace);

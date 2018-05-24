@@ -17,7 +17,7 @@ namespace Download {
 	/// 下载目标信息.
 	/// </summary>
 	[System.Serializable]
-	public class DownloadTargetInfo {
+	public class DownloadTargetInfo : ClassExtension {
 		
 		/// <summary>
 		/// bundle no.
@@ -87,14 +87,14 @@ namespace Download {
 
 			if (true == File.Exists (copyFrom)) {
 				File.Copy (copyFrom, copyTo, true);
-				UtilsLog.Info ("CopyTargetWhenDownloadCompleted", "Copy File:{0} -> {1}",
+				this.Info ("CopyTargetWhenDownloadCompleted()::Copy File:{0} -> {1}",
 					copyFrom, copyTo);
 			}
 			if (false == File.Exists (copyTo)) {
-				UtilsLog.Error ("CopyTargetWhenDownloadCompleted", "Failed!! FileName:{0} -> {1}", copyFrom, copyTo);
+				this.Error ("CopyTargetWhenDownloadCompleted()::Failed!! FileName:{0} -> {1}", copyFrom, copyTo);
 			} 
 			File.Delete (copyFrom);
-			UtilsLog.Info ("CopyTargetWhenDownloadCompleted", "Delete File -> {0}",
+			this.Info ("CopyTargetWhenDownloadCompleted()::Delete File -> {0}",
 				copyFrom);
 		}
 
@@ -197,14 +197,14 @@ namespace Download {
 				target.DataSize = iTarget.DataSize;
 				target.CheckCode = iTarget.CheckCode;
 				target.Downloaded = false;
-				UtilsLog.Info ("AddTarget", "New:{0}", iTarget.toString ());
+				this.Info ("AddTarget()::New:{0}", iTarget.toString ());
 			} else {
 				// 变更的场合
 				if (false == iTarget.CheckCode.Equals (target.CheckCode)) {
 					target.DataSize = iTarget.DataSize;
 					target.CheckCode = iTarget.CheckCode;
 					target.Downloaded = false;
-					UtilsLog.Info ("AddTarget", "Changed:{0}", iTarget.toString ());
+					this.Info ("AddTarget()::Changed:{0}", iTarget.toString ());
 				}
 			}
 		}
@@ -261,7 +261,7 @@ namespace Download {
 				return false;
 			}
 			if (1 != targets.Length) {
-				UtilsLog.Warning ("isTargetExist", "There is duplicate id exist in download list!!!(Bundle ID:{0} FileType:{1})", 
+				this.Warning ("isTargetExist()::There is duplicate id exist in download list!!!(Bundle ID:{0} FileType:{1})", 
 					iBundleId, iFileType);
 			}
 			iTarget = targets [0];
@@ -278,7 +278,7 @@ namespace Download {
 			string iBundleId, TUploadFileType iFileType = TUploadFileType.Bundle) {
 			DownloadTargetInfo targetInfo = null;
 			if (isTargetExist (iBundleId, iFileType, out targetInfo) == false) {
-				UtilsLog.Error ("GetBundleFullPath", "This bundles is not exist!!!({BundleId:{0} FileType:{1})", 
+				this.Error ("GetBundleFullPath()::This bundles is not exist!!!({BundleId:{0} FileType:{1})", 
 					iBundleId, iFileType);
 				return null;
 			}
@@ -479,7 +479,7 @@ namespace Download {
 						long dataSize = (string.IsNullOrEmpty(downloadInfo.DataSize) == true) ? 0 : Convert.ToInt64(downloadInfo.DataSize);
 						this._progressCounter.UpdateCompletedDataSize (dataSize);
 
-						UtilsLog.Info ("DownloadCompleted", "Count({0}/{1}) DataSize({2}/{3})",
+						this.Info ("DownloadCompleted()::Count({0}/{1}) DataSize({2}/{3})",
 							this._progressCounter.DidCount, this._progressCounter.TotalCount, 
 							this._progressCounter.DidDatasize, this._progressCounter.TotalDatasize);
 					}

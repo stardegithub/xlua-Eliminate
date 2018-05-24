@@ -27,7 +27,7 @@ namespace Common {
 				}
 				return objRet;
 			} else {
-				UtilsLog.Error ("TimeCounter", "Create():TimeCounter Create Failed!!!");
+				UtilsLog.Error ("TimeCounter", "Create()::TimeCounter Create Failed!!!");
 				return null;
 			}
 		}

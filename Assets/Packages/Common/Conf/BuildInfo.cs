@@ -96,6 +96,11 @@ namespace Common {
 		public TPlatformType PlatformType;
 
 		/// <summary>
+		/// 日志等级.
+		/// </summary>
+		public LogLevel LogLevel;
+
+		/// <summary>
 		/// 临时信息.
 		/// </summary>
 		public TempInfo TempInfo = new TempInfo();
@@ -114,6 +119,7 @@ namespace Common {
 			this.BuildVersionCode = -1;
 			this.CenterVersion = null;
 			this.PlatformType = TPlatformType.None;
+			this.LogLevel = LogLevel.All;
 			this.TempInfo.Clear ();
 		}
 	}
@@ -251,6 +257,23 @@ namespace Common {
 		}
 
 		/// <summary>
+		/// 日志等级.
+		/// </summary>
+		public LogLevel LogLevel {
+			get { 
+				if (null != this.Data) {
+					return this.Data.Default.LogLevel;
+				}
+				return LogLevel.Invalid;
+			}
+			set { 
+				if (null != this.Data) {
+					this.Data.Default.LogLevel = value;
+				}
+			}
+		}
+
+		/// <summary>
 		/// 平台类型.
 		/// </summary>
 		public TPlatformType PlatformType {
@@ -350,6 +373,8 @@ namespace Common {
 			this.Data.Default.BuildShortVersion = iData.Default.BuildShortVersion;
 			this.Data.Default.BuildVersionCode = iData.Default.BuildVersionCode;
 			this.Data.Default.CenterVersion = iData.Default.CenterVersion;
+			this.Data.Default.PlatformType = iData.Default.PlatformType;
+			this.Data.Default.LogLevel = iData.Default.LogLevel;
 
 			// 选项数据
 			this.Data.Options.OptionsSettings = iData.Options.OptionsSettings;

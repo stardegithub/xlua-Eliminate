@@ -13,14 +13,14 @@ namespace AssetBundles {
 	/// <summary>
 	/// 数据加载器.
 	/// </summary>
-	public sealed class DataLoader
+	public sealed class DataLoader : ClassExtension
 	{
 		public static Object LoadFromResource(string path)
 		{
 			Object objRet = ResourcesLoad.Load(path) as Object;
 			if(null == objRet) {
-				UtilsLog.Warning ("DataLoadController", 
-					"LoadFromResource():Load Failed!!(path:{0})", path);
+				UtilsLog.Warning ("DataLoader", 
+					"LoadFromResource()::Load Failed!!(path:{0})", path);
 			}
 			return objRet;
 		}
@@ -34,8 +34,8 @@ namespace AssetBundles {
 		{
 			Object objRet = Load<Object>(path);
 			if(null == objRet) {
-				UtilsLog.Warning ("DataLoadController", 
-					"LoadData():Load Failed!!(path:{0})", path);
+				UtilsLog.Warning ("DataLoader", 
+					"LoadData()::Load Failed!!(path:{0})", path);
 			}
 			return objRet;
 		}
@@ -69,8 +69,8 @@ namespace AssetBundles {
 		public static void LoadScene(string iSceneName)
 		{
 			if (false == AssetBundlesManager.Instance.LoadScene (iSceneName)) {
-				UtilsLog.Warning ("DataLoadController", 
-					"LoadScene():There is no scene({0}) in asset bundles manager!!", 
+				UtilsLog.Warning ("DataLoader", 
+					"LoadScene()::There is no scene({0}) in asset bundles manager!!", 
 					iSceneName);
 
 				// 加载场景

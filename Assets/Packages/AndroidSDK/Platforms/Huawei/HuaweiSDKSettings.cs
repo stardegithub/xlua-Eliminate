@@ -452,13 +452,13 @@ namespace AndroidSDK.Platforms.Huawei {
 
 			string dir = string.Format("{0}/../AndroidPlatform", Application.dataPath);
 			if (false == Directory.Exists (dir)) {
-				UtilsLog.Warning ("GetAndroidCopyFromDir", "The directory is not exist!!(Dir:{0})", dir);
+				this.Warning ("GetAndroidCopyFromDir()::The directory is not exist!!(Dir:{0})", dir);
 				Directory.CreateDirectory (dir);
 			}
 
 			dir = string.Format("{0}/{1}", dir, this.PlatformType.ToString());
 			if (false == Directory.Exists (dir)) {
-				UtilsLog.Warning ("GetAndroidCopyFromDir", "The directory is not exist!!(Dir:{0})", dir);
+				this.Warning ("GetAndroidCopyFromDir()::The directory is not exist!!(Dir:{0})", dir);
 				Directory.CreateDirectory (dir);
 			}
 
@@ -473,7 +473,7 @@ namespace AndroidSDK.Platforms.Huawei {
 
 			string dir = string.Format("{0}/Plugins/Android", Application.dataPath);
 			if (false == Directory.Exists (dir)) {
-				UtilsLog.Warning ("GetAndroidCopyToDir", "The directory is not exist!!(Dir:{0})", dir);
+				this.Warning ("GetAndroidCopyToDir()::The directory is not exist!!(Dir:{0})", dir);
 				Directory.CreateDirectory (dir);
 			}
 
@@ -597,7 +597,7 @@ namespace AndroidSDK.Platforms.Huawei {
 				if (true == File.Exists (copyToFile)) {
 					File.Delete (copyToFile);
 				}
-				UtilsLog.Info ("CopyResources", "Copy Libs : {0} -> {1}",
+				this.Info ("CopyResources()::Copy Libs : {0} -> {1}",
 					file, copyToFile);
 
 				File.Copy (file, copyToFile);
