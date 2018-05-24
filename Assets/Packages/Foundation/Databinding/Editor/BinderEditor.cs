@@ -122,7 +122,7 @@ namespace Foundation.Editor
             else
             {
                 var luaObervableBehaviour = Target.Context.DataInstance as LuaObservableBehaviour;
-                string luaScript = luaObervableBehaviour.GetLuaScript();
+                string luaScript = luaObervableBehaviour.LoadLuaScript();
                 if (!string.IsNullOrEmpty(luaScript))
                 {
                     luaEnv.DoString(luaScript, GetType().Name, luaTable);

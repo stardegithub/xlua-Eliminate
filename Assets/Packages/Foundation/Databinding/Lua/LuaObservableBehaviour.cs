@@ -10,18 +10,26 @@ using Common;
 
 namespace Foundation.Databinding.Lua
 {
-	public class LuaObservableBehaviour : MonoBehaviourExtension, IObservableModel
+    public class LuaObservableBehaviour : MonoBehaviourExtension, IObservableModel
     {
+        const string BaseChunk = @"
+            function set(key, value)
+                _ENV[key] = value
+                notifyproperty(key, value)
+            end";
+
         [HideInInspector]
-        public TextAsset _luaText;
+        public TextAsset LuaText;
         [HideInInspector]
-        public string _luaTextPath;
+        public string LuaTextPath;
+        protected string _tableName;
+        protected LuaTable _luaTable;
 
-        private Action awakeMethod, startMethod, onenableMethod, ondisableMethod, ondestroyMethod, updateMethod;
+        protected Action awakeMethod, startMethod, onenableMethod, ondisableMethod, ondestroyMethod, updateMethod;
 
-        
 
-        private Action<ObservableMessage> _onBindingEvent = delegate { };
+
+        protected Action<ObservableMessage> _onBindingEvent = delegate { };
         public event Action<ObservableMessage> OnBindingUpdate
         {
             add
@@ -34,13 +42,13 @@ namespace Foundation.Databinding.Lua
             }
         }
 
-		private LuaBinder _binder;
+        private LuaBinder _binder;
 
         private bool _isDisposed;
 
         private ObservableMessage _bindingMessage;
 
-		private LuaBinder Binder
+        private LuaBinder Binder
         {
             get
             {
@@ -110,6 +118,14 @@ namespace Foundation.Databinding.Lua
             ondisableMethod = null;
             ondestroyMethod = null;
             updateMethod = null;
+            if (_luaTable != null)
+            {
+                _luaTable.Dispose();
+            }
+            if (LuaManager.Instance != null)
+            {
+                LuaManager.Instance.RemoveTable(_tableName);
+            }
 
             Dispose();
         }
@@ -122,57 +138,44 @@ namespace Foundation.Databinding.Lua
             }
         }
 
-        protected void InitBinder()
+        public string LoadLuaScript()
         {
-            if (_binder != null)
+            if (LuaText == null)
             {
-                return;
-            }
-
-            string luaScript = GetLuaScript();
-            if (string.IsNullOrEmpty(luaScript))
-            {
-                return;
-            }
-
-            LuaTable luaTable = LuaManager.Instance.LuaEnv.NewTable();
-            LuaTable metaTable = LuaManager.Instance.LuaEnv.NewTable();
-            metaTable.Set("__index", LuaManager.Instance.LuaEnv.Global);
-            luaTable.SetMetaTable(metaTable);
-            metaTable.Dispose();
-
-            Action<string, object> action = NotifyProperty;
-            luaTable.Set("notifyproperty", action);
-            luaTable.Set("self", this.gameObject);
-            LuaManager.Instance.LuaEnv.DoString(@"
-            function set(key, value)
-                _ENV[key] = value
-                notifyproperty(key, value)
-            end", GetType().Name, luaTable);
-            LuaManager.Instance.LuaEnv.DoString(luaScript, GetType().Name, luaTable);
-
-            luaTable.Get("awake", out awakeMethod);
-            luaTable.Get("start", out startMethod);
-            luaTable.Get("onenable", out onenableMethod);
-            luaTable.Get("ondisable", out ondisableMethod);
-            luaTable.Get("ondestroy", out ondestroyMethod);
-            luaTable.Get("update", out updateMethod);
-            _binder = new LuaBinder(this, luaTable);
-        }
-
-        public string GetLuaScript()
-        {
-            if (_luaText == null)
-            {
-                if (string.IsNullOrEmpty(_luaTextPath))
+                if (string.IsNullOrEmpty(LuaTextPath))
                 {
                     return null;
                 }
-                _luaText = AssetBundles.DataLoader.Load<TextAsset>(_luaTextPath);
+                LuaText = AssetBundles.DataLoader.Load<TextAsset>(LuaTextPath);
             }
 
-            if (_luaText == null) return null;
-            return _luaText.text;
+            if (LuaText == null) return null;
+            _tableName = LuaText.name;
+            return LuaText.text;
+        }
+
+        protected void InitBinder()
+        {
+            if (_binder != null) { return; }
+
+            string luaScript = LoadLuaScript();
+            if (string.IsNullOrEmpty(luaScript)) { return; }
+
+            _luaTable = LuaManager.Instance.CreateExpandTable(_tableName);
+            if (_luaTable == null) { return; }
+
+            _luaTable.Set("notifyproperty", new Action<string, object>(NotifyProperty));
+            _luaTable.Set("self", this.gameObject);
+            LuaManager.Instance.DoString(BaseChunk, "basechunk", _luaTable);
+            LuaManager.Instance.DoString(luaScript, _tableName, _luaTable);
+
+            _luaTable.Get("awake", out awakeMethod);
+            _luaTable.Get("start", out startMethod);
+            _luaTable.Get("onenable", out onenableMethod);
+            _luaTable.Get("ondisable", out ondisableMethod);
+            _luaTable.Get("ondestroy", out ondestroyMethod);
+            _luaTable.Get("update", out updateMethod);
+            _binder = new LuaBinder(this, _luaTable);
         }
 
         [HideInInspector]

@@ -6,7 +6,7 @@ using Facade.Core;
 
 namespace Facade
 {
-    public class ScriptObserverBehaviour : ObserverBehaviour
+    public class FacadeScriptObserver : ObserverBehaviour
     {
         [SerializeField]
         protected string scriptName;

@@ -53,7 +53,7 @@ namespace Facade.Core {
 	/// <summary>
 	/// MonoBehaviour类型观察者基类
 	/// </summary>
-	public class ObserverBehaviour : MonoBehaviourExtension, IObserver
+	public abstract class ObserverBehaviour : MonoBehaviourExtension, IObserver
 	{
 		public virtual List<string> ObserverMessages { get; protected set; }
 
