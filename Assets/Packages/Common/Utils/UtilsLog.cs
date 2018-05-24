@@ -103,7 +103,7 @@ namespace Common {
 		public static void DebugLog(string iSubTag, string iFormat, params object[] iArgs) {
 
 			// 判断日志级别
-			if (_curLogLevel >= LogLevel.Debug) {
+			if (_curLogLevel > LogLevel.Debug) {
 				return;
 			}
 
@@ -136,7 +136,7 @@ namespace Common {
 		public static void RInfo(string iSubTag, string iFormat, params object[] iArgs) {
 
 			// 判断日志级别
-			if (_curLogLevel >= LogLevel.RInfo) {
+			if (_curLogLevel > LogLevel.RInfo) {
 				return;
 			}
 
@@ -158,7 +158,7 @@ namespace Common {
 		public static void Warning(string iSubTag, string iFormat, params object[] iArgs) {
 			
 			// 判断日志级别
-			if (_curLogLevel >= LogLevel.Warning) {
+			if (_curLogLevel > LogLevel.Warning) {
 				return;
 			}
 
@@ -180,7 +180,7 @@ namespace Common {
 		public static void LInfo(string iSubTag, string iFormat, params object[] iArgs) {
 
 			// 判断日志级别
-			if (_curLogLevel >= LogLevel.LInfo) {
+			if (_curLogLevel > LogLevel.LInfo) {
 				return;
 			}
 
@@ -202,7 +202,7 @@ namespace Common {
 		public static void Error(string iSubTag, string iFormat, params object[] iArgs) {
 
 			// 判断日志级别
-			if (_curLogLevel >= LogLevel.Error) {
+			if (_curLogLevel > LogLevel.Error) {
 				return;
 			}
 
@@ -224,7 +224,7 @@ namespace Common {
 		public static void Fatal(string iSubTag, string iFormat, params object[] iArgs) {
 
 			// 判断日志级别
-			if (_curLogLevel >= LogLevel.Fatal) {
+			if (_curLogLevel > LogLevel.Fatal) {
 				return;
 			}
 
