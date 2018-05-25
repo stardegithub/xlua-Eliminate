@@ -1,0 +1,15 @@
+login_account = ""
+local GameData = require("GameData")
+
+function awake()
+	login_account = GameData.GameState.Login.LoginAccount
+end
+
+function onbtnclick_switchaccount()
+	CS.EC.UI.UIManager.Instance:CloseUI()
+	CS.EC.UI.UIManager.Instance:OpenUI("Prefab/Login/UI_Login")
+end
+
+function onbtnclick_startgame()
+	CS.EC.UI.GameStateManager.Instance:SetNextState("GameStateHome")
+end
