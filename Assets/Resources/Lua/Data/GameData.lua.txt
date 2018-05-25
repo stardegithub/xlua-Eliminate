@@ -1,4 +1,5 @@
 return {
     --用户数据
-    User = require("UserData")
+    User = require("UserData"),
+    GameState = {},
 }

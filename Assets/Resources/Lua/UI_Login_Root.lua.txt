@@ -1,20 +1,19 @@
-Text = "123"
+login_account = ""
+login_password = ""
+local GameData = require("GameData")
 
 function awake()
 	print("awake")
 end
 
-function update()
-	-- print("update")
+function onbtnclick_accountlogin()
+	print(GameData.GameState.Login);
+	GameData.GameState.Login.LoginAccount = login_account
+	CS.EC.UI.UIManager.Instance:CloseUI()
+	CS.EC.UI.UIManager.Instance:OpenUI("Prefab/Login/UI_StartGame")
 end
 
-function onbtnclick1()
-	print("onbtnclick1")
-	set("Text", "onbtnclick1")
-end
-
-function onbtnclick2()
-	print("onbtnclick2")
-	-- CS.GameManager.UIManager.Instance:CloseUI("UI/Login/UI_Login")
-	CS.GameManager.GameStateManager.Instance:SetNextState("GameStateHome")
+function onbtnclick_guestlogin()
+	CS.EC.UI.UIManager.Instance:CloseUI()
+	CS.EC.UI.UIManager.Instance:OpenUI("Prefab/Login/UI_StartGame")
 end
