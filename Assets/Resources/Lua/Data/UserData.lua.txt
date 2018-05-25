@@ -1,0 +1,10 @@
+return {
+    -- GUID
+    GUID = 0,
+    --昵称
+    NickName = 0,
+    --钱包信息
+    Wallet = require("WalletData"),
+    --奖金池
+    BonusPool = require("BonusPoolData")
+}

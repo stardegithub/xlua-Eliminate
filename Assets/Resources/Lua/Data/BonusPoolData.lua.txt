@@ -1,0 +1,6 @@
+return {
+    -- 总奖金池
+    Total = 0,
+    --个人奖金池
+    Personal = 0
+}

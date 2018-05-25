@@ -71,7 +71,7 @@ namespace GameState.Conf
             Type = GameStateType.None;
             Name = null;
             ClassName = null;
-			LuaPath = null;
+            LuaPath = null;
             Managers.Clear();
         }
     }
@@ -114,6 +114,15 @@ namespace GameState.Conf
         public string uiRootName = "UIRoot";
         public string uiRootPath = "Prefab/UIRoot";
         public string uiCameraName = "UICamera";
+
+        /// <summary>
+        /// lua文件前缀
+        /// </summary
+        public string[] LuaFilePrefixs = new string[]{ "Lua/", "Lua/Data/" };
+        /// <summary>
+        /// lua文件后缀
+        /// </summary>
+        public string[] LuaFileSuffixs = new string[]{ ".lua", "" };
 
         /// <summary>
         /// 管理器（固定）.
@@ -267,6 +276,8 @@ namespace GameState.Conf
             this.Data.uiRootName = iData.uiRootName;
             this.Data.uiRootPath = iData.uiRootPath;
             this.Data.uiCameraName = iData.uiCameraName;
+            this.Data.LuaFilePrefixs = iData.LuaFilePrefixs;
+            this.Data.LuaFileSuffixs = iData.LuaFileSuffixs;
             this.Data.Managers.AddRange(iData.Managers);
             this.Data.States.AddRange(iData.States);
 

@@ -26,6 +26,8 @@ namespace XLua
         protected override void SingletonAwake()
         {
             _luaEnv = new LuaEnv();
+            AddLoaders();
+
             _luaTableMap = new Dictionary<string, LuaTable>();
             tableMap = _luaEnv.NewTable();
             _luaEnv.Global.Set("tablemap", tableMap);
@@ -53,6 +55,33 @@ namespace XLua
         void OnApplicationQuit()
         {
             _isApplicationQuit = true;
+        }
+
+        /// <summary>
+        /// 添加require的加载文件方法
+        /// </summary>
+        private void AddLoaders()
+        {
+            var _conf = GameState.Conf.GameStateConf.GetInstance();
+            foreach (string luaFilePrefix in _conf.Data.LuaFilePrefixs)
+            {
+                foreach (string luaFileSuffix in _conf.Data.LuaFileSuffixs)
+                {
+                    _luaEnv.AddLoader((ref string filename) =>
+                    {
+                        string filePath = string.Format("{0}{1}{2}", luaFilePrefix, filename, luaFileSuffix);
+                        var luaText = AssetBundles.DataLoader.Load<TextAsset>(filePath);
+                        if (luaText != null)
+                        {
+                            return System.Text.Encoding.UTF8.GetBytes(luaText.text);
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    });
+                }
+            }
         }
 
         /// <summary>
