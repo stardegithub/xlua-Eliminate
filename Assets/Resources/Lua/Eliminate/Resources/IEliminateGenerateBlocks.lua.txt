@@ -1,0 +1,114 @@
+IEliminateGenerateBlocks ={}
+
+function IEliminateGenerateBlocks.GenerateBlocks( managerData ,dropover_callback)
+    -- body
+    print("GenerateBlocks")
+    local util = CS.GamePlay.GamePlayUtil
+
+    local tableRow = managerData.tableRow
+    local tableColumn = managerData.tableColumn
+    local blockManagerInfo = managerData.BlockManagerInfo
+    --逐列检测
+    for i=1,tableColumn,1
+    do
+        --计数器
+        local count = 0
+        --下落队列
+        local dropQueue = {}
+        --逐行检测
+        for j=1,tableRow,1
+        do
+            if (blockManagerInfo.allBlocks[j][i].mtransform ~= nil)
+            then
+                --计数
+                count = count +1
+                --放入队列
+                table.insert( dropQueue, blockManagerInfo.allBlocks[j][i])
+                print(blockManagerInfo.allBlocks[j][i].blockRow .. blockManagerInfo.allBlocks[j][i].blockColumn .. " insert")
+            end
+        end
+        --下落
+        for k = 1,#dropQueue,1
+        do
+            local current = dropQueue[k]
+            print(current.blockRow .. current.blockColumn .. " pop")
+            
+            --修改全局数组(原位置情况)
+            --local tempBlock = blockManagerInfo.allBlocks[current.blockRow][current.blockColumn]
+            
+            --blockManagerInfo.allBlocks[current.blockRow][current.blockColumn].mtransform = nil
+            --修改Item的行数
+            
+            --current.blockRow = k
+            --blockManagerInfo.allBlocks[current.blockRow][current.blockColumn] = current
+
+            -- --修改全局数组(填充新位置)
+
+            -- blockManagerInfo.allBlocks[current.blockRow][current.blockColumn].mtransform = current.mtransform
+
+            if(k < current.blockRow)
+            then
+                local targetBlock = blockManagerInfo.allBlocks[k][current.blockColumn]
+                targetBlock:SetBlockProperty(k,current.blockColumn,current.curType,current.mtransform) 
+
+                current.mtransform = nil
+                --current = blockManagerInfo.allBlocks[k][current.blockColumn]
+
+                --下落
+                targetBlock:CurrentBlockDrop(blockManagerInfo.allPos[targetBlock.blockRow][targetBlock.blockColumn],dropover_callback)
+                blockManagerInfo.allBlocks[targetBlock.blockRow][targetBlock.blockColumn] = targetBlock
+                
+                
+            end
+            --tempBlock.mtransform = nil         
+        end
+        dropQueue ={}
+    end
+    printallblock(blockManagerInfo.allBlocks)
+    
+    for i=1,tableColumn,1
+    do
+        local count = 0
+        local newBlockQueue = {}
+        for j=1,tableRow,1
+        do
+            local curBlock = blockManagerInfo.allBlocks[j][i]
+            if (curBlock.mtransform == nil)
+            then
+                --生成一个Item
+                local currentGo = CS.GamePlay.ObjectPool.GetGameObject(util.BlockPath, blockManagerInfo.blockParent)
+                currentGo.transform.position = blockManagerInfo.allPos[tableRow][i] + CS.UnityEngine.Vector3(0,100,0)
+                --随机数
+                local random = util.Range(0, util.EBlockTypeToInt(util.EBlockType.Num))
+
+                -- curBlock.mtransform = currentGo.transform
+
+                curBlock:SetBlockProperty(tableRow,i,CS.GamePlay.GamePlayUtil.EBlockType.__CastFrom(random),currentGo.transform)
+
+                table.insert(newBlockQueue,curBlock)
+                count = count + 1
+            
+            end
+        end
+        for k = 1 ,count,1
+        do
+            --获取Item组件
+            local currentBlock = newBlockQueue[k]  
+            
+            --获取要移动的行数
+            local r = tableRow - count + k
+            --移动
+            currentBlock:BlockMove(r, i,dropover_callback)
+            blockManagerInfo.allBlocks[r][i] = currentBlock
+            
+        end
+        newBlockQueue = {}
+    end
+    print("GenerateBlocks over")
+    printallblock(blockManagerInfo.allBlocks)
+    
+    
+    
+end
+
+return IEliminateGenerateBlocks

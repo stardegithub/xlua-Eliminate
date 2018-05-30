@@ -1,0 +1,18 @@
+IEliminateOperation ={}
+
+function IEliminateOperation.Operation( curBlock,targetBlock,blockManager,callback )
+    -- body
+    print("Operation")
+    --临时行列
+    local tempRow = curBlock.blockRow
+    local tempColumn = curBlock.blockColumn
+    --相互移动
+    curBlock:BlockMove(targetBlock.blockRow, targetBlock.blockColumn,callback)
+    blockManager.data.BlockManagerInfo.allBlocks[targetBlock.blockRow][targetBlock.blockColumn] = curBlock
+    
+    targetBlock:BlockMove(tempRow, tempColumn,callback)
+    blockManager.data.BlockManagerInfo.allBlocks[tempRow][tempColumn] = targetBlock
+    
+end
+
+return IEliminateOperation

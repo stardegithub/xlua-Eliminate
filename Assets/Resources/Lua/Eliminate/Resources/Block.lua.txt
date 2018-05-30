@@ -1,0 +1,172 @@
+
+Block ={}
+
+Block.mtransform = nil
+Block.blockManager = nil
+Block.downPos = CS.UnityEngine.Vector3()
+Block.upPos = CS.UnityEngine.Vector3()
+Block.hasCheck = false
+Block.blockRow = 0
+Block.blockColumn = 0
+Block.curImg = CS.UnityEngine.UI.Image
+Block.curType = CS.GamePlay.GamePlayUtil.EBlockType.Apple
+Block.curEliminateType = CS.GamePlay.GamePlayUtil.EEliminateType.Default
+Block.isMoving = false
+
+function Block:new(row,column,type,mtransform,blockManager)
+    local o = {}
+    setmetatable(o,self)
+    self.__index = self
+    o:Init(row,column,type,mtransform,blockManager)
+    return o
+end
+
+
+function Block:Init(row,column,type,transform,blockManager)
+
+    -- self.curImg = self.mtransform.FindChild("Icon").GetComponent("Image")  
+    self.blockManager = blockManager 
+    self:SetBlockProperty(row,column,type,transform)
+end
+
+function Block:SetBlockProperty(row,column,type,transform)
+    self.mtransform = transform    
+
+    self.curImg = self.mtransform:GetComponent("Image")        
+    local spr = CS.GamePlay.GamePlayUtil.GetSpriteAssetsByType(type)
+    self.blockRow = row
+    self.blockColumn = column
+    self.curImg.sprite = spr
+    self.curType = type
+    self.curEliminateType = CS.GamePlay.GamePlayUtil.EEliminateType.Default
+    self:InitListener()
+    
+end
+
+
+function Block:InitListener()
+    local eventTrigger = self.mtransform:GetComponent("EventTrigger")
+    
+    for i = 0 ,eventTrigger.triggers.Count - 1,1 --in ipairs(eventTrigger.triggers)
+    do
+        local trigger = eventTrigger.triggers[i] --lua下标从1开始
+        if(trigger.eventID == CS.UnityEngine.EventSystems.EventTriggerType.PointerDown) 
+        then
+            trigger.callback:RemoveAllListeners()
+            trigger.callback:AddListener(function(data)
+                self.downPos = data.position
+                print(self.blockManager.data.isOperation)
+                print(self.isMoving)
+                print(self.blockRow)
+                print(self.blockColumn)
+                
+            end)
+        else if (trigger.eventID == CS.UnityEngine.EventSystems.EventTriggerType.PointerUp)    
+        then       
+            trigger.callback:RemoveAllListeners()
+            trigger.callback:AddListener(function(data)                
+                if (self.blockManager.data.isOperation or self.isMoving)
+                then
+                    return --返回
+                end
+                self.upPos = data.position
+                --获取方向
+                local dir = self:GetDirection()
+            
+                self.blockManager.data.isOperation = true       --正在操作    
+                self.blockManager:OperateBlock(self, dir)
+            end)
+        end
+        end
+
+    end
+    
+end
+
+function Block:EliminateSelf()
+
+  CS.GamePlay.ObjectPool.ResetGameObject(self.mtransform.gameObject)
+  self.mtransform = nil
+  self.hasCheck = false
+  self.curEliminateType = CS.GamePlay.GamePlayUtil.EEliminateType.Default
+end
+
+
+
+-- function Block:onPointerDown(downPos)
+--     self.downPos = downPos
+--     print "shu biao dianxia lai le "
+--     print(self.downPos)
+-- end
+
+-- function Block:onPointerUp(upPos)
+--     --如果其他人正在操作
+--     if (self.blockManager.isOperation or self.isMoving)
+--     then
+--         return;--返回
+--     end
+--     self.pPos = upPos
+
+--     --获取方向
+--     local dir = self:GetDirection()
+
+--     self.blockManager.isOperation = true       --正在操作    
+--     self.blockManager:OperateBlock(this, dir)
+-- end
+
+
+function Block:BlockMove(targetRow, targetColumn,callback)
+
+    self.isMoving = true
+    local pos = self.blockManager.data.BlockManagerInfo.allPos[targetRow][targetColumn]
+    --self:BlockChange(targetRow, targetColumn)
+    self:SetBlockProperty(targetRow,targetColumn,self.curType,self.mtransform)
+    
+    local domove = self.mtransform:DOMove(pos, CS.GamePlay.GamePlayUtil.BlockMoveTime)
+    domove:OnComplete(function()
+        self.isMoving = false
+        callback()        
+      end)
+  end
+
+function Block:BlockChange(targetRow,targetColumn)
+    --改行列
+    self.blockRow = targetRow
+    self.blockColumn = targetColumn
+    self.blockManager.data.BlockManagerInfo.allBlocks[targetRow][targetColumn] = self
+end
+
+
+function Block:GetDirection()
+
+    --方向向量
+    local dir = self.upPos - self.downPos
+    --如果是横向滑动
+    if (math.abs(dir.x) > math.abs(dir.y))
+    then
+        --返回横向坐标
+        return CS.UnityEngine.Vector2(dir.x / math.abs(dir.x), 0);
+    else
+    
+        --返回纵向坐标
+        return CS.UnityEngine.Vector2(0, dir.y / math.abs(dir.y));
+    
+    end
+end
+
+function Block:CurrentBlockDrop(pos,dropover_callback)
+
+    self.isMoving = true
+    print(self.blockRow .. " ".. self.blockColumn .. " in drop")
+    --下落
+    local domove = self.mtransform:DOMove(pos, CS.GamePlay.GamePlayUtil.BlockMoveTime)
+    domove:OnComplete(function()
+        self.isMoving = false
+        print(self.blockRow .. " ".. self.blockColumn .. " drop over")
+        
+        dropover_callback()
+    --coroutine.resume( self.blockManager.coBlockExchange)   
+    end)
+end
+
+return Block

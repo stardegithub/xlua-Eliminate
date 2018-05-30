@@ -1,0 +1,43 @@
+IEliminateInit ={} 
+Block = require("Block")
+
+function IEliminateInit.Init(row,colunm,blockTypes,size,blockManager)
+    -- body
+    print(" here run IEliminateInit.Init")
+    local util = CS.GamePlay.GamePlayUtil
+    --local canvas = util.InstantiateGameObject(util.BlockCanvasPath)
+    local blockManagerInfo = blockManager.data.BlockManagerInfo
+    
+
+    CS.GamePlay.ObjectPool.GetGameObject(util.BlockCanvasPath, blockManagerInfo.blockParent) 
+    blockManagerInfo.blockParent = CS.UnityEngine.GameObject.Find("BlockParentPanel").transform
+
+
+    local offset = CS.UnityEngine.Vector2(0, 0) 
+    --生成ITEM
+    for i = 1,row,1 do
+        blockManagerInfo.allBlocks[i] = {}
+        blockManagerInfo.allPos[i] = {}
+        for j = 1, colunm,1 do
+            --生成
+            local currentBlockGo = CS.GamePlay.ObjectPool.GetGameObject(util.BlockPath, blockManagerInfo.blockParent) 
+            --设置坐标
+            currentBlockGo.transform.localPosition = CS.UnityEngine.Vector3(j * size, i * size, 0) + CS.UnityEngine.Vector3(offset.x, offset.y, 0) 
+            --随机图案编号
+            local random = util.Range(0, util.EBlockTypeToInt(util.EBlockType.Num)) 
+            --local random = Random.Range(0, (int)Util.EBlockType.Num) 
+            --获取Item组件
+            local current = Block:new(i, j,CS.GamePlay.GamePlayUtil.EBlockType.__CastFrom(random),currentBlockGo.transform,blockManager)
+
+            --current.Init(i, j, (Util.EBlockType)random) 
+            --保存到数组
+            blockManagerInfo.allBlocks[i][j] = current
+            --记录世界坐标
+            blockManagerInfo.allPos[i][j] = currentBlockGo.transform.position
+        end
+    end
+
+end
+
+
+return IEliminateInit

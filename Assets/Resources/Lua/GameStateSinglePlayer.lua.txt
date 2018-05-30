@@ -1,5 +1,9 @@
+local blockManager = require ("BlockManager")
+
+
 function enter()
-	print("game state single player enter")
+    print("game state single player enter")
+    blockManager:Init()
 end
 
 function exit()

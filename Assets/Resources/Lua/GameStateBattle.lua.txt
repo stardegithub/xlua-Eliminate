@@ -1,0 +1,10 @@
+function enter()
+
+    local obj = CS.GameManager.UIManager.Instance:OpenUI("UI/Battle/UI_Battle")
+    
+	print("game state battle enter")
+end
+
+function exit()
+    print("game state battle exit")
+end

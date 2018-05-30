@@ -1,0 +1,28 @@
+require ("EliminateFuncHealper")
+
+IEliminateCheckImpasse ={}
+
+function IEliminateCheckImpasse.CheckImpasse(allBlocks)
+    -- body
+    print("CheckImpasse")
+    local Vector2 = CS.UnityEngine.Vector2
+
+    for i,v in ipairs(allBlocks)
+    do
+        for j,block in ipairs(v)
+        do
+            if (IsMoveCanEliminate(block, Vector2.up, allBlocks)
+            or IsMoveCanEliminate(block, Vector2.down, allBlocks)
+            or IsMoveCanEliminate(block, Vector2.left, allBlocks)
+            or IsMoveCanEliminate(block, Vector2.right, allBlocks))
+            then
+                return false
+            end
+        end
+    end
+    UpsetBlock(allBlocks)
+    return true
+    
+end
+
+return IEliminateCheckImpasse

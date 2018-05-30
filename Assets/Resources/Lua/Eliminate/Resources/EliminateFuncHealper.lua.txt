@@ -1,0 +1,360 @@
+
+--/ <summary>
+--/ 填充相同Item列表  
+--/ </summary>
+function FillSameBlocksList(sameBlocksList,current,allBlocks)
+
+    --如果已存在，跳过
+    for i,block in ipairs(sameBlocksList)
+    do
+        if(block == current)
+        then 
+            return 
+        end
+    end
+    --添加到列表
+    table.insert(sameBlocksList,current)
+    --上下左右的Item
+    tempBlockList = GetAroundBlock(current, allBlocks)
+
+    for i,block in ipairs(tempBlockList)
+    do
+        --如果Item不合法，跳过
+        if (block.mtransform ~= nil and current.curType == block.curType)
+        then
+            FillSameBlocksList(sameBlocksList, block, allBlocks)
+        end
+    end
+end
+
+function GetEliminateList(current, sameBlocksList,allBlocks)
+    local eliminateList = {}
+    --计数器
+    local rowCount = 0
+    local columnCount = 0
+    --临时列表
+    local rowTempList = {}
+    local columnTempList = {}
+    --/横向纵向检测
+    for i,block in ipairs(sameBlocksList)
+    do
+        --如果在同一行
+        if (block.blockRow == current.blockRow)
+        then
+            --判断该点与Curren中间有无间隙
+            local rowCanBoom = CheckBlocksInterval(true, current, block, allBlocks)
+            if (rowCanBoom)
+            then
+                --计数
+                rowCount = rowCount + 1
+                --添加到行临时列表
+                table.insert(rowTempList,block)
+            end
+        end
+        --如果在同一列
+        if (block.blockColumn == current.blockColumn)
+        then
+            --判断该点与Curren中间有无间隙
+            local columnCanBoom = CheckBlocksInterval(false, current, block, allBlocks)
+            if (columnCanBoom)
+            then
+                --计数
+                columnCount = columnCount + 1
+                --添加到列临时列表
+                table.insert(columnTempList,block )
+            end
+        end
+    end
+    --横向消除
+    local horizontalBoom = false
+    --如果横向三个以上
+    if (rowCount > 2)
+    then
+        --将临时列表中的Item全部放入BoomList
+        for i,v in ipairs(rowTempList)
+        do
+            table.insert(eliminateList,v)
+        end
+        --横向消除
+        horizontalBoom = true
+    end
+    --如果纵向三个以上
+    if (columnCount > 2)
+    then
+        if (horizontalBoom)
+        then
+            --剔除自己
+            --table.remove(eliminateList)
+            for i,v in ipairs(eliminateList)
+            do
+                if(v == current)
+                then
+                    table.remove(eliminateList,i)        
+                    break            
+                end
+            end
+        end
+        --将临时列表中的Item全部放入BoomList
+        for i,v in ipairs(columnTempList)
+        do
+            table.insert(eliminateList,v)            
+        end
+    end
+    return eliminateList
+end
+
+
+--/ 检测item向dir方向移动一格是否可消除
+function IsMoveCanEliminate(block, dir,allBlocks)
+
+    local tableRow = #allBlocks
+    local tableColumn = #allBlocks[1]    
+    
+    --获取目标行列
+    local targetRow = block.blockRow + math.ceil(dir.y)
+    local targetColumn = block.blockColumn + math.ceil(dir.x)
+    --检测合法
+    local isLagal = CheckRCLegal(targetRow, targetColumn, tableRow, tableColumn)
+    if (isLagal == false)
+    then
+        return false
+    end
+    --获取目标
+    local target = allBlocks[targetRow][targetColumn]
+    --从全局列表中获取当前item，查看是否已经被消除，被消除后不能再交换
+    local myBlock = allBlocks[block.blockRow][block.blockColumn]
+    if (target.mtransform == nil or myBlock.mtransform == nil)
+    then
+        return false
+    end
+    --相互移动
+    -- target.BlockMove(block.blockRow, block.blockColumn, Vector3.zero, false)
+    -- block.BlockMove(targetRow, targetColumn, Vector3.zero, false)
+    -- target:BlockChange(block.blockRow, block.blockColumn)
+    -- block:BlockChange(targetRow, targetColumn)
+    target:SetBlockProperty(block.blockRow,block.blockColumn,target.curType,target.mtransform)
+    block:SetBlockProperty(targetRow,targetColumn,block.curType,block.mtransform)
+    
+
+
+    --返回值
+    local isok = true
+    --消除检测	
+
+    local sameBlocksList = {}
+    FillSameBlocksList(sameBlocksList, block, allBlocks)
+    local eliminateList = GetEliminateList(block, sameBlocksList, allBlocks)
+
+    local count = 0
+    for i,v in ipairs(eliminateList)
+    do
+        count = count + 1
+    end
+    if(count >1)
+    then
+        isok = true
+    else
+        isok = false
+    end
+    --还原	
+    --临时行列
+    local tempRow = myBlock.blockRow
+    local tempColumn = myBlock.blockColumn 
+    --移动
+    -- block:BlockChange(target.blockRow, target.blockColumn)
+    -- target:BlockChange(tempRow, tempColumn)
+
+    block:SetBlockProperty(target.blockRow,target.blockColumn,block.curType,block.mtransform)
+    target:SetBlockProperty(tempRow,tempColumn,target.curType,target.mtransform)
+
+    return isok
+end
+
+--/ 检测两个Item之间是否有间隙（图案不一致）
+function CheckBlocksInterval(isHorizontal,beginBlock,endBlock,allBlocks)
+    --获取图案
+    local type = beginBlock.curType
+    --如果是横向
+    if (isHorizontal)
+    then
+        --起点终点列号
+        local beginIndex = beginBlock.blockColumn
+        local endIndex = endBlock.blockColumn
+        --如果起点在右，交换起点终点列号
+        if (beginIndex > endIndex)
+        then
+            beginIndex = endBlock.blockColumn
+            endIndex = beginBlock.blockColumn
+        end
+        --遍历中间的Item
+        for i = beginIndex + 1, endIndex -1 ,1
+        do
+            --异常处理（中间未生成，标识为不合法）
+            if (allBlocks[beginBlock.blockRow][i].mtransform == nil)
+            then
+                return false
+            end
+            --如果中间有间隙（有图案不一致的）
+            if (allBlocks[beginBlock.blockRow][i].curType ~= type)
+            then
+                return false
+            end
+        end
+        return true
+    else
+    
+        --起点终点行号
+        local beginIndex = beginBlock.blockRow
+        local endIndex = endBlock.blockRow
+        --如果起点在上，交换起点终点列号
+        if (beginIndex > endIndex)
+        then
+            beginIndex = endBlock.blockRow
+            endIndex = beginBlock.blockRow
+        end
+        --遍历中间的Item
+        for i = beginIndex + 1, endIndex -1, 1
+        do
+            --如果中间有间隙（有图案不一致的）
+            if (allBlocks[i][beginBlock.blockColumn].curType ~= type)
+            then
+                return false
+            end
+        end
+        return true
+    end
+end
+
+function GetAroundBlock(current,allBlocks)
+    local blocks = {}
+    local tableRow = #allBlocks
+    local tableColumn = #allBlocks[1]
+    --up
+    local row = current.blockRow + 1
+    local column = current.blockColumn
+    if (CheckRCLegal(row, column, tableRow, tableColumn) and allBlocks[row][column].mtransform ~= nil)
+    then
+        table.insert(blocks,allBlocks[row][column])
+    end
+    --down
+    row = current.blockRow - 1
+    column = current.blockColumn
+    if (CheckRCLegal(row, column, tableRow, tableColumn)and allBlocks[row][column].mtransform ~= nil)
+    then
+        table.insert(blocks,allBlocks[row][column])
+    end
+    --left
+    row = current.blockRow
+    column = current.blockColumn - 1
+    if (CheckRCLegal(row, column, tableRow, tableColumn)and allBlocks[row][column].mtransform ~= nil)
+    then
+        table.insert(blocks,allBlocks[row][column])
+    end
+    --right
+    row = current.blockRow
+    column = current.blockColumn + 1
+    if (CheckRCLegal(row, column, tableRow, tableColumn)and allBlocks[row][column].mtransform ~= nil)
+    then
+        table.insert(blocks,allBlocks[row][column])
+    end
+
+    return blocks
+end
+
+--/ 检测行列是否合法
+function CheckRCLegal(row, column,tableRow,tableColumn)
+    if (row >= 1 and row <= tableRow and column >= 1 and column <= tableColumn)
+    then
+        return true
+    end
+    return false
+end
+
+--/ <summary>
+--/ 洗牌
+--/ </summary>
+--/ <returns><c>true</c>, if RC legal was checked, <c>false</c> otherwise.</returns>
+function UpsetBlock(allBlocks)
+    local util = CS.GamePlay.GamePlayUtil
+    for i,v in ipairs(allBlocks)
+    do
+        for j,block in ipairs(v)
+        do
+            if (block.mtransform ~= nil)
+            then
+                --随机数
+                local random = util.Range(0, util.EBlockTypeToInt(util.EBlockType.Num))
+                block:SetBlockProperty(block.blockRow,block.blockColumn, util.EBlockType.__CastFrom(random),block.mtransform)
+            end
+        end
+    end
+end
+
+function CheckEliminateType(curBlock,checkBlockList)
+    local leftNum = 0
+    local rightNum = 0
+    local topNum = 0
+    local bottomNum = 0
+
+    local curRow = curBlock.blockRow
+    local curCloumn = curBlock.blockColumn
+
+    local util = CS.GamePlay.GamePlayUtil
+
+    for i,checkBlock in ipairs(checkBlockList)
+    do
+        if (checkBlock.blockRow == curRow)--同列
+        then
+            if (checkBlock.blockColumn > curCloumn)--右边
+            then
+                rightNum = rightNum + 1
+            elseif (checkBlock.blockColumn < curCloumn)--左边
+            then
+                leftNum = leftNum + 1
+            end
+        end
+        if (checkBlock.blockColumn == curCloumn)--同行
+        then
+            if (checkBlock.blockRow > curRow)--上边
+            then
+                topNum = topNum + 1
+            elseif (checkBlock.blockRow < curRow)--下边
+            then
+                bottomNum = bottomNum + 1
+            end
+        end
+    end
+    local ret = util.EEliminateType.Default
+
+    if (rightNum + leftNum >= 3 or topNum + bottomNum >= 3)--直线型
+    then
+
+        print("直线")
+        ret = util.EEliminateType.Itype
+    end
+
+    if (rightNum >= 1 and leftNum >= 1 and topNum >= 1 and bottomNum >= 1)--十字
+    then
+        print("十字")
+        ret = util.EEliminateType.Xtype
+    end
+
+    if ((rightNum * leftNum * topNum * bottomNum == 0) and
+    ((rightNum >= 1 and leftNum >= 1 and topNum + bottomNum >= 2) or topNum >= 1 and bottomNum >= 1 and rightNum + leftNum >= 2))--T字
+    then
+        print("t字")
+        ret = util.EEliminateType.Ttype
+    end
+
+    if ((rightNum >= 2 and leftNum == 0 and topNum >= 2 and bottomNum == 0) or
+    (rightNum >= 2 and leftNum == 0 and topNum == 0 and bottomNum >= 2) or
+    (rightNum == 0 and leftNum >= 2 and topNum == 0 and bottomNum >= 2) or
+    (rightNum == 0 and leftNum >= 2 and topNum >= 2 and bottomNum == 0))--L字
+    then
+        print("l字")
+        ret = util.EEliminateType.Ltype
+    end
+
+    return ret
+end
+

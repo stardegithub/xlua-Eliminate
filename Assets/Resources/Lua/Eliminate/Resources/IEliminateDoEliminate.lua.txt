@@ -1,0 +1,14 @@
+IEliminateDoEliminate = {}
+
+function IEliminateDoEliminate.DoEliminate(eliminateList,allBlocks)
+    -- body
+    print("DoEliminate")
+    for i,block in ipairs(eliminateList)
+    do
+        --allBlocks[block.blockRow][block.blockColumn].mtransform = nil
+        block:EliminateSelf()
+    end
+
+end
+
+return IEliminateDoEliminate

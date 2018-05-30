@@ -1,0 +1,294 @@
+require ("EliminateFuncHealper")
+BlockManager = {}
+-- BlockManager.BlockManagerInfo = 
+-- {
+--     allBlocks = {},
+--     allPos = {},
+--     blockParent = CS.UnityEngine.GameObject.Find("BlockParentPanel").transform --可优化，暂时不知如何效率获取transform
+-- }
+-- --manager存储的信息
+BlockManager.data = nil
+-- --是否有操作在进行
+-- BlockManager.isOperation = false
+-- --ITEM的边长
+-- BlockManager.BlockSize = 0
+-- --实现接口的实例
+-- BlockManager.eliminateFunc = {}
+-- --本次游戏的block类型列表
+-- --private List<Util.EBlockType> blockTypes = new List<Util.EBlockType>()
+-- BlockManager.blockTypes = {}
+-- --行列
+-- BlockManager.tableRow = 5
+-- BlockManager.tableColumn = 5
+
+function awake()
+    BlockManager:Init()
+
+end
+
+function BlockManager:Init()
+
+    self.data = require("BlockManagerData")
+    
+   --获取借口实现，对应各个lua脚本
+    --eliminateFunc = new EliminateFunction()
+    self.data.eliminateFunc["Init"] = require("IEliminateInit") 
+    self.data.eliminateFunc["CheckImpasse"] = require("IEliminateCheckImpasse") 
+    self.data.eliminateFunc["CheckEliminate"] = require("IEliminateCheckEliminate") 
+    self.data.eliminateFunc["DoEliminate"] = require("IEliminateDoEliminate") 
+    self.data.eliminateFunc["GenerateBlocks"] = require("IEliminateGenerateBlocks") 
+    self.data.eliminateFunc["Operation"] = require("IEliminateOperation") 
+    
+
+    self.data.blockTypes[1] = CS.GamePlay.GamePlayUtil.EBlockType.Apple
+    self.data.blockTypes[2] = CS.GamePlay.GamePlayUtil.EBlockType.Banana
+    self.data.blockTypes[3] = CS.GamePlay.GamePlayUtil.EBlockType.Pear
+    self.data.blockTypes[4] = CS.GamePlay.GamePlayUtil.EBlockType.Grape
+    self.data.blockTypes[5] = CS.GamePlay.GamePlayUtil.EBlockType.Lemon
+
+    --下列之后应读配置数据
+    self.data.BlockSize = self:GetBlockSize()
+    print(self.transform)
+    self:InitGame()
+end
+
+--/ 获取Item边长
+function BlockManager:GetBlockSize()
+    return 100
+end
+
+--/ 初始化游戏
+function BlockManager:InitGame()
+    self.data.eliminateFunc["Init"].Init(self.data.tableRow, self.data.tableColumn, self.data.blockTypes, self.data.BlockSize,self)
+    self:CheckAllBlockEliminate()
+end
+
+function BlockManager:CheckAllBlockEliminate()
+    local checkBlockList = {}
+    for i,v in ipairs(self.data.BlockManagerInfo.allBlocks)
+    do
+        for j,j_v in ipairs(v)
+        do
+            table.insert(checkBlockList,j_v)
+        end
+    end  
+    local eliminatelist = self.data.eliminateFunc["CheckEliminate"].CheckEliminate(checkBlockList, self.data.BlockManagerInfo.allBlocks)
+    checkBlockList = {}
+    self:EliminateBlock(eliminatelist)
+end
+
+function BlockManager:EliminateBlock(eliminateList)
+    local count = 0
+    for i,v in ipairs(eliminateList)
+    do
+        count = count + 1
+    end
+    
+    --有消除
+    if (count > 0)
+    then
+        self.data.isOperation = true        
+        self:ManipulateBoomList(eliminateList)
+        -- local co = coroutine.create(self.ManipulateBoomList)        
+        -- coroutine.resume(co,self,eliminateList) 
+        
+        -- while("deaded" == coroutine.status( co ) )
+        -- do
+        --    break -- coroutine.yield()
+        -- end
+        --StartCoroutine(ManipulateBoomList(eliminateList))
+    else
+        
+        if (self.data.eliminateFunc["CheckImpasse"].CheckImpasse(self.data.BlockManagerInfo.allBlocks))
+        then
+            print("impasse true")
+            self:CheckAllBlockEliminate()
+            --Debug.Log("here  cant eliminate!")
+        end
+        --操作结束
+        self.data.isOperation = false
+    end
+end
+
+
+--/ 处理BoomList
+function BlockManager:ManipulateBoomList(tempBoomList)
+    self.data.eliminateFunc["DoEliminate"].DoEliminate(tempBoomList, self.data.BlockManagerInfo.allBlocks)
+    --开启下落
+    local coGenerate = coroutine.create(self.Generate)
+    assert(coroutine.resume(coGenerate,self,function()
+        assert(coroutine.resume(coGenerate))
+    end) )
+    -- while("deaded" == coroutine.status(coGenerate ) )
+    -- do
+    --     break -- coroutine.yield()
+    -- end
+    
+    --yield return StartCoroutine(Generate())
+end
+
+--/ Items下落
+function BlockManager:Generate(dropover_callback)
+    
+    self.data.isOperation = true
+
+    self.data.eliminateFunc["GenerateBlocks"].GenerateBlocks(self.data,dropover_callback)
+
+    local isDropOver = false
+    local allBlocksList = {}
+   
+    while (not(isDropOver))
+    do        
+        local isbreak = false    
+
+        for i,v in ipairs(self.data.BlockManagerInfo.allBlocks)
+        do
+            for j,block in ipairs(v)
+            do
+                if(block.isMoving)
+                then
+                    isbreak = true
+                    break
+                end
+            end
+        end
+
+        if(not(isbreak))
+        then
+            isDropOver = true
+            break
+        end
+        coroutine.yield()
+    end
+    print("drop over")
+    self:CheckAllBlockEliminate()
+end
+
+
+function BlockManager:OperateBlock(curBlock,dir)
+    --点击异常处理
+    if (dir.magnitude ~= 1)
+    then
+        self.data.isOperation = false
+        return
+    end
+
+    --获取目标行列
+    local targetRow = curBlock.blockRow + math.ceil(dir.y)
+    local targetColumn = curBlock.blockColumn + math.ceil(dir.x)
+    
+    --检测合法
+    local isLagal = CheckRCLegal(targetRow, targetColumn,self.data.tableRow,self.data.tableColumn)
+    if (not(isLagal))
+    then
+        self.data.isOperation = false
+        --不合法跳出
+        return
+    end
+    --获取目标
+    local targetBlock = self.data.BlockManagerInfo.allBlocks[targetRow][targetColumn]
+
+    if (targetBlock.mtransform == nil or curBlock.mtransform == nil)
+    then
+        self.data.isOperation = false
+        --Item已经被消除
+        return
+    end
+
+    local coBlockExchange = coroutine.create( self.BlockExchange)
+    assert(coroutine.resume(coBlockExchange,self,curBlock,targetBlock,function()
+        print(coBlockExchange)
+        assert(coroutine.resume( coBlockExchange) )
+    end))
+    --StartCoroutine(BlockExchange(curBlock, targetBlock))
+end
+
+function BlockManager:BlockExchange(curBlock,targetBlock,callback)
+    self.data.eliminateFunc["Operation"].Operation(curBlock, targetBlock,self,callback)
+
+    while (curBlock.isMoving or targetBlock.isMoving)
+    do
+        coroutine.yield() --等待所有block移动结束
+    end
+
+    print("block move over")
+    
+    --还原标志位
+    local reduction = false
+
+    --消除处理
+    local checkBlockList = {}
+    table.insert( checkBlockList,curBlock)
+    table.insert( checkBlockList,targetBlock)
+
+    local eliminateList = self.data.eliminateFunc["CheckEliminate"].CheckEliminate(checkBlockList, self.data.BlockManagerInfo.allBlocks)
+    if (#eliminateList > 0)
+    then
+        self:EliminateBlock(eliminateList)
+        reduction = false
+    else
+        reduction = true
+    end
+    --还原
+    if (reduction)
+    then
+
+        --临时行列
+        local tempRow = curBlock.blockRow
+        local tempColumn = curBlock.blockColumn
+        --移动
+        self.data.eliminateFunc["Operation"].Operation(targetBlock, curBlock,self,callback)
+
+        while (curBlock.isMoving or targetBlock.isMoving)
+        do
+            coroutine.yield()
+        end
+        --操作完毕
+        self.data.isOperation = false
+    end
+end
+
+-- --/ 检测行列是否合法
+-- function CheckRCLegal(row, column)
+--     if (row >= 0 and row < self.data.tableRow and column >= 0 and column < self.data.tableColumn)
+--     then
+--         return true
+--     else
+--         return false            
+--     end
+-- end
+
+
+function update()
+
+    -- if (Input.GetKeyDown(KeyCode.Space))
+    -- {
+    --     UnityEngine.SceneManagement.SceneManager.LoadScene(0)
+    -- }
+end
+
+function printallblock(allblocks)
+    local printstr = ""
+    print("-----------------------------------")
+    for i = #allblocks,1,-1
+    do
+        for j=1,#allblocks[1],1
+        do
+            local a = 1
+            if(allblocks[i][j].mtransform == nil)
+            then
+                a = 0
+            end
+            --printstr = printstr .. allblocks[i][j].blockRow .. allblocks[i][j].blockColumn .."_" ..  a  .. "*"
+            printstr = printstr .. tostring(allblocks[i][j].curType) .. "*"
+            
+        end
+        print(printstr)
+        printstr = ""
+    end
+    print("-----------------------------------")
+    
+
+end
+
+return BlockManager

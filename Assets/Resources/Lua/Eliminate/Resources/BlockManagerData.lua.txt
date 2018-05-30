@@ -1,0 +1,22 @@
+return{
+
+    BlockManagerInfo = 
+    {
+        allBlocks = {},
+        allPos = {},
+        blockParent = nil --CS.UnityEngine.GameObject.Find("BlockParentPanel").transform --可优化，暂时不知如何效率获取transform
+    },
+    
+    --manager存储的信息
+    --是否有操作在进行
+    isOperation = false,
+    --ITEM的边长
+    BlockSize = 0,
+    --实现接口的实例
+    eliminateFunc = {},
+    --本次游戏的block类型列表
+    blockTypes = {},
+    --行列
+    tableRow = 5,
+    tableColumn = 5
+}

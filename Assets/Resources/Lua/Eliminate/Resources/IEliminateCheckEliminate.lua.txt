@@ -1,0 +1,46 @@
+require ("EliminateFuncHealper")
+
+IEliminateCheckEliminate = {}
+
+function IEliminateCheckEliminate.CheckEliminate(checkBlockList,allBlocks )
+    local ret = {}
+    -- body
+    print("CheckEliminate")
+
+    for i,block in ipairs(checkBlockList)
+    do
+        --指定位置的Item存在，且没有被检测过
+        if ((block.mtransform ~= nil ) and (block.hasCheck == false))
+        then
+            --检测周围的消除
+            local sameBlocksList = {}
+
+            FillSameBlocksList(sameBlocksList, block, allBlocks)
+            local eliminateList = GetEliminateList(block, sameBlocksList, allBlocks)
+            --避免重复加入列表
+            for j,newblock in ipairs(eliminateList)
+            do
+                local hasInsert = false
+                for k,oldblock in ipairs(ret)
+                do
+                    if(newblock == oldblock)
+                    then
+                        hasInsert = true
+                        break
+                    end
+                end
+
+                if(hasInsert == false) --还没有被加入队列
+                then
+                    table.insert(ret,newblock) --默认在末尾插入
+                    block.curEliminateType = CheckEliminateType(newblock, eliminateList)
+                    newblock.hasCheck = true
+                end
+            
+            end
+        end
+    end
+    return ret
+end
+
+return IEliminateCheckEliminate

@@ -1,0 +1,20 @@
+Text = "123"
+
+function awake()
+	print("awake")
+end
+
+function update()
+	-- print("update")
+end
+
+function onbtnclick1()
+	print("onbtnclick1")
+	set("Text", "onbtnclick1")
+end
+
+function onbtnclick2()
+	print("onbtnclick2")
+	-- CS.GameManager.UIManager.Instance:CloseUI("UI/Login/UI_Login")
+	CS.GameManager.GameStateManager.Instance:SetNextState("GameStateHome")
+end
